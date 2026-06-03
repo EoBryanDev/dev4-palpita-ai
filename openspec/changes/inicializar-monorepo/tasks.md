@@ -21,8 +21,8 @@
 
 - [x] 4.1 Criar a pasta apps/web e inicializar o Next.js com App Router. (Status: DONE, Início: 03:22, Concluído: 03:26)
 - [x] 4.2 Configurar o Tailwind CSS e shadcn/ui em apps/web para suporte nativo a temas (Light/Dark). (Status: DONE, Início: 03:27, Concluído: 03:29)
-- [/] 4.3 Configurar o Biome e o Vitest no subprojeto apps/web. (Status: IN_PROGRESS, Início: 03:30)
-- [ ] 4.4 Ligar as dependências locais de packages/core e packages/db em apps/web para importar os tipos e regras.
+- [x] 4.3 Configurar o Biome e o Vitest no subprojeto apps/web. (Status: DONE, Início: 03:30, Concluído: 03:31)
+- [/] 4.4 Ligar as dependências locais de packages/core e packages/db em apps/web para importar os tipos e regras. (Status: IN_PROGRESS, Início: 03:32)
 - [ ] 4.5 Criar uma versão esqueleto da rota pública `/home` (com Banner de Timeout e Toggle de Tema) e da rota `/validation-user/[id]` para validação de tokens.
 
 ## 5. Validação Final de Qualidade
