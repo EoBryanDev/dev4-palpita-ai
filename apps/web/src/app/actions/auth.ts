@@ -56,7 +56,7 @@ export async function loginUsuario(
       };
     }
 
-    if (usuario.status !== 'ATIVO') {
+    if (usuario.status !== 'ATIVO' && usuario.status !== 'LIBERADO') {
       return {
         success: false,
         message: 'Sua conta está pendente de liberação ou inativa.',

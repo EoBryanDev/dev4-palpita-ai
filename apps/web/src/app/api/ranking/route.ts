@@ -1,10 +1,10 @@
 import { db, palpites, partidas, usuarios } from '@palpita/db';
-import { eq } from 'drizzle-orm';
+import { eq, or } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 export async function GET(): Promise<NextResponse> {
   try {
-    // 1. Buscar usuários ativos
+    // 1. Buscar usuários ativos ou liberados
     const activeUsers = await db
       .select({
         id: usuarios.id,
@@ -12,7 +12,7 @@ export async function GET(): Promise<NextResponse> {
         email: usuarios.email,
       })
       .from(usuarios)
-      .where(eq(usuarios.status, 'ATIVO'));
+      .where(or(eq(usuarios.status, 'ATIVO'), eq(usuarios.status, 'LIBERADO')));
 
     // 2. Buscar partidas finalizadas
     const finishedMatches = await db

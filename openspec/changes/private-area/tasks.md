@@ -6,10 +6,10 @@
 
 ## 2. Página Meu Espaço (Dashboard do Competidor)
 
-- [ ] 2.1 Criar a página `/meu-espaço` (RSC) exibindo o resumo do usuário (pontos acumulados e posição no ranking geral) obtido dinamicamente.
-- [ ] 2.2 Listar partidas da rodada com status de palpites pendentes, bloqueando após o horário de início da partida (RN02).
-- [ ] 2.3 Implementar o salvamento de palpites validando o prazo (RN02) e o status de liberação do usuário (RN05).
-- [ ] 2.4 Criar testes de componente para o Dashboard e formulário de palpites.
+- [x] 2.1 Criar a página `/meu-espaço` (RSC) exibindo o resumo do usuário (pontos acumulados e posição no ranking geral) obtido dinamicamente. (Status: DONE, Início: 20:41, Concluído: 20:44)
+- [x] 2.2 Listar partidas da rodada com status de palpites pendentes, bloqueando após o horário de início da partida (RN02). (Status: DONE, Início: 20:41, Concluído: 20:44)
+- [x] 2.3 Implementar o salvamento de palpites validando o prazo (RN02) e o status de liberação do usuário (RN05). (Status: DONE, Início: 20:41, Concluído: 20:44)
+- [x] 2.4 Criar testes de componente para o Dashboard e formulário de palpites. (Status: DONE, Início: 20:41, Concluído: 20:44)
 
 ## 3. Painel Administrativo de Convites e Usuários (/admin/usuarios)
 

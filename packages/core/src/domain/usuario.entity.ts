@@ -1,4 +1,4 @@
-export type TUsuarioStatus = 'PENDENTE' | 'ATIVO' | 'DESATIVADO';
+export type TUsuarioStatus = 'PENDENTE' | 'ATIVO' | 'DESATIVADO' | 'LIBERADO';
 export type TUsuarioCargo = 'ADMIN' | 'COLABORADOR';
 
 export interface IUsuarioProps {
@@ -64,6 +64,10 @@ export class Usuario {
 
   public ativar(): void {
     this._status = 'ATIVO';
+  }
+
+  public liberar(): void {
+    this._status = 'LIBERADO';
   }
 
   public desativar(): void {
