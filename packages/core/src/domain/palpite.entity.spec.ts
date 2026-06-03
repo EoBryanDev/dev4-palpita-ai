@@ -1,0 +1,221 @@
+import { describe, expect, it } from 'vitest';
+import { Palpite } from './palpite.entity';
+
+describe('Palpite Entity', () => {
+  it('deve criar um palpite com propriedades corretas', () => {
+    const props = {
+      id: 'palpite-1',
+      usuarioId: 'usuario-1',
+      partidaId: 'partida-1',
+      golsTimeA: 2,
+      golsTimeB: 1,
+      dataCriacao: new Date(),
+      dataAtualizacao: new Date(),
+    };
+
+    const palpite = new Palpite(props);
+
+    expect(palpite.id).toBe(props.id);
+    expect(palpite.usuarioId).toBe(props.usuarioId);
+    expect(palpite.partidaId).toBe(props.partidaId);
+    expect(palpite.golsTimeA).toBe(2);
+    expect(palpite.golsTimeB).toBe(1);
+  });
+
+  it('deve lancar erro ao criar palpite com gols negativos', () => {
+    const props = {
+      id: 'palpite-1',
+      usuarioId: 'usuario-1',
+      partidaId: 'partida-1',
+      golsTimeA: -1,
+      golsTimeB: 1,
+      dataCriacao: new Date(),
+      dataAtualizacao: new Date(),
+    };
+
+    expect(() => new Palpite(props)).toThrow('Gols nao podem ser negativos');
+  });
+
+  describe('RN02 - Bloqueio de Horario', () => {
+    it('deve permitir atualizar palpite antes do inicio da partida', () => {
+      const dataInicioPartida = new Date('2026-06-15T15:00:00Z');
+      const dataReferencia = new Date('2026-06-15T14:59:00Z'); // 1 minuto antes
+
+      const palpite = new Palpite({
+        id: 'palpite-1',
+        usuarioId: 'usuario-1',
+        partidaId: 'partida-1',
+        golsTimeA: 1,
+        golsTimeB: 1,
+        dataCriacao: new Date(),
+        dataAtualizacao: new Date(),
+      });
+
+      palpite.atualizarPlacar(2, 0, dataInicioPartida, dataReferencia);
+
+      expect(palpite.golsTimeA).toBe(2);
+      expect(palpite.golsTimeB).toBe(0);
+      expect(palpite.dataAtualizacao).toBe(dataReferencia);
+    });
+
+    it('deve lancar erro ao tentar atualizar palpite no horario exato do inicio da partida', () => {
+      const dataInicioPartida = new Date('2026-06-15T15:00:00Z');
+      const dataReferencia = new Date('2026-06-15T15:00:00Z'); // Mesma data/hora
+
+      const palpite = new Palpite({
+        id: 'palpite-1',
+        usuarioId: 'usuario-1',
+        partidaId: 'partida-1',
+        golsTimeA: 1,
+        golsTimeB: 1,
+        dataCriacao: new Date(),
+        dataAtualizacao: new Date(),
+      });
+
+      expect(() =>
+        palpite.atualizarPlacar(2, 0, dataInicioPartida, dataReferencia),
+      ).toThrow('Prazo para palpitar nesta partida expirou');
+    });
+
+    it('deve lancar erro ao tentar atualizar palpite apos o inicio da partida', () => {
+      const dataInicioPartida = new Date('2026-06-15T15:00:00Z');
+      const dataReferencia = new Date('2026-06-15T15:05:00Z'); // 5 minutos depois
+
+      const palpite = new Palpite({
+        id: 'palpite-1',
+        usuarioId: 'usuario-1',
+        partidaId: 'partida-1',
+        golsTimeA: 1,
+        golsTimeB: 1,
+        dataCriacao: new Date(),
+        dataAtualizacao: new Date(),
+      });
+
+      expect(() =>
+        palpite.atualizarPlacar(2, 0, dataInicioPartida, dataReferencia),
+      ).toThrow('Prazo para palpitar nesta partida expirou');
+    });
+  });
+
+  describe('RN01 - Calculo de Pontuacao', () => {
+    it('deve retornar 0 pontos se a partida nao tiver resultado lancado (gols nulos)', () => {
+      const palpite = new Palpite({
+        id: 'palpite-1',
+        usuarioId: 'usuario-1',
+        partidaId: 'partida-1',
+        golsTimeA: 2,
+        golsTimeB: 1,
+        dataCriacao: new Date(),
+        dataAtualizacao: new Date(),
+      });
+
+      const pontos = palpite.calcularPontos(null, null);
+      expect(pontos).toBe(0);
+    });
+
+    it('deve atribuir 1 ponto se o placar exato for identico (Vitoria do Time A)', () => {
+      const palpite = new Palpite({
+        id: 'palpite-1',
+        usuarioId: 'usuario-1',
+        partidaId: 'partida-1',
+        golsTimeA: 2,
+        golsTimeB: 1,
+        dataCriacao: new Date(),
+        dataAtualizacao: new Date(),
+      });
+
+      const pontos = palpite.calcularPontos(2, 1);
+      expect(pontos).toBe(1);
+    });
+
+    it('deve atribuir 1 ponto se errar placar mas acertar vencedor (Vitoria do Time A com placar diferente)', () => {
+      const palpite = new Palpite({
+        id: 'palpite-1',
+        usuarioId: 'usuario-1',
+        partidaId: 'partida-1',
+        golsTimeA: 3,
+        golsTimeB: 0,
+        dataCriacao: new Date(),
+        dataAtualizacao: new Date(),
+      });
+
+      const pontos = palpite.calcularPontos(2, 1);
+      expect(pontos).toBe(1);
+    });
+
+    it('deve atribuir 0 pontos se errar o vencedor (Palpitou Vitoria do Time A, mas deu Vitoria do Time B)', () => {
+      const palpite = new Palpite({
+        id: 'palpite-1',
+        usuarioId: 'usuario-1',
+        partidaId: 'partida-1',
+        golsTimeA: 2,
+        golsTimeB: 1,
+        dataCriacao: new Date(),
+        dataAtualizacao: new Date(),
+      });
+
+      const pontos = palpite.calcularPontos(0, 3);
+      expect(pontos).toBe(0);
+    });
+
+    it('deve atribuir 1 ponto se acertar o empate com placar exato', () => {
+      const palpite = new Palpite({
+        id: 'palpite-1',
+        usuarioId: 'usuario-1',
+        partidaId: 'partida-1',
+        golsTimeA: 1,
+        golsTimeB: 1,
+        dataCriacao: new Date(),
+        dataAtualizacao: new Date(),
+      });
+
+      const pontos = palpite.calcularPontos(1, 1);
+      expect(pontos).toBe(1);
+    });
+
+    it('deve atribuir 1 ponto se acertar o empate com placar diferente', () => {
+      const palpite = new Palpite({
+        id: 'palpite-1',
+        usuarioId: 'usuario-1',
+        partidaId: 'partida-1',
+        golsTimeA: 2,
+        golsTimeB: 2,
+        dataCriacao: new Date(),
+        dataAtualizacao: new Date(),
+      });
+
+      const pontos = palpite.calcularPontos(1, 1);
+      expect(pontos).toBe(1);
+    });
+
+    it('deve atribuir 0 pontos se palpitar empate mas jogo teve vencedor', () => {
+      const palpite = new Palpite({
+        id: 'palpite-1',
+        usuarioId: 'usuario-1',
+        partidaId: 'partida-1',
+        golsTimeA: 1,
+        golsTimeB: 1,
+        dataCriacao: new Date(),
+        dataAtualizacao: new Date(),
+      });
+
+      const points = palpite.calcularPontos(2, 1);
+      expect(points).toBe(0);
+    });
+
+    it('deve atribuir 0 pontos se palpitar vencedor mas jogo terminou empatado', () => {
+      const palpite = new Palpite({
+        id: 'palpite-1',
+        usuarioId: 'usuario-1',
+        partidaId: 'partida-1',
+        golsTimeA: 2,
+        golsTimeB: 1,
+        dataCriacao: new Date(),
+        dataAtualizacao: new Date(),
+      });
+
+      const points = palpite.calcularPontos(1, 1);
+      expect(points).toBe(0);
+    });
+  });
+});

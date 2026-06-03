@@ -1,0 +1,25 @@
+{
+  "name": "@palpita/db",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@palpita/core": "workspace:*",
+    "drizzle-orm": "^0.31.2",
+    "postgres": "^3.4.4"
+  },
+  "devDependencies": {
+    "@palpita/tsconfig": "workspace:*",
+    "dotenv": "^16.4.5",
+    "drizzle-kit": "^0.22.7",
+    "typescript": "^5.4.5"
+  }
+}
