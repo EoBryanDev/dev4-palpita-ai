@@ -2,10 +2,10 @@
 
 ## 1. Configuração e Infraestrutura
 
-- [ ] 1.1 Configurar o `biome.json` na raiz para ignorar explicitamente as pastas `.turbo`, `.next` e `node_modules` no linter e formatação.
-- [ ] 1.2 Instalar as dependências `@tanstack/react-query`, `zustand` e `bcryptjs` (e `@types/bcryptjs` como devDependency) no pacote `@palpita/web` (`apps/web`).
-- [ ] 1.3 Criar e configurar o QueryClientProvider na raiz do Next.js (`apps/web/src/app/layout.tsx`).
-- [ ] 1.4 Criar a store global do Zustand para UI (`useUiStore`) em `apps/web/src/lib/store/ui.ts` para gerenciar o tema claro/escuro.
+- [x] 1.1 Configurar o `biome.json` na raiz para ignorar explicitamente as pastas `.turbo`, `.next` e `node_modules` no linter e formatação.
+- [x] 1.2 Instalar as dependências `@tanstack/react-query`, `zustand` e `bcryptjs` (e `@types/bcryptjs` como devDependency) no pacote `@palpita/web` (`apps/web`).
+- [x] 1.3 Criar e configurar o QueryClientProvider na raiz do Next.js (`apps/web/src/app/layout.tsx`).
+- [x] 1.4 Criar a store global do Zustand para UI (`useUiStore`) em `apps/web/src/lib/store/ui.ts` para gerenciar o tema claro/escuro.
 
 ## 2. Componentes e Estilos Globais
 
