@@ -5,7 +5,8 @@
       "**/node_modules/**",
       "**/dist/**",
       "**/.next/**",
-      "**/migrations/**"
+      "**/migrations/**",
+      "**/.turbo/**"
     ]
   },
   "organizeImports": {

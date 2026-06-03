@@ -1,0 +1,325 @@
+import { Button } from '@/components/ui/button';
+import { db, partidas, rodadas } from '@palpita/db';
+import { asc, eq } from 'drizzle-orm';
+import { Calendar, Clock, Trophy } from 'lucide-react';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import type React from 'react';
+
+export const metadata: Metadata = {
+  title: 'Agenda de Partidas - Copa 2026 | Palpita AI',
+  description:
+    'Confira o calendário completo de jogos da Copa do Mundo de 2026 por dia e não perca nenhum palpite.',
+};
+
+interface IAgendaPageProps {
+  searchParams: Promise<{ dia?: string }>;
+}
+
+interface IPartidaFormatada {
+  id: string;
+  timeA: string;
+  timeB: string;
+  golsTimeA: number | null;
+  golsTimeB: number | null;
+  dataInicio: Date;
+  status: string;
+  rodada: string;
+}
+
+export default async function AgendaPage({
+  searchParams,
+}: IAgendaPageProps): Promise<React.ReactNode> {
+  const { dia: selectedDia } = await searchParams;
+
+  let allPartidas: IPartidaFormatada[] = [];
+
+  try {
+    const dbPartidas = await db
+      .select({
+        id: partidas.id,
+        timeA: partidas.timeA,
+        timeB: partidas.timeB,
+        golsTimeA: partidas.golsTimeA,
+        golsTimeB: partidas.golsTimeB,
+        dataInicio: partidas.dataInicio,
+        status: partidas.status,
+        rodadaNome: rodadas.nome,
+      })
+      .from(partidas)
+      .innerJoin(rodadas, eq(partidas.rodadaId, rodadas.id))
+      .orderBy(asc(partidas.dataInicio));
+
+    allPartidas = dbPartidas.map((p) => ({
+      id: p.id,
+      timeA: p.timeA,
+      timeB: p.timeB,
+      golsTimeA: p.golsTimeA,
+      golsTimeB: p.golsTimeB,
+      dataInicio: p.dataInicio,
+      status: p.status,
+      rodada: p.rodadaNome,
+    }));
+  } catch (error) {
+    console.error(
+      'Erro ao buscar partidas para agenda. Usando fallback.',
+      error,
+    );
+  }
+
+  // Fallback caso o banco esteja vazio
+  if (allPartidas.length === 0) {
+    allPartidas = [
+      {
+        id: '1',
+        timeA: 'Brasil',
+        timeB: 'França',
+        golsTimeA: null,
+        golsTimeB: null,
+        dataInicio: new Date('2026-06-12T16:00:00'),
+        status: 'NAO_INICIADA',
+        rodada: 'Rodada 1',
+      },
+      {
+        id: '2',
+        timeA: 'EUA',
+        timeB: 'México',
+        golsTimeA: null,
+        golsTimeB: null,
+        dataInicio: new Date('2026-06-12T19:00:00'),
+        status: 'NAO_INICIADA',
+        rodada: 'Rodada 1',
+      },
+      {
+        id: '3',
+        timeA: 'Argentina',
+        timeB: 'Espanha',
+        golsTimeA: null,
+        golsTimeB: null,
+        dataInicio: new Date('2026-06-13T13:00:00'),
+        status: 'NAO_INICIADA',
+        rodada: 'Rodada 1',
+      },
+      {
+        id: '4',
+        timeA: 'Uruguai',
+        timeB: 'Itália',
+        golsTimeA: null,
+        golsTimeB: null,
+        dataInicio: new Date('2026-06-13T16:00:00'),
+        status: 'NAO_INICIADA',
+        rodada: 'Rodada 1',
+      },
+      {
+        id: '5',
+        timeA: 'Alemanha',
+        timeB: 'Japão',
+        golsTimeA: null,
+        golsTimeB: null,
+        dataInicio: new Date('2026-06-14T10:00:00'),
+        status: 'NAO_INICIADA',
+        rodada: 'Rodada 1',
+      },
+      {
+        id: '6',
+        timeA: 'Inglaterra',
+        timeB: 'Marrocos',
+        golsTimeA: null,
+        golsTimeB: null,
+        dataInicio: new Date('2026-06-14T13:00:00'),
+        status: 'NAO_INICIADA',
+        rodada: 'Rodada 1',
+      },
+    ];
+  }
+
+  // Agrupa partidas por dia (YYYY-MM-DD)
+  const diasDisponiveis = Array.from(
+    new Set(allPartidas.map((p) => p.dataInicio.toISOString().split('T')[0])),
+  ).sort();
+
+  // Define dia ativo default
+  const activeDia =
+    selectedDia && diasDisponiveis.includes(selectedDia)
+      ? selectedDia
+      : diasDisponiveis[0] || '';
+
+  // Filtra as partidas pelo dia ativo
+  const partidasDoDia = allPartidas.filter(
+    (p) => p.dataInicio.toISOString().split('T')[0] === activeDia,
+  );
+
+  return (
+    <div className="mx-auto w-full max-w-7xl p-6 px-6 space-y-8 flex-1">
+      {/* Header */}
+      <div className="space-y-2">
+        <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+          <Calendar className="h-3 w-3" />
+          Calendário de Jogos
+        </div>
+        <h1 className="text-4xl font-extrabold tracking-tight">
+          Agenda da Copa 2026
+        </h1>
+        <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl">
+          Navegue pelos dias de competições, veja os confrontos agendados e
+          acompanhe o andamento oficial dos placares.
+        </p>
+      </div>
+
+      {/* Tabs de Dias */}
+      {diasDisponiveis.length > 0 && (
+        <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-none border-b border-zinc-200 dark:border-zinc-800">
+          {diasDisponiveis.map((diaStr) => {
+            const date = new Date(`${diaStr}T00:00:00`);
+            const formatDia = new Intl.DateTimeFormat('pt-BR', {
+              day: 'numeric',
+              month: 'short',
+            }).format(date);
+            const formatSemana = new Intl.DateTimeFormat('pt-BR', {
+              weekday: 'short',
+            }).format(date);
+
+            const isSelected = diaStr === activeDia;
+
+            return (
+              <Link key={diaStr} href={`/agenda?dia=${diaStr}`} scroll={false}>
+                <button
+                  type="button"
+                  className={`flex flex-col items-center justify-center rounded-xl p-3 min-w-[70px] border transition-all text-xs font-medium cursor-pointer ${
+                    isSelected
+                      ? 'bg-emerald-600 border-emerald-600 text-zinc-50 dark:bg-emerald-500 dark:border-emerald-500 dark:text-zinc-950 shadow-md'
+                      : 'bg-white border-zinc-200 hover:border-zinc-300 dark:bg-zinc-900 dark:border-zinc-800 dark:hover:border-zinc-700'
+                  }`}
+                >
+                  <span className="opacity-80 uppercase text-[10px]">
+                    {formatSemana}
+                  </span>
+                  <span className="text-sm font-bold mt-1">{formatDia}</span>
+                </button>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Grid de Partidas */}
+      {partidasDoDia.length > 0 ? (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {partidasDoDia.map((partida) => {
+            const timeStr = new Intl.DateTimeFormat('pt-BR', {
+              hour: '2-digit',
+              minute: '2-digit',
+            }).format(partida.dataInicio);
+
+            const hasFinished = partida.status === 'ENCERRADA';
+            const isLive = partida.status === 'EM_ANDAMENTO';
+
+            return (
+              <div
+                key={partida.id}
+                className={`relative rounded-2xl border bg-white p-6 shadow-sm dark:bg-zinc-900 transition-all ${
+                  isLive
+                    ? 'border-emerald-500 ring-1 ring-emerald-500/50'
+                    : 'border-zinc-200 dark:border-zinc-800'
+                }`}
+              >
+                {/* Status Badge */}
+                <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-4">
+                  <span className="font-semibold text-zinc-400">
+                    {partida.rodada}
+                  </span>
+                  {isLive ? (
+                    <span className="inline-flex items-center gap-1 bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase animate-pulse dark:bg-red-950/50 dark:text-red-400">
+                      Ao Vivo
+                    </span>
+                  ) : hasFinished ? (
+                    <span className="bg-zinc-100 text-zinc-600 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase dark:bg-zinc-800 dark:text-zinc-400">
+                      Encerrado
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
+                      <Clock className="h-3.5 w-3.5" />
+                      {timeStr}
+                    </span>
+                  )}
+                </div>
+
+                {/* Times e Placar */}
+                <div className="flex items-center justify-between gap-2 py-2">
+                  {/* Time A */}
+                  <div className="flex flex-1 flex-col items-center gap-2 text-center max-w-[40%]">
+                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-sm font-bold border border-zinc-200 dark:border-zinc-700">
+                      {partida.timeA.slice(0, 3).toUpperCase()}
+                    </div>
+                    <span className="text-sm font-bold truncate w-full">
+                      {partida.timeA}
+                    </span>
+                  </div>
+
+                  {/* Placar central */}
+                  <div className="flex items-center gap-3 font-extrabold text-2xl px-2">
+                    {hasFinished || isLive ? (
+                      <>
+                        <span>{partida.golsTimeA}</span>
+                        <span className="text-zinc-400 text-sm font-normal">
+                          -
+                        </span>
+                        <span>{partida.golsTimeB}</span>
+                      </>
+                    ) : (
+                      <span className="text-zinc-300 dark:text-zinc-700 text-sm font-medium">
+                        VS
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Time B */}
+                  <div className="flex flex-1 flex-col items-center gap-2 text-center max-w-[40%]">
+                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-sm font-bold border border-zinc-200 dark:border-zinc-700">
+                      {partida.timeB.slice(0, 3).toUpperCase()}
+                    </div>
+                    <span className="text-sm font-bold truncate w-full">
+                      {partida.timeB}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Footer Action */}
+                <div className="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
+                  <span className="text-[10px] text-zinc-400 font-mono">
+                    ID: {partida.id.slice(0, 8)}
+                  </span>
+                  {!hasFinished ? (
+                    <Link href="/login">
+                      <Button size="xs" variant="outline">
+                        Palpitar
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/ranking"
+                      className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
+                    >
+                      <Trophy className="h-3 w-3" />
+                      Ver Ranking
+                    </Link>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="text-center py-16 border border-dashed border-zinc-200 rounded-2xl dark:border-zinc-800">
+          <Calendar className="h-12 w-12 mx-auto text-zinc-300 dark:text-zinc-700" />
+          <h3 className="text-lg font-semibold mt-4">
+            Nenhuma partida para este dia
+          </h3>
+          <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">
+            Selecione outro dia no calendário acima.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
