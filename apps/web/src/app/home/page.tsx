@@ -1,3 +1,4 @@
+import { SolicitarConviteForm } from '@/components/solicitar-convite-form';
 import { Button } from '@/components/ui/button';
 import {
   AlertTriangle,
@@ -81,29 +82,39 @@ export default async function HomePage({
       <div className="mx-auto w-full max-w-7xl flex-1 p-6 px-6">
         {/* Seção Hero */}
         <section className="relative my-8 overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent p-8 dark:border-zinc-800 md:p-12">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-              <Sparkles className="h-3 w-3" />
-              Copa do Mundo de 2026
+          <div className="grid gap-8 md:grid-cols-2 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                <Sparkles className="h-3 w-3" />
+                Copa do Mundo de 2026
+              </div>
+              <h1 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">
+                Dê seus palpites e domine a classificação
+              </h1>
+              <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
+                Acompanhe as rodadas, chute os placares dos confrontos e some
+                pontos na disputa pelo primeiro lugar. Simples, rápido e
+                inteligente.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-4">
+                <a href="#solicitar-convite">
+                  <Button
+                    size="lg"
+                    className="bg-emerald-600 text-zinc-50 hover:bg-emerald-500 dark:bg-emerald-50 dark:text-zinc-950 dark:hover:bg-emerald-400"
+                  >
+                    Peça seu convite
+                  </Button>
+                </a>
+                <Button size="lg" variant="outline">
+                  Ver Regulamento
+                </Button>
+              </div>
             </div>
-            <h1 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">
-              Dê seus palpites e domine a classificação
-            </h1>
-            <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
-              Acompanhe as rodadas, chute os placares dos confrontos e some
-              pontos na disputa pelo primeiro lugar. Simples, rápido e
-              inteligente.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Button
-                size="lg"
-                className="bg-emerald-600 text-zinc-50 hover:bg-emerald-500 dark:bg-emerald-500 dark:text-zinc-950 dark:hover:bg-emerald-400"
-              >
-                Criar Minha Conta
-              </Button>
-              <Button size="lg" variant="outline">
-                Ver Regulamento
-              </Button>
+            <div
+              id="solicitar-convite"
+              className="flex justify-center md:justify-end"
+            >
+              <SolicitarConviteForm />
             </div>
           </div>
         </section>

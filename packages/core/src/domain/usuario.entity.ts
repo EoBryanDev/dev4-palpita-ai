@@ -8,6 +8,7 @@ export interface IUsuarioProps {
   status: TUsuarioStatus;
   cargo: TUsuarioCargo;
   dataCriacao: Date;
+  senha?: string | null;
 }
 
 export class Usuario {
@@ -17,6 +18,7 @@ export class Usuario {
   private _status: TUsuarioStatus;
   private _cargo: TUsuarioCargo;
   private readonly _dataCriacao: Date;
+  private _senha?: string | null;
 
   constructor(props: IUsuarioProps) {
     this._id = props.id;
@@ -25,6 +27,7 @@ export class Usuario {
     this._status = props.status;
     this._cargo = props.cargo;
     this._dataCriacao = props.dataCriacao;
+    this._senha = props.senha;
   }
 
   public get id(): string {
@@ -49,6 +52,14 @@ export class Usuario {
 
   public get dataCriacao(): Date {
     return this._dataCriacao;
+  }
+
+  public get senha(): string | null | undefined {
+    return this._senha;
+  }
+
+  public definirSenha(senhaHash: string): void {
+    this._senha = senhaHash;
   }
 
   public ativar(): void {
