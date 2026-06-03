@@ -1,8 +1,8 @@
 ## 1. Autenticação e Middleware de Segurança
 
 - [x] 1.1 Configurar o armazenamento de sessão e cookies (Server Actions de login, logout e sessão). (Status: DONE, Início: 20:24, Concluído: 20:33)
-- [/] 1.2 Criar o arquivo `middleware.ts` na raiz da aplicação web (`apps/web/src/middleware.ts`) para proteger `/meu-espaço/*` e `/admin/*`. (Status: IN_PROGRESS, Início: 20:24)
-- [/] 1.3 Implementar testes de unidade para validar os bloqueios e redirecionamentos do middleware. (Status: IN_PROGRESS, Início: 20:24)
+- [x] 1.2 Criar o arquivo `middleware.ts` na raiz da aplicação web (`apps/web/src/middleware.ts`) para proteger `/meu-espaço/*` e `/admin/*`. (Status: DONE, Início: 20:24, Concluído: 20:35)
+- [x] 1.3 Implementar testes de unidade para validar os bloqueios e redirecionamentos do middleware. (Status: DONE, Início: 20:24, Concluído: 20:35)
 
 ## 2. Página Meu Espaço (Dashboard do Competidor)
 

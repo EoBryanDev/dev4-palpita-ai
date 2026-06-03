@@ -219,9 +219,10 @@ describe('obterSessao', () => {
   });
 
   it('deve retornar null se o cookie estiver corrompido ou inválido', async () => {
-    mockCookiesStore.get.mockReturnValueOnce({ value: 'cookie-invalido-nao-json' });
+    mockCookiesStore.get.mockReturnValueOnce({
+      value: 'cookie-invalido-nao-json',
+    });
     const session = await obterSessao();
     expect(session).toBeNull();
   });
 });
-
