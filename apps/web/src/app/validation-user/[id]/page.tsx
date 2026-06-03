@@ -1,3 +1,4 @@
+import { DefinirSenhaForm } from '@/components/definir-senha-form';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { TokenConvite } from '@palpita/core';
@@ -190,21 +191,7 @@ export default async function ValidationUserPage({
       );
     }
 
-    // 6. Token e valido! Ativa o usuario e marca o token como usado no banco de dados
-    await db.transaction(async (tx) => {
-      // Marca token como usado
-      await tx
-        .update(tokensConvite)
-        .set({ usado: true })
-        .where(eq(tokensConvite.id, tokenData.id));
-
-      // Ativa o usuario
-      await tx
-        .update(usuarios)
-        .set({ status: 'ATIVO' })
-        .where(eq(usuarios.id, tokenData.usuarioId));
-    });
-
+    // 6. Token e valido! Exibe o formulario para definicao de senha
     return (
       <div className="flex min-h-screen flex-col bg-zinc-50 font-sans text-zinc-900 transition-colors dark:bg-zinc-950 dark:text-zinc-50">
         <header className="flex items-center justify-between p-6">
@@ -216,29 +203,7 @@ export default async function ValidationUserPage({
           <ThemeToggle />
         </header>
         <main className="flex flex-1 items-center justify-center p-6">
-          <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-8 shadow-xl transition-all dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="flex flex-col items-center text-center">
-              <div className="rounded-full bg-emerald-100 p-3 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400">
-                <ShieldCheck className="h-8 w-8" />
-              </div>
-              <h1 className="mt-4 text-2xl font-bold tracking-tight">
-                Conta ativada!
-              </h1>
-              <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-                Parabéns,{' '}
-                <span className="font-semibold">{usuarioData.nome}</span>! Sua
-                conta foi ativada com sucesso. Agora você já pode participar da
-                disputa de palpites da Copa do Mundo.
-              </p>
-              <div className="mt-6 w-full">
-                <Link href="/home" className="w-full">
-                  <Button className="w-full bg-emerald-600 text-zinc-50 hover:bg-emerald-500 dark:bg-emerald-500 dark:text-zinc-950 dark:hover:bg-emerald-400">
-                    Acessar o Bolão
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
+          <DefinirSenhaForm tokenId={tokenData.id} />
         </main>
       </div>
     );

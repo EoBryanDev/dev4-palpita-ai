@@ -16,9 +16,9 @@
 ## 3. Validação de Convites (RN04)
 
 - [x] 3.1 Criar a Action de servidor ou endpoint para solicitação de convite a partir da Home, inserindo no banco com status pendente. (Status: DONE, Início: 19:38, Concluído: 19:42)
-- [ ] 3.2 Implementar a validação robusta de convite temporário na rota `/validation-user/[id]` de modo que rejeite se criado há mais de 5 minutos (RN04).
-- [ ] 3.3 Implementar a definição de senha com hashing usando `bcryptjs` e atualização do status do usuário ativado, com redirecionamento de sucesso para `/login`.
-- [ ] 3.4 Escrever testes para cobrir a expiração do link e validação de senhas com Vitest.
+- [x] 3.2 Implementar a validação robusta de convite temporário na rota `/validation-user/[id]` de modo que rejeite se criado há mais de 5 minutos (RN04). (Status: DONE, Início: 19:43, Concluído: 19:45)
+- [x] 3.3 Implementar a definição de senha com hashing usando `bcryptjs` e atualização do status do usuário ativado, com redirecionamento de sucesso para `/login`. (Status: DONE, Início: 19:43, Concluído: 19:45)
+- [x] 3.4 Escrever testes para cobrir a expiração do link e validação de senhas com Vitest. (Status: DONE, Início: 19:43, Concluído: 19:45)
 
 ## 4. Rotas Públicas de Visualização
 
