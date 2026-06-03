@@ -12,9 +12,10 @@
 
 ## 3. Pacote de Persistência com Drizzle
 
-- [ ] 3.1 Criar a estrutura de packages/db (package.json, tsconfig.json, drizzle.config.ts e conexão).
-- [ ] 3.2 Desenhar o esquema de tabelas no Drizzle utilizando português e nomenclatura neutra (tabelas: usuarios, partidas, palpites, rodadas, tokens_convite; campos: gols_time_a, gols_time_b).
-- [ ] 3.3 Subir o banco PostgreSQL local via Docker Compose, gerar a migração inicial com Drizzle Kit e rodá-la.
+- [x] 3.1 Criar a estrutura de packages/db (package.json, tsconfig.json, drizzle.config.ts e conexão).
+- [x] 3.2 Desenhar o esquema de tabelas no Drizzle utilizando português e nomenclatura neutra (tabelas: usuarios, partidas, palpites, rodadas, tokens_convite; campos: gols_time_a, gols_time_b).
+- [x] 3.3 Subir o banco PostgreSQL local via Docker Compose, gerar a migração inicial com Drizzle Kit e rodá-la.
+
 
 ## 4. Inicialização da Aplicação Web Next.js
 
