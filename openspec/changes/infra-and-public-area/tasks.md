@@ -31,10 +31,10 @@
 ## 5. Exibição de Dados e Estatísticas (RN03)
 
 - [x] 5.1 Criar a página `/ranking` que exibe a classificação geral atualizada usando React Query para cache dinâmico. (Status: DONE, Início: 20:05, Concluído: 20:08)
-- [/] 5.2 Criar a rota `/palpites` que exibe estatísticas agregadas coletivas de cada jogo (vitórias do time A, vitória do time B, empates). (Status: IN_PROGRESS, Início: 20:08)
-- [/] 5.3 Implementar o controle rigoroso da regra RN03 na API/Actions: não retornar palpites individuais de usuários antes do início da partida. (Status: IN_PROGRESS, Início: 20:08)
+- [x] 5.2 Criar a rota `/palpites` que exibe estatísticas agregadas coletivas de cada jogo (vitórias do time A, vitória do time B, empates). (Status: DONE, Início: 20:08, Concluído: 20:10)
+- [x] 5.3 Implementar o controle rigoroso da regra RN03 na API/Actions: não retornar palpites individuais de usuários antes do início da partida. (Status: DONE, Início: 20:08, Concluído: 20:10)
 
 ## 6. Validação e Qualidade
 
-- [ ] 6.1 Rodar a validação do linter (`pnpm lint`) e certificar-se de que não há falhas.
-- [ ] 6.2 Executar os testes (`pnpm test`) garantindo que todos passem com sucesso.
+- [x] 6.1 Rodar a validação do linter (`pnpm lint`) e certificar-se de que não há falhas. (Status: DONE, Início: 20:10, Concluído: 20:10)
+- [x] 6.2 Executar os testes (`pnpm test`) garantindo que todos passem com sucesso. (Status: DONE, Início: 20:10, Concluído: 20:10)
