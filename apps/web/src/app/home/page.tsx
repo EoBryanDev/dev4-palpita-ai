@@ -1,4 +1,3 @@
-import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import {
   AlertTriangle,
@@ -47,44 +46,7 @@ export default async function HomePage({
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-50 font-sans text-zinc-900 transition-colors dark:bg-zinc-950 dark:text-zinc-50">
-      {/* Header Principal */}
-      <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/80 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/80">
-        <div className="mx-auto flex max-w-7xl items-center justify-between p-4 px-6">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-black tracking-wider text-emerald-600 dark:text-emerald-400">
-              PALPITA AI
-            </span>
-          </div>
-          <nav className="hidden items-center gap-6 md:flex">
-            <Link
-              href="/home"
-              className="text-sm font-medium hover:text-emerald-600 dark:hover:text-emerald-400"
-            >
-              Início
-            </Link>
-            <Link
-              href="/home"
-              className="text-sm font-medium text-zinc-500 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400"
-            >
-              Classificação
-            </Link>
-            <Link
-              href="/home"
-              className="text-sm font-medium text-zinc-500 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400"
-            >
-              Regras
-            </Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <ThemeToggle />
-            <Button className="bg-emerald-600 text-zinc-50 hover:bg-emerald-500 dark:bg-emerald-500 dark:text-zinc-950 dark:hover:bg-emerald-400">
-              Palpitar
-            </Button>
-          </div>
-        </div>
-      </header>
-
+    <>
       {/* Banner de Timeout de Link/Acesso */}
       {(showTimeoutBanner || true) && (
         <div className="border-b border-amber-200 bg-amber-50 text-amber-900 transition-colors dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200">
@@ -116,7 +78,7 @@ export default async function HomePage({
       )}
 
       {/* Main Content */}
-      <main className="mx-auto w-full max-w-7xl flex-1 p-6 px-6">
+      <div className="mx-auto w-full max-w-7xl flex-1 p-6 px-6">
         {/* Seção Hero */}
         <section className="relative my-8 overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent p-8 dark:border-zinc-800 md:p-12">
           <div className="max-w-2xl">
@@ -244,12 +206,7 @@ export default async function HomePage({
             ))}
           </div>
         </section>
-      </main>
-
-      {/* Rodapé */}
-      <footer className="border-t border-zinc-200 py-6 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
-        <p>© 2026 Palpita AI. Todos os direitos reservados.</p>
-      </footer>
-    </div>
+      </div>
+    </>
   );
 }

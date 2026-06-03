@@ -6,6 +6,7 @@ import { Header } from '@/components/header';
 import { QueryProvider } from '@/components/query-provider';
 import { ScrollToTop } from '@/components/scroll-to-top';
 import { ThemeProvider } from '@/components/theme-provider';
+import { TimeoutBanner } from '@/components/timeout-banner';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -42,6 +43,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
+            <TimeoutBanner />
             <Header />
             <main className="flex-1 flex flex-col">{children}</main>
             <Footer />
