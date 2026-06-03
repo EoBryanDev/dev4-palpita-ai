@@ -1,15 +1,29 @@
 import { SolicitarConviteForm } from '@/components/solicitar-convite-form';
 import { Button } from '@/components/ui/button';
+import { db, partidas, rodadas } from '@palpita/db';
+import { asc, eq } from 'drizzle-orm';
 import {
   AlertTriangle,
   Calendar,
   Clock,
+  Coins,
   Sparkles,
   Trophy,
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
 import type React from 'react';
+
+interface IHomePartida {
+  id: string;
+  timeA: string;
+  timeB: string;
+  golsTimeA: number | null;
+  golsTimeB: number | null;
+  dataInicio: string;
+  status: string;
+  rodada: string;
+}
 
 interface IHomePageProps {
   searchParams: Promise<{ timeout?: string }>;
@@ -21,30 +35,77 @@ export default async function HomePage({
   const { timeout } = await searchParams;
   const showTimeoutBanner = timeout === 'true';
 
-  // Partidas ficticias do esqueleto para demonstrar a interface
-  const partidasFicticias = [
-    {
-      id: '1',
-      timeA: 'Brasil',
-      timeB: 'França',
-      dataInicio: '12 de Junho, 16:00',
-      rodada: 'Rodada 1',
-    },
-    {
-      id: '2',
-      timeA: 'Argentina',
-      timeB: 'Espanha',
-      dataInicio: '13 de Junho, 13:00',
-      rodada: 'Rodada 1',
-    },
-    {
-      id: '3',
-      timeA: 'Alemanha',
-      timeB: 'Japão',
-      dataInicio: '14 de Junho, 10:00',
-      rodada: 'Rodada 1',
-    },
-  ];
+  let partidasList: IHomePartida[] = [];
+
+  try {
+    // Tenta buscar partidas reais do banco de dados
+    const partidasDb = await db
+      .select({
+        id: partidas.id,
+        timeA: partidas.timeA,
+        timeB: partidas.timeB,
+        golsTimeA: partidas.golsTimeA,
+        golsTimeB: partidas.golsTimeB,
+        dataInicio: partidas.dataInicio,
+        status: partidas.status,
+        rodadaNome: rodadas.nome,
+      })
+      .from(partidas)
+      .innerJoin(rodadas, eq(partidas.rodadaId, rodadas.id))
+      .orderBy(asc(partidas.dataInicio))
+      .limit(6);
+
+    partidasList = partidasDb.map((p) => ({
+      id: p.id,
+      timeA: p.timeA,
+      timeB: p.timeB,
+      golsTimeA: p.golsTimeA,
+      golsTimeB: p.golsTimeB,
+      dataInicio: new Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        month: 'long',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(p.dataInicio),
+      status: p.status,
+      rodada: p.rodadaNome,
+    }));
+  } catch (error) {
+    console.error(
+      'Erro ao carregar partidas do banco. Usando fallback ficticio.',
+      error,
+    );
+  }
+
+  // Fallback de partidas ficticias caso o banco esteja vazio
+  if (partidasList.length === 0) {
+    partidasList = [
+      {
+        id: '1',
+        timeA: 'Brasil',
+        timeB: 'França',
+        dataInicio: '12 de Junho, 16:00',
+        rodada: 'Rodada 1',
+        status: 'NAO_INICIADA',
+      },
+      {
+        id: '2',
+        timeA: 'Argentina',
+        timeB: 'Espanha',
+        dataInicio: '13 de Junho, 13:00',
+        rodada: 'Rodada 1',
+        status: 'NAO_INICIADA',
+      },
+      {
+        id: '3',
+        timeA: 'Alemanha',
+        timeB: 'Japão',
+        dataInicio: '14 de Junho, 10:00',
+        rodada: 'Rodada 1',
+        status: 'NAO_INICIADA',
+      },
+    ];
+  }
 
   return (
     <>
@@ -79,9 +140,9 @@ export default async function HomePage({
       )}
 
       {/* Main Content */}
-      <div className="mx-auto w-full max-w-7xl flex-1 p-6 px-6">
+      <div className="mx-auto w-full max-w-7xl flex-1 p-6 px-6 space-y-12">
         {/* Seção Hero */}
-        <section className="relative my-8 overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent p-8 dark:border-zinc-800 md:p-12">
+        <section className="relative overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent p-8 dark:border-zinc-800 md:p-12">
           <div className="grid gap-8 md:grid-cols-2 items-center">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
@@ -105,9 +166,11 @@ export default async function HomePage({
                     Peça seu convite
                   </Button>
                 </a>
-                <Button size="lg" variant="outline">
-                  Ver Regulamento
-                </Button>
+                <a href="#regras-pontuacao">
+                  <Button size="lg" variant="outline">
+                    Ver Regulamento
+                  </Button>
+                </a>
               </div>
             </div>
             <div
@@ -121,7 +184,7 @@ export default async function HomePage({
 
         {/* Estatisticas Rápidas */}
         <section className="grid gap-6 sm:grid-cols-3">
-          <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm transition-all hover:border-emerald-500/50">
             <div className="flex items-center gap-4">
               <div className="rounded-xl bg-emerald-100 p-3 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400">
                 <Trophy className="h-6 w-6" />
@@ -134,7 +197,7 @@ export default async function HomePage({
               </div>
             </div>
           </div>
-          <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm transition-all hover:border-emerald-500/50">
             <div className="flex items-center gap-4">
               <div className="rounded-xl bg-emerald-100 p-3 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400">
                 <Users className="h-6 w-6" />
@@ -147,7 +210,7 @@ export default async function HomePage({
               </div>
             </div>
           </div>
-          <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm transition-all hover:border-emerald-500/50">
             <div className="flex items-center gap-4">
               <div className="rounded-xl bg-emerald-100 p-3 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400">
                 <Calendar className="h-6 w-6" />
@@ -162,14 +225,69 @@ export default async function HomePage({
           </div>
         </section>
 
+        {/* Regras de Pontuação (RN01) */}
+        <section
+          id="regras-pontuacao"
+          className="rounded-3xl border border-zinc-200 bg-zinc-50/50 p-8 dark:border-zinc-800 dark:bg-zinc-900/30"
+        >
+          <div className="max-w-3xl space-y-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+              <Coins className="h-3 w-3" />
+              Regulamento Oficial
+            </div>
+            <h2 className="text-3xl font-bold tracking-tight">
+              Regras de Pontuação (RN01)
+            </h2>
+            <p className="text-zinc-600 dark:text-zinc-400">
+              O sistema de pontuação é simples e direto, premiando tanto a
+              precisão absoluta quanto a intuição do vencedor da partida. Veja
+              como acumular pontos:
+            </p>
+
+            <div className="grid gap-6 md:grid-cols-3">
+              <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm">
+                <div className="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">
+                  1 pt
+                </div>
+                <h3 className="text-lg font-bold mt-2">Placar Exato</h3>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                  Você acertou exatamente a quantidade de gols de ambas as
+                  seleções.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm">
+                <div className="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">
+                  1 pt
+                </div>
+                <h3 className="text-lg font-bold mt-2">Resultado Final</h3>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                  Você errou o placar exato, mas acertou a seleção vencedora ou
+                  a condição de empate.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm">
+                <div className="text-3xl font-extrabold text-zinc-400">
+                  0 pt
+                </div>
+                <h3 className="text-lg font-bold mt-2">Errado</h3>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                  Você não acertou o vencedor e nem a ocorrência de empate.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Confrontos do Dia */}
-        <section className="mt-12">
+        <section>
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold tracking-tight">
               Próximos Confrontos
             </h2>
             <Link
-              href="/home"
+              href="/agenda"
               className="text-sm font-semibold text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300"
             >
               Ver todas as partidas
@@ -177,10 +295,10 @@ export default async function HomePage({
           </div>
 
           <div className="mt-6 grid gap-6 md:grid-cols-3">
-            {partidasFicticias.map((partida) => (
+            {partidasList.map((partida) => (
               <div
                 key={partida.id}
-                className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+                className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 transition-all hover:border-zinc-300 dark:hover:border-zinc-700"
               >
                 <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
                   <span className="font-semibold text-emerald-600 dark:text-emerald-400">
@@ -193,26 +311,32 @@ export default async function HomePage({
                 </div>
 
                 <div className="my-6 flex items-center justify-between gap-4 font-semibold">
-                  <div className="flex flex-1 flex-col items-center gap-2">
-                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-sm font-bold">
+                  <div className="flex flex-1 flex-col items-center gap-2 text-center">
+                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-sm font-bold border border-zinc-200 dark:border-zinc-700">
                       {partida.timeA.slice(0, 3).toUpperCase()}
                     </div>
-                    <span className="text-sm">{partida.timeA}</span>
+                    <span className="text-sm truncate w-full">
+                      {partida.timeA}
+                    </span>
                   </div>
 
-                  <span className="text-zinc-400">VS</span>
+                  <span className="text-zinc-400 text-xs">VS</span>
 
-                  <div className="flex flex-1 flex-col items-center gap-2">
-                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-sm font-bold">
+                  <div className="flex flex-1 flex-col items-center gap-2 text-center">
+                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-sm font-bold border border-zinc-200 dark:border-zinc-700">
                       {partida.timeB.slice(0, 3).toUpperCase()}
                     </div>
-                    <span className="text-sm">{partida.timeB}</span>
+                    <span className="text-sm truncate w-full">
+                      {partida.timeB}
+                    </span>
                   </div>
                 </div>
 
-                <Button className="w-full bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200">
-                  Palpitar
-                </Button>
+                <Link href="/login" className="block w-full">
+                  <Button className="w-full bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200">
+                    Palpitar
+                  </Button>
+                </Link>
               </div>
             ))}
           </div>
