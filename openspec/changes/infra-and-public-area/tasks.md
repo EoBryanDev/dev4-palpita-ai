@@ -30,9 +30,9 @@
 
 ## 5. Exibição de Dados e Estatísticas (RN03)
 
-- [ ] 5.1 Criar a página `/ranking` que exibe a classificação geral atualizada usando React Query para cache dinâmico.
-- [ ] 5.2 Criar a rota `/palpites` que exibe estatísticas agregadas coletivas de cada jogo (vitórias do time A, vitória do time B, empates).
-- [ ] 5.3 Implementar o controle rigoroso da regra RN03 na API/Actions: não retornar palpites individuais de usuários antes do início da partida.
+- [x] 5.1 Criar a página `/ranking` que exibe a classificação geral atualizada usando React Query para cache dinâmico. (Status: DONE, Início: 20:05, Concluído: 20:08)
+- [/] 5.2 Criar a rota `/palpites` que exibe estatísticas agregadas coletivas de cada jogo (vitórias do time A, vitória do time B, empates). (Status: IN_PROGRESS, Início: 20:08)
+- [/] 5.3 Implementar o controle rigoroso da regra RN03 na API/Actions: não retornar palpites individuais de usuários antes do início da partida. (Status: IN_PROGRESS, Início: 20:08)
 
 ## 6. Validação e Qualidade
 
