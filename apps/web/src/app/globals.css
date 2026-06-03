@@ -46,9 +46,16 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  --color-copa-green: hsl(var(--copa-green));
+  --color-copa-gold: hsl(var(--copa-gold));
+  --color-copa-navy: hsl(var(--copa-navy));
 }
 
 :root {
+  --copa-green: 142 76% 36%;
+  --copa-gold: 38 90% 51%;
+  --copa-navy: 220 80% 16%;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -84,6 +91,9 @@
 }
 
 .dark {
+  --copa-green: 142 70% 45%;
+  --copa-gold: 38 90% 60%;
+  --copa-navy: 220 80% 10%;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);

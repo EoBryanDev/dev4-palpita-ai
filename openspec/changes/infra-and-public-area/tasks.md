@@ -9,7 +9,7 @@
 
 ## 2. Componentes e Estilos Globais
 
-- [ ] 2.1 Configurar o alternador de temas claro/escuro com HSL nos estilos do app e integrá-lo no cabeçalho ou barra de navegação global.
+- [x] 2.1 Configurar o alternador de temas claro/escuro com HSL nos estilos do app e integrá-lo no cabeçalho ou barra de navegação global. (Status: DONE, Início: 16:30, Concluído: 16:32)
 - [ ] 2.2 Criar o botão flutuante de Voltar ao Topo que aparece após 300px de scroll vertical.
 - [ ] 2.3 Criar o Banner de Timeout com cronômetro regressivo na raiz (exibindo tempo para bloqueio de palpites da rodada atual).
 
