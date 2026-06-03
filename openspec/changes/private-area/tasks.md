@@ -1,21 +1,32 @@
-# tasks - private-area
+## 1. Autenticação e Middleware de Segurança
 
-- [ ] Implementar Autenticação e Middleware de Segurança <!-- id: 0 -->
-  - Configurar armazenamento de sessão e cookies.
-  - Criar o `middleware.ts` para proteger `/meu-espaço/*` e `/admin/*`.
-  - Redirecionar usuários não logados e aplicar restrição de role `ADMIN`.
-- [ ] Implementar a página Meu Espaço (Dashboard do Competidor) <!-- id: 1 -->
-  - Exibir resumo do usuário (pontuação atual, classificação no ranking, status do convite).
-  - Listar jogos da rodada com campos para preenchimento/salvamento de palpites.
-  - Implementar validação do prazo de palpites (bloqueando após horário inicial do jogo) no cliente e servidor (RN02).
-- [ ] Implementar Painel Administrativo de Convites e Usuários (`/admin/usuarios`) <!-- id: 2 -->
-  - Listar usuários com solicitações de convites pendentes.
-  - Permitir aprovação de convites e liberação pós-pagamento (RN04, RN05).
-- [ ] Implementar Painel de Cadastro de Jogos e Resultados (`/admin/partidas`) <!-- id: 3 -->
-  - Interface para cadastrar partidas e organizar rodadas.
-  - Campo para lançamento de placar final oficial.
-  - Implementar transação no banco de dados para salvar placar, rodar cálculo automático dos pontos dos palpites (RN01) e atualizar ranking geral.
-- [ ] Testes de Integração e Validação do Fluxo Privado <!-- id: 4 -->
-  - Validar bloqueios do middleware.
-  - Validar bloqueio de palpites fora do prazo.
-  - Validar cálculos das pontuações de palpites pós-inserção do placar oficial.
+- [/] 1.1 Configurar o armazenamento de sessão e cookies (Server Actions de login, logout e sessão). (Status: IN_PROGRESS, Início: 20:24)
+- [/] 1.2 Criar o arquivo `middleware.ts` na raiz da aplicação web (`apps/web/src/middleware.ts`) para proteger `/meu-espaço/*` e `/admin/*`. (Status: IN_PROGRESS, Início: 20:24)
+- [/] 1.3 Implementar testes de unidade para validar os bloqueios e redirecionamentos do middleware. (Status: IN_PROGRESS, Início: 20:24)
+
+## 2. Página Meu Espaço (Dashboard do Competidor)
+
+- [ ] 2.1 Criar a página `/meu-espaço` (RSC) exibindo o resumo do usuário (pontos acumulados e posição no ranking geral) obtido dinamicamente.
+- [ ] 2.2 Listar partidas da rodada com status de palpites pendentes, bloqueando após o horário de início da partida (RN02).
+- [ ] 2.3 Implementar o salvamento de palpites validando o prazo (RN02) e o status de liberação do usuário (RN05).
+- [ ] 2.4 Criar testes de componente para o Dashboard e formulário de palpites.
+
+## 3. Painel Administrativo de Convites e Usuários (/admin/usuarios)
+
+- [ ] 3.1 Criar a interface de administração `/admin/usuarios` listando usuários pendentes e liberados.
+- [ ] 3.2 Implementar Server Actions para aprovação de solicitações, geração de tokens temporários (RN04) e ativação.
+- [ ] 3.3 Adicionar controle de liberação de apostas ("Liberado" / "Pendente") conforme RN05.
+- [ ] 3.4 Escrever testes de integração para o fluxo de aprovação e ativação de convites.
+
+## 4. Painel de Cadastro de Jogos e Resultados (/admin/partidas)
+
+- [ ] 4.1 Criar a tela `/admin/partidas` para visualização e cadastro de novos jogos e rodadas de palpites.
+- [ ] 4.2 Desenvolver a funcionalidade de lançamento de placar final oficial das partidas.
+- [ ] 4.3 Implementar transação segura no banco de dados para salvar resultados oficiais, executar recálculo dinâmico de palpites (RN01) e atualizar ranking corporativo.
+- [ ] 4.4 Escrever testes cobrindo a transação de recálculo de pontos pós-jogo e atualização geral de ranking.
+
+## 5. Validação e Qualidade
+
+- [ ] 5.1 Rodar a verificação de linting e formatação com Biome em todo o repositório (`biome check --write .`).
+- [ ] 5.2 Executar todos os testes de unidade da aplicação web para garantir que a cobertura está adequada e tudo compila com sucesso.
+
