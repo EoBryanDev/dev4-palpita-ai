@@ -5,6 +5,7 @@ Este documento define as regras de operação, consulta de documentação e flux
 ## 1. Consulta e Diretrizes do Projeto
 
 - **Código:** Todo o desenvolvimento de código deve ser baseado rigorosamente no arquivo `docs/rules/coding.md`.
+- **Framework/bibliotecas:** Toda dúvida sobre framework/biblioteca deve ser utilizado o MCP Context7.
 - **Dúvidas Gerais:** Consulte o diretório `docs/` para diretrizes gerais do projeto.
 - **Regras Específicas:** Consulte o diretório `docs/rules/` para regras detalhadas (como `linting.md`, `testing.md` e `versioning.md`).
 - **Arquitetura e Design:** Siga sempre as decisões de design e arquitetura estipuladas nos documentos de proposta ou requisitos (ex.: `docs/prds/PRD_001_Plataforma_Palpites_DEV4.md` e eventuais arquivos `design.md` ou `proposal.md`).
