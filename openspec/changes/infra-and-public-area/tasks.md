@@ -26,7 +26,7 @@
 - [x] 4.2 Criar a página `/agenda` mostrando partidas de futebol por dia selecionado. (Status: DONE, Início: 19:50, Concluído: 19:51)
 - [x] 4.3 Criar a página `/times` exibindo de forma interativa as seleções que disputam a Copa 2026. (Status: DONE, Início: 19:51, Concluído: 19:53)
 - [x] 4.4 Criar a página `/chaves` exibindo a estrutura de grupos e o chaveamento do mata-mata. (Status: DONE, Início: 19:53, Concluído: 19:54)
-- [ ] 4.5 Criar a página `/login` com layout premium para entrada do usuário.
+- [x] 4.5 Criar a página `/login` com layout premium para entrada do usuário. (Status: DONE, Início: 19:55, Concluído: 19:58)
 
 ## 5. Exibição de Dados e Estatísticas (RN03)
 
