@@ -6,9 +6,9 @@
 
 ## 2. Pacote Compartilhado de Domínio Core
 
-- [ ] 2.1 Criar a estrutura do pacote packages/core (package.json, tsconfig.json e src/index.ts).
-- [ ] 2.2 Implementar as entidades de domínio orientadas a objetos (Palpite, Usuario, Partida, TokenConvite) aplicando as regras RN01 (pontuação), RN02 (bloqueio por horário) e RN04 (expiração do link em 5 min).
-- [ ] 2.3 Implementar testes de unidade com Vitest para validar as regras RN01, RN02 e RN04 no pacote core.
+- [x] 2.1 Criar a estrutura do pacote packages/core (package.json, tsconfig.json e src/index.ts).
+- [x] 2.2 Implementar as entidades de domínio orientadas a objetos (Palpite, Usuario, Partida, TokenConvite) aplicando as regras RN01 (pontuação), RN02 (bloqueio por horário) e RN04 (expiração do link em 5 min).
+- [x] 2.3 Implementar testes de unidade com Vitest para validar as regras RN01, RN02 e RN04 no pacote core.
 
 ## 3. Pacote de Persistência com Drizzle
 
