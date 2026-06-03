@@ -30,10 +30,14 @@
   "devDependencies": {
     "@palpita/tsconfig": "workspace:*",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/bcryptjs": "^3.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^5.2.0",
+    "happy-dom": "^20.9.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^1.6.1"
