@@ -1,0 +1,27 @@
+# Dependências e Módulos
+node_modules/
+
+# Builds e Saídas
+dist/
+build/
+.next/
+out/
+.turbo/
+
+# Logs e Cache
+*.log
+.eslintcache
+.node_repl_history
+.npm/
+.pnpm-debug.log
+
+# Variáveis de Ambiente
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+
+# Arquivos do Sistema Operacional
+.DS_Store
+Thumbs.db

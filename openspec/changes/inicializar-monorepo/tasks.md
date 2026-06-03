@@ -1,8 +1,8 @@
 ## 1. Setup da Estrutura Raiz do Monorepo
 
-- [ ] 1.1 Criar os arquivos de configuração na raiz: pnpm-workspace.yaml, package.json, turbo.json e biome.json.
-- [ ] 1.2 Criar o pacote packages/tsconfig com as configurações globais do TypeScript.
-- [ ] 1.3 Criar o arquivo docker-compose.yml na raiz configurado com o PostgreSQL 16 local.
+- [x] 1.1 Criar os arquivos de configuração na raiz: pnpm-workspace.yaml, package.json, turbo.json e biome.json.
+- [x] 1.2 Criar o pacote packages/tsconfig com as configurações globais do TypeScript.
+- [x] 1.3 Criar o arquivo docker-compose.yml na raiz configurado com o PostgreSQL 16 local.
 
 ## 2. Pacote Compartilhado de Domínio Core
 
