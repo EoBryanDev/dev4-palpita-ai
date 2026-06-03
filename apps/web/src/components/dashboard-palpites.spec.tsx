@@ -71,11 +71,9 @@ describe('DashboardPalpites Component', () => {
     vi.clearAllMocks();
   });
 
-  it('deve renderizar as informações do competidor, pontos e classificação', () => {
+  it('deve renderizar as informações de pontos, classificação e rodada', () => {
     render(<DashboardPalpites {...defaultProps} />);
 
-    expect(screen.getByText('Competidor Teste')).toBeDefined();
-    expect(screen.getByText('user@test.com')).toBeDefined();
     expect(screen.getByText('5 Pontos')).toBeDefined();
     expect(screen.getByText('#3')).toBeDefined();
     expect(screen.getByText('Apostas Liberadas')).toBeDefined();
@@ -104,7 +102,7 @@ describe('DashboardPalpites Component', () => {
     expect(screen.getByText('Argentina')).toBeDefined();
     expect(screen.getByText('França')).toBeDefined();
 
-    // Palpite salvo: Alemanha vs Espanha
+    // Palpite salvos: Alemanha vs Espanha
     expect(screen.getByText('Alemanha')).toBeDefined();
     expect(screen.getByText('Espanha')).toBeDefined();
   });
@@ -143,23 +141,5 @@ describe('DashboardPalpites Component', () => {
       await screen.findByText('Palpite registrado com sucesso!'),
     ).toBeDefined();
     expect(mockRefresh).toHaveBeenCalled();
-  });
-
-  it('deve chamar a action logoutUsuario ao clicar no botão de sair', async () => {
-    (logoutUsuario as Mock).mockResolvedValueOnce({
-      success: true,
-      message: 'Sucesso',
-    });
-
-    render(<DashboardPalpites {...defaultProps} />);
-
-    const btnLogout = screen.getByTitle('Sair');
-    fireEvent.click(btnLogout);
-
-    await waitFor(() => {
-      expect(logoutUsuario).toHaveBeenCalled();
-    });
-
-    expect(mockPush).toHaveBeenCalledWith('/login');
   });
 });

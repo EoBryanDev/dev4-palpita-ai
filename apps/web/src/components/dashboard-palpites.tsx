@@ -174,53 +174,6 @@ export function DashboardPalpites({
 
   return (
     <div className="min-h-screen bg-zinc-50 transition-colors dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 pb-16">
-      {/* Header do Painel */}
-      <header className="sticky top-0 z-40 w-full border-b border-zinc-200/80 bg-white/80 backdrop-blur-md dark:border-zinc-800/80 dark:bg-zinc-950/80">
-        <div className="mx-auto flex max-w-7xl h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-lg shadow-emerald-500/20 dark:from-emerald-500 dark:to-teal-400">
-              <Trophy className="h-5 w-5" />
-            </div>
-            <div>
-              <span className="text-lg font-black tracking-wider bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 bg-clip-text text-transparent dark:from-emerald-400 dark:via-emerald-300 dark:to-teal-400">
-                PALPITA AI
-              </span>
-              <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-400">
-                Competidor
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex flex-col items-end text-right">
-              <span className="text-sm font-bold">{nomeUsuario}</span>
-              <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                {emailUsuario}
-              </span>
-            </div>
-            {cargoUsuario === 'ADMIN' && (
-              <Button
-                variant="outline"
-                className="text-xs font-bold border-emerald-600/30 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-500/30 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
-                onClick={() => router.push('/admin/usuarios')}
-              >
-                Painel Admin
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleLogout}
-              disabled={logoutPending}
-              title="Sair"
-              className="text-zinc-500 hover:text-red-600 dark:text-zinc-400 dark:hover:text-red-400"
-            >
-              <LogOut className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      </header>
-
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8">
         {/* Aviso de Conta Pendente de Liberação (RN05) */}
         {!isUsuarioLiberado && (

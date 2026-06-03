@@ -1,6 +1,11 @@
-import { db, palpites, partidas, rodadas, usuarios } from '@palpita/db';
 import bcrypt from 'bcryptjs';
+import dotenv from 'dotenv';
 import { eq } from 'drizzle-orm';
+import { db } from './connection';
+import { palpites, partidas, rodadas, usuarios } from './schema';
+
+// Carregar variáveis de ambiente
+dotenv.config();
 
 async function seed() {
   console.log('Iniciando seed de dados...');

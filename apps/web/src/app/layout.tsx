@@ -8,6 +8,8 @@ import { ScrollToTop } from '@/components/scroll-to-top';
 import { ThemeProvider } from '@/components/theme-provider';
 import { TimeoutBanner } from '@/components/timeout-banner';
 
+import { obterSessao } from '@/app/actions/auth';
+
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
@@ -24,11 +26,13 @@ export const metadata: Metadata = {
     'Dê seus palpites nos jogos da Copa do Mundo e dispute prêmios com seus amigos.',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await obterSessao();
+
   return (
     <html
       lang="pt-BR"
@@ -44,7 +48,7 @@ export default function RootLayout({
         >
           <QueryProvider>
             <TimeoutBanner />
-            <Header />
+            <Header initialSession={session} />
             <main className="flex-1 flex flex-col">{children}</main>
             <Footer />
             <ScrollToTop />

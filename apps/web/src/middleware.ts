@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 1. Verificar se a rota precisa de proteção
-  const isMeuEspaco = pathname.startsWith('/meu-espaço');
+  const isMeuEspaco = pathname.startsWith('/meu-espaco');
   const isAdmin = pathname.startsWith('/admin');
 
   if (!isMeuEspaco && !isAdmin) {
@@ -39,7 +39,7 @@ export function middleware(request: NextRequest) {
 
     // 3. Se for rota administrativa, verificar se o cargo é ADMIN
     if (isAdmin && session.cargo !== 'ADMIN') {
-      const meuEspacoUrl = new URL('/meu-espaço', request.url);
+      const meuEspacoUrl = new URL('/meu-espaco', request.url);
       return NextResponse.redirect(meuEspacoUrl);
     }
   } catch (error) {
@@ -54,5 +54,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/meu-espaço/:path*', '/admin/:path*'],
+  matcher: ['/meu-espaco/:path*', '/admin/:path*'],
 };

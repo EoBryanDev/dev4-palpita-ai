@@ -51,8 +51,8 @@ describe('Middleware', () => {
     expect(NextResponse.next).toHaveBeenCalled();
   });
 
-  it('deve redirecionar para /login ao tentar acessar /meu-espaço sem sessão ativa', () => {
-    const req = createMockRequest('/meu-espaço/palpites');
+  it('deve redirecionar para /login ao tentar acessar /meu-espaco sem sessão ativa', () => {
+    const req = createMockRequest('/meu-espaco/palpites');
     const res = middleware(req);
 
     expect(res?.type).toBe('redirect');
@@ -61,14 +61,14 @@ describe('Middleware', () => {
   });
 
   it('deve redirecionar para /login se a sessão contiver dados inválidos', () => {
-    const req = createMockRequest('/meu-espaço', btoa('invalido'));
+    const req = createMockRequest('/meu-espaco', btoa('invalido'));
     const res = middleware(req);
 
     expect(res?.type).toBe('redirect');
     expect(res?.url).toContain('/login');
   });
 
-  it('deve permitir o acesso a /meu-espaço se o usuário estiver autenticado', () => {
+  it('deve permitir o acesso a /meu-espaco se o usuário estiver autenticado', () => {
     const sessionData = {
       id: 'user-123',
       nome: 'Fulano',
@@ -76,14 +76,14 @@ describe('Middleware', () => {
       cargo: 'COLABORADOR',
     };
     const sessionCookie = btoa(encodeURIComponent(JSON.stringify(sessionData)));
-    const req = createMockRequest('/meu-espaço/perfil', sessionCookie);
+    const req = createMockRequest('/meu-espaco/perfil', sessionCookie);
     const res = middleware(req);
 
     expect(res?.type).toBe('next');
     expect(NextResponse.next).toHaveBeenCalled();
   });
 
-  it('deve redirecionar para /meu-espaço se um usuário com cargo COLABORADOR tentar acessar /admin', () => {
+  it('deve redirecionar para /meu-espaco se um usuário com cargo COLABORADOR tentar acessar /admin', () => {
     const sessionData = {
       id: 'user-123',
       nome: 'Fulano',
@@ -95,7 +95,7 @@ describe('Middleware', () => {
     const res = middleware(req);
 
     expect(res?.type).toBe('redirect');
-    expect(decodeURIComponent(res?.url)).toContain('/meu-espaço');
+    expect(decodeURIComponent(res?.url)).toContain('/meu-espaco');
     expect(NextResponse.redirect).toHaveBeenCalled();
   });
 
@@ -115,7 +115,7 @@ describe('Middleware', () => {
   });
 
   it('deve apagar o cookie de sessão e redirecionar para /login se o cookie estiver corrompido', () => {
-    const req = createMockRequest('/meu-espaço', '!!!invalid-base64!!!');
+    const req = createMockRequest('/meu-espaco', '!!!invalid-base64!!!');
     const res = middleware(req);
 
     expect(res?.type).toBe('redirect');

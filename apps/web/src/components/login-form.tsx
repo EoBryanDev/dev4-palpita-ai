@@ -51,7 +51,8 @@ export function LoginForm() {
           localStorage.setItem('palpita_user_email', email);
         }
         setTimeout(() => {
-          router.push('/');
+          router.push('/meu-espaco');
+          router.refresh();
         }, 1500);
       } else {
         setErrorMsg(res.message);
