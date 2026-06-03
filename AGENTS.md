@@ -25,6 +25,8 @@ Ao trabalhar no arquivo de controle de tarefas (`openspec/changes/name-of-change
     3. Crie um novo commit seguindo as regras de padronização do `docs/rules/versioning.md`.
     4. Marque a tarefa como concluída (Done).
 
+**Ao mudar diretrizes**: Se alguma modificação alterar a estrutura ou a lógica de negócios da aplicação, você **deve** atualizar o respectivo arquivo de documentação em `./docs` **antes ou durante** a alteração do código.
+
 ## 3. Utilização de Habilidades (Skills)
 
 - Sempre que estiver trabalhando em alguma alteração, verifique se existem habilidades (skills) úteis no diretório `~/.gemini/antigravity/skills` que possam ajudar a resolver a tarefa de forma mais eficiente.
