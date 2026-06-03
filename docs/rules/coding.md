@@ -25,8 +25,7 @@
 - **Paradigma:** Híbrido.
 - **Funcional:** Obrigatório para Componentes React, Hooks e Helpers.
 - **POO (Orientação a Objetos):** Obrigatório para Objetos de Negócio Centrais, Serviços e Modelos de Domínio.
-- **ESLint:** Airbnb Base + regras do React.
-- **Formatação:** Ordenação alfabética de imports e ordenação de classes do Tailwind CSS (plugin do Prettier).
+- **Lint/Formatação:** Regras definidas em `.biome/biome.json`.
 - **Code Smells:** Aplique sempre os princípios SOLID, DRY, Fail Fast e K.I.S.S. Evite código duplicado e funções com mais de 100 linhas.
 - **Comentários:** Nunca utilize comentários para explicar o código. Utilize comentários apenas para explicar o porquê de algo estar sendo feito de determinada maneira.
 - **Imports:** Sempre organize os imports em ordem alfabética, separados por categorias (padrão, terceiros, locais).
