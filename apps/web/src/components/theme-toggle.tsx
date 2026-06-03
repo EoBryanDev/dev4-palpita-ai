@@ -2,10 +2,11 @@
 
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import type React from 'react';
 import { useEffect, useState } from 'react';
 import { Button } from './ui/button';
 
-export function ThemeToggle(): JSX.Element | null {
+export function ThemeToggle(): React.ReactNode {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
