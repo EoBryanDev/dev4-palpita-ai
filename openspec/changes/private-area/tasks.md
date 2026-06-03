@@ -1,0 +1,21 @@
+# tasks - private-area
+
+- [ ] Implementar Autenticação e Middleware de Segurança <!-- id: 0 -->
+  - Configurar armazenamento de sessão e cookies.
+  - Criar o `middleware.ts` para proteger `/meu-espaço/*` e `/admin/*`.
+  - Redirecionar usuários não logados e aplicar restrição de role `ADMIN`.
+- [ ] Implementar a página Meu Espaço (Dashboard do Competidor) <!-- id: 1 -->
+  - Exibir resumo do usuário (pontuação atual, classificação no ranking, status do convite).
+  - Listar jogos da rodada com campos para preenchimento/salvamento de palpites.
+  - Implementar validação do prazo de palpites (bloqueando após horário inicial do jogo) no cliente e servidor (RN02).
+- [ ] Implementar Painel Administrativo de Convites e Usuários (`/admin/usuarios`) <!-- id: 2 -->
+  - Listar usuários com solicitações de convites pendentes.
+  - Permitir aprovação de convites e liberação pós-pagamento (RN04, RN05).
+- [ ] Implementar Painel de Cadastro de Jogos e Resultados (`/admin/partidas`) <!-- id: 3 -->
+  - Interface para cadastrar partidas e organizar rodadas.
+  - Campo para lançamento de placar final oficial.
+  - Implementar transação no banco de dados para salvar placar, rodar cálculo automático dos pontos dos palpites (RN01) e atualizar ranking geral.
+- [ ] Testes de Integração e Validação do Fluxo Privado <!-- id: 4 -->
+  - Validar bloqueios do middleware.
+  - Validar bloqueio de palpites fora do prazo.
+  - Validar cálculos das pontuações de palpites pós-inserção do placar oficial.
