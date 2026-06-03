@@ -19,13 +19,11 @@
 
 ## 4. Inicialização da Aplicação Web Next.js
 
-- [ ] 4.1 Criar a pasta apps/web e inicializar o Next.js com App Router.
-- [ ] 4.2 Configurar o Tailwind CSS e shadcn/ui em apps/web para suporte nativo a temas (Light/Dark).
-- [ ] 4.3 Configurar o Biome e o Vitest no subprojeto apps/web.
-- [ ] 4.4 Ligar as dependências locais de packages/core e packages/db em apps/web para importar os tipos e regras.
-- [ ] 4.5 Criar uma versão esqueleto da rota pública `/home` (com Banner de Timeout e Toggle de Tema) e da rota `/validation-user/[id]` para validação de tokens.
+- [x] 4.1 Criar a pasta apps/web e inicializar o Next.js com App Router. (Status: DONE, Início: 03:22, Concluído: 03:26)
+- [x] 4.2 Configurar o Tailwind CSS e shadcn/ui em apps/web para suporte nativo a temas (Light/Dark). (Status: DONE, Início: 03:27, Concluído: 03:29)
+- [x] 4.3 Configurar o Biome e o Vitest no subprojeto apps/web. (Status: DONE, Início: 03:30, Concluído: 03:31)
+- [x] 4.4 Ligar as dependências locais de packages/core e packages/db em apps/web para importar os tipos e regras. (Status: DONE, Início: 03:32, Concluído: 03:32)
+- [x] 4.5 Criar uma versão esqueleto da rota pública `/home` (com Banner de Timeout e Toggle de Tema) e da rota `/validation-user/[id]` para validação de tokens. (Status: DONE, Início: 03:33, Concluído: 03:34)
 
-## 5. Validação Final de Qualidade
-
-- [ ] 5.1 Rodar a verificação de linting e formatação com Biome em todo o repositório (`biome check --apply .`).
-- [ ] 5.2 Executar todos os testes de unidade via Turborepo para garantir que a cobertura está adequada e tudo compila.
+- [x] 5.1 Rodar a verificação de linting e formatação com Biome em todo o repositório (`biome check --apply .`). (Status: DONE, Início: 03:34, Concluído: 03:34)
+- [x] 5.2 Executar todos os testes de unidade via Turborepo para garantir que a cobertura está adequada e tudo compila. (Status: DONE, Início: 03:34, Concluído: 03:34)
