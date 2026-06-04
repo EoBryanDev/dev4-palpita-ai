@@ -13,6 +13,13 @@ vi.mock('@/app/actions/auth', () => ({
   logoutUsuario: vi.fn(),
 }));
 
+const mockToast = vi.fn();
+vi.mock('@/components/ui/use-toast', () => ({
+  useToast: () => ({
+    toast: mockToast,
+  }),
+}));
+
 const mockPush = vi.fn();
 const mockRefresh = vi.fn();
 
@@ -137,9 +144,10 @@ describe('DashboardPalpites Component', () => {
       expect(salvarPalpite).toHaveBeenCalledWith('partida-1', 3, 2);
     });
 
-    expect(
-      await screen.findByText('Palpite registrado com sucesso!'),
-    ).toBeDefined();
+    expect(mockToast).toHaveBeenCalledWith({
+      title: 'Palpite salvo!',
+      description: 'Palpite registrado com sucesso!',
+    });
     expect(mockRefresh).toHaveBeenCalled();
   });
 });

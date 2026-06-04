@@ -3,8 +3,8 @@
 import { logoutUsuario } from '@/app/actions/auth';
 import { salvarPalpite } from '@/app/actions/palpites';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 import {
-  AlertCircle,
   AlertTriangle,
   CheckCircle2,
   Clock,
@@ -71,17 +71,13 @@ export function DashboardPalpites({
   historico,
 }: IDashboardPalpitesProps): React.ReactNode {
   const router = useRouter();
+  const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
   const [logoutPending, startLogout] = useTransition();
 
   // Estado para armazenar os valores temporários digitados nos inputs de palpites
   const [valoresPalpites, setValoresPalpites] = useState<
     Record<string, { golsA: string; golsB: string }>
-  >({});
-
-  // Mensagens de feedback por partida
-  const [feedbacks, setFeedbacks] = useState<
-    Record<string, { success: boolean; message: string }>
   >({});
 
   const isUsuarioLiberado = userStatus === 'LIBERADO';
@@ -114,37 +110,33 @@ export function DashboardPalpites({
     const golsBStr = valores?.golsB ?? String(partida.palpiteGolsB ?? '');
 
     if (golsAStr === '' || golsBStr === '') {
-      setFeedbacks((prev) => ({
-        ...prev,
-        [partidaId]: {
-          success: false,
-          message: 'Preencha ambos os placares para salvar.',
-        },
-      }));
+      toast({
+        title: 'Aviso',
+        description: 'Preencha ambos os placares para salvar.',
+        variant: 'destructive',
+      });
       return;
     }
 
     const golsA = Number.parseInt(golsAStr, 10);
     const golsB = Number.parseInt(golsBStr, 10);
 
-    setFeedbacks((prev) => ({
-      ...prev,
-      [partidaId]: { success: false, message: '' },
-    }));
-
     startTransition(async () => {
       const result = await salvarPalpite(partidaId, golsA, golsB);
-      setFeedbacks((prev) => ({
-        ...prev,
-        [partidaId]: {
-          success: result.success,
-          message: result.message,
-        },
-      }));
 
       if (result.success) {
+        toast({
+          title: 'Palpite salvo!',
+          description: result.message,
+        });
         // Recarregar os dados do servidor para atualizar o dashboard
         router.refresh();
+      } else {
+        toast({
+          title: 'Erro ao salvar',
+          description: result.message,
+          variant: 'destructive',
+        });
       }
     });
   };
@@ -372,24 +364,6 @@ export function DashboardPalpites({
                           </Button>
                         </div>
                       </div>
-
-                      {/* Feedbacks de validação/sucesso */}
-                      {feedbacks[partida.id]?.message && (
-                        <div
-                          className={`text-xs font-semibold w-full md:w-auto ${
-                            feedbacks[partida.id].success
-                              ? 'text-emerald-600 dark:text-emerald-400'
-                              : 'text-red-500'
-                          } flex items-center gap-1 md:mt-0`}
-                        >
-                          {feedbacks[partida.id].success ? (
-                            <CheckCircle2 className="h-4 w-4 shrink-0" />
-                          ) : (
-                            <AlertCircle className="h-4 w-4 shrink-0" />
-                          )}
-                          <span>{feedbacks[partida.id].message}</span>
-                        </div>
-                      )}
                     </div>
                   ))}
                 </div>
@@ -494,24 +468,6 @@ export function DashboardPalpites({
                             Alterar
                           </Button>
                         </div>
-
-                        {/* Feedbacks de validação/sucesso */}
-                        {feedbacks[partida.id]?.message && (
-                          <div
-                            className={`text-xs font-semibold w-full md:w-auto ${
-                              feedbacks[partida.id].success
-                                ? 'text-emerald-600 dark:text-emerald-400'
-                                : 'text-red-500'
-                            } flex items-center gap-1 md:mt-0`}
-                          >
-                            {feedbacks[partida.id].success ? (
-                              <CheckCircle2 className="h-4 w-4 shrink-0" />
-                            ) : (
-                              <AlertCircle className="h-4 w-4 shrink-0" />
-                            )}
-                            <span>{feedbacks[partida.id].message}</span>
-                          </div>
-                        )}
                       </div>
                     );
                   })}
