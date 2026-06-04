@@ -13,10 +13,10 @@
 
 ## 3. Painel Administrativo de Convites e Usuários (/admin/usuarios)
 
-- [ ] 3.1 Criar a interface de administração `/admin/usuarios` listando usuários pendentes e liberados.
-- [ ] 3.2 Implementar Server Actions para aprovação de solicitações, geração de tokens temporários (RN04) e ativação.
-- [ ] 3.3 Adicionar controle de liberação de apostas ("Liberado" / "Pendente") conforme RN05.
-- [ ] 3.4 Escrever testes de integração para o fluxo de aprovação e ativação de convites.
+- [x] 3.1 Criar a interface de administração `/admin/usuarios` listando usuários pendentes e liberados. (Status: DONE, Início: 13:01, Concluído: 13:04)
+- [x] 3.2 Implementar Server Actions para aprovação de solicitações, geração de tokens temporários (RN04) e ativação. (Status: DONE, Início: 13:01, Concluído: 13:04)
+- [x] 3.3 Adicionar controle de liberação de apostas ("Liberado" / "Pendente") conforme RN05. (Status: DONE, Início: 13:01, Concluído: 13:04)
+- [x] 3.4 Escrever testes de integração para o fluxo de aprovação e ativação de convites. (Status: DONE, Início: 13:01, Concluído: 13:04)
 
 ## 4. Painel de Cadastro de Jogos e Resultados (/admin/partidas)
 

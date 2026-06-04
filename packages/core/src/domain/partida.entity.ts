@@ -1,4 +1,9 @@
-export type TPartidaStatus = 'AGENDADA' | 'EM_ANDAMENTO' | 'FINALIZADA';
+export type TPartidaStatus =
+  | 'AGENDADA'
+  | 'EM_ANDAMENTO'
+  | 'FINALIZADA'
+  | 'AGENDADO'
+  | 'FINALIZADO';
 
 export interface IPartidaProps {
   id: string;

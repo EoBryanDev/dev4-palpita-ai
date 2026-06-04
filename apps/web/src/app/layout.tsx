@@ -9,6 +9,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { TimeoutBanner } from '@/components/timeout-banner';
 
 import { obterSessao } from '@/app/actions/auth';
+import { Toaster } from '@/components/ui/toaster';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -52,6 +53,7 @@ export default async function RootLayout({
             <main className="flex-1 flex flex-col">{children}</main>
             <Footer />
             <ScrollToTop />
+            <Toaster />
           </QueryProvider>
         </ThemeProvider>
       </body>
