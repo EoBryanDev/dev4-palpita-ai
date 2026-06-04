@@ -27,6 +27,6 @@
 
 ## 5. Validação e Qualidade
 
-- [ ] 5.1 Rodar a verificação de linting e formatação com Biome em todo o repositório (`biome check --write .`).
-- [ ] 5.2 Executar todos os testes de unidade da aplicação web para garantir que a cobertura está adequada e tudo compila com sucesso.
+- [x] 5.1 Rodar a verificação de linting e formatação com Biome em todo o repositório (`biome check --write .`). (Status: DONE, Início: 13:30, Concluído: 13:30)
+- [x] 5.2 Executar todos os testes de unidade da aplicação web para garantir que a cobertura está adequada e tudo compila com sucesso. (Status: DONE, Início: 13:30, Concluído: 13:31)
 
