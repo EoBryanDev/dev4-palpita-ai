@@ -81,7 +81,9 @@ export function Header({
           {links.map((link) => {
             const isActive =
               pathname === link.href ||
-              (link.href !== '/home' && pathname.startsWith(link.href));
+              (link.href !== '/home' &&
+                link.href !== '/admin' &&
+                pathname.startsWith(link.href));
             return (
               <Link
                 key={link.href}
@@ -152,7 +154,9 @@ export function Header({
             {links.map((link) => {
               const isActive =
                 pathname === link.href ||
-                (link.href !== '/home' && pathname.startsWith(link.href));
+                (link.href !== '/home' &&
+                  link.href !== '/admin' &&
+                  pathname.startsWith(link.href));
               return (
                 <Link
                   key={link.href}
