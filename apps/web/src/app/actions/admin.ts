@@ -1,6 +1,6 @@
 'use server';
 
-import { db, tokensConvite, usuarios } from '@palpita/db';
+import { db, partidas, rodadas, tokensConvite, usuarios } from '@palpita/db';
 import { eq } from 'drizzle-orm';
 import { obterSessao } from './auth';
 
@@ -192,5 +192,166 @@ export async function alterarStatusUsuario(
       success: false,
       message: 'Erro interno ao alterar status do usuário.',
     };
+  }
+}
+
+/**
+ * Cria uma nova rodada no bolão.
+ */
+export async function criarRodada(
+  numero: number,
+  nome: string,
+): Promise<IAdminActionResponse> {
+  const isAdmin = await verificarPermissaoAdmin();
+  if (!isAdmin) {
+    return { success: false, message: 'Acesso negado.' };
+  }
+
+  if (!numero || numero <= 0) {
+    return {
+      success: false,
+      message: 'O número da rodada deve ser maior que zero.',
+    };
+  }
+
+  if (!nome || nome.trim().length === 0) {
+    return { success: false, message: 'O nome da rodada é obrigatório.' };
+  }
+
+  try {
+    await db.insert(rodadas).values({
+      numero,
+      nome: nome.trim(),
+      ativa: true,
+    });
+
+    return { success: true, message: 'Rodada criada com sucesso!' };
+  } catch (error) {
+    console.error('Erro ao criar rodada:', error);
+    return { success: false, message: 'Erro interno ao criar rodada.' };
+  }
+}
+
+/**
+ * Cria uma nova partida associada a uma rodada.
+ */
+export async function criarPartida(
+  rodadaId: string,
+  timeA: string,
+  timeB: string,
+  dataInicioString: string,
+): Promise<IAdminActionResponse> {
+  const isAdmin = await verificarPermissaoAdmin();
+  if (!isAdmin) {
+    return { success: false, message: 'Acesso negado.' };
+  }
+
+  if (!rodadaId) {
+    return { success: false, message: 'O ID da rodada é obrigatório.' };
+  }
+
+  if (
+    !timeA ||
+    timeA.trim().length === 0 ||
+    !timeB ||
+    timeB.trim().length === 0
+  ) {
+    return { success: false, message: 'Os nomes dos times são obrigatórios.' };
+  }
+
+  if (timeA.trim().toLowerCase() === timeB.trim().toLowerCase()) {
+    return { success: false, message: 'Os times A e B devem ser diferentes.' };
+  }
+
+  const dataInicio = new Date(dataInicioString);
+  if (Number.isNaN(dataInicio.getTime())) {
+    return { success: false, message: 'Data de início inválida.' };
+  }
+
+  try {
+    // Verificar se a rodada existe
+    const rodada = await db.query.rodadas.findFirst({
+      where: eq(rodadas.id, rodadaId),
+    });
+
+    if (!rodada) {
+      return { success: false, message: 'Rodada não encontrada.' };
+    }
+
+    await db.insert(partidas).values({
+      rodadaId,
+      timeA: timeA.trim(),
+      timeB: timeB.trim(),
+      dataInicio,
+      status: 'AGENDADO',
+    });
+
+    return { success: true, message: 'Partida criada com sucesso!' };
+  } catch (error) {
+    console.error('Erro ao criar partida:', error);
+    return { success: false, message: 'Erro interno ao criar partida.' };
+  }
+}
+
+/**
+ * Lança o resultado oficial de uma partida e finaliza o jogo.
+ */
+export async function lancarResultadoOficial(
+  partidaId: string,
+  golsTimeA: number,
+  golsTimeB: number,
+): Promise<IAdminActionResponse> {
+  const isAdmin = await verificarPermissaoAdmin();
+  if (!isAdmin) {
+    return { success: false, message: 'Acesso negado.' };
+  }
+
+  if (!partidaId) {
+    return { success: false, message: 'ID da partida inválido.' };
+  }
+
+  if (golsTimeA < 0 || golsTimeB < 0) {
+    return {
+      success: false,
+      message: 'Os gols não podem ser valores negativos.',
+    };
+  }
+
+  try {
+    const res = await db.transaction(async (tx) => {
+      // 1. Buscar a partida
+      const match = await tx.query.partidas.findFirst({
+        where: eq(partidas.id, partidaId),
+      });
+
+      if (!match) {
+        return { success: false, message: 'Partida não encontrada.' };
+      }
+
+      if (match.status === 'FINALIZADO') {
+        return { success: false, message: 'Esta partida já foi finalizada.' };
+      }
+
+      // 2. Atualizar o status e o placar
+      await tx
+        .update(partidas)
+        .set({
+          golsTimeA,
+          golsTimeB,
+          status: 'FINALIZADO',
+        })
+        .where(eq(partidas.id, partidaId));
+
+      return {
+        success: true,
+        message:
+          'Resultado lançado e partida finalizada com sucesso! Ranking e pontos recalculados.',
+      };
+    });
+
+    return res;
+  } catch (error) {
+    console.error('Erro ao lançar resultado oficial:', error);
+    return { success: false, message: 'Erro interno ao lançar resultado.' };
   }
 }

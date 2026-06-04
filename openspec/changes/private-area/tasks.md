@@ -20,10 +20,10 @@
 
 ## 4. Painel de Cadastro de Jogos e Resultados (/admin/partidas)
 
-- [ ] 4.1 Criar a tela `/admin/partidas` para visualização e cadastro de novos jogos e rodadas de palpites.
-- [ ] 4.2 Desenvolver a funcionalidade de lançamento de placar final oficial das partidas.
-- [ ] 4.3 Implementar transação segura no banco de dados para salvar resultados oficiais, executar recálculo dinâmico de palpites (RN01) e atualizar ranking corporativo.
-- [ ] 4.4 Escrever testes cobrindo a transação de recálculo de pontos pós-jogo e atualização geral de ranking.
+- [x] 4.1 Criar a tela `/admin/partidas` para visualização e cadastro de novos jogos e rodadas de palpites. (Status: DONE, Início: 13:21, Concluído: 13:25)
+- [x] 4.2 Desenvolver a funcionalidade de lançamento de placar final oficial das partidas. (Status: DONE, Início: 13:21, Concluído: 13:25)
+- [x] 4.3 Implementar transação segura no banco de dados para salvar resultados oficiais, executar recálculo dinâmico de palpites (RN01) e atualizar ranking corporativo. (Status: DONE, Início: 13:21, Concluído: 13:25)
+- [x] 4.4 Escrever testes cobrindo a transação de recálculo de pontos pós-jogo e atualização geral de ranking. (Status: DONE, Início: 13:21, Concluído: 13:25)
 
 ## 5. Validação e Qualidade
 
