@@ -6,10 +6,10 @@
 
 ## 2. Refatoração de Lógica de Negócio e APIs
 
-- [ ] 2.1 Atualizar a entidade de partida e as regras de validação no pacote `@palpita/core` para refletir as referências de times.
-- [ ] 2.2 Atualizar as Server Actions administrativas em `apps/web/src/app/actions/admin.ts` para cadastro de partidas e lançamento de resultados oficiais usando os relacionamentos de times.
-- [ ] 2.3 Atualizar a Server Action de salvar palpites (`apps/web/src/app/actions/palpites.ts`) para suportar a nova estrutura de partida baseada em times.
-- [ ] 2.4 Corrigir o bug do filtro de status na API `/api/palpites/route.ts` para abranger usuários `ATIVO` e `LIBERADO`, enriquecendo os nomes e emojis dos times a partir da tabela.
+- [x] 2.1 Atualizar a entidade de partida e as regras de validação no pacote `@palpita/core` para refletir as referências de times. (Status: DONE, Início: 14:14, Concluído: 14:26)
+- [x] 2.2 Atualizar as Server Actions administrativas em `apps/web/src/app/actions/admin.ts` para cadastro de partidas e lançamento de resultados oficiais usando os relacionamentos de times. (Status: DONE, Início: 14:14, Concluído: 14:26)
+- [x] 2.3 Atualizar a Server Action de salvar palpites (`apps/web/src/app/actions/palpites.ts`) para suportar a nova estrutura de partida baseada em times. (Status: DONE, Início: 14:14, Concluído: 14:26)
+- [x] 2.4 Corrigir o bug do filtro de status na API `/api/palpites/route.ts` para abranger usuários `ATIVO` e `LIBERADO`, enriquecendo os nomes e emojis dos times a partir da tabela. (Status: DONE, Início: 14:14, Concluído: 14:26)
 
 ## 3. Interface do Usuário (UI) e Páginas
 
