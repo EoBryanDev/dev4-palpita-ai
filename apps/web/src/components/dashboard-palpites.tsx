@@ -22,6 +22,8 @@ export interface IPartidaDashboard {
   id: string;
   timeA: string;
   timeB: string;
+  timeAEmoji?: string;
+  timeBEmoji?: string;
   dataInicio: string;
   status: string;
   golsTimeA?: number | null;
@@ -35,6 +37,8 @@ export interface IHistoricoDashboard {
   partidaId: string;
   timeA: string;
   timeB: string;
+  timeAEmoji?: string;
+  timeBEmoji?: string;
   placarOficialA: number;
   placarOficialB: number;
   palpiteA: number;
@@ -307,10 +311,20 @@ export function DashboardPalpites({
                           {formatarData(partida.dataInicio)}
                         </span>
                         <div className="flex items-center gap-3">
+                          {partida.timeAEmoji && (
+                            <span className="text-base">
+                              {partida.timeAEmoji}
+                            </span>
+                          )}
                           <span className="text-sm font-bold">
                             {partida.timeA}
                           </span>
                           <span className="text-xs text-zinc-400">vs</span>
+                          {partida.timeBEmoji && (
+                            <span className="text-base">
+                              {partida.timeBEmoji}
+                            </span>
+                          )}
                           <span className="text-sm font-bold">
                             {partida.timeB}
                           </span>
@@ -415,10 +429,20 @@ export function DashboardPalpites({
                             {formatarData(partida.dataInicio)}
                           </span>
                           <div className="flex items-center gap-3">
+                            {partida.timeAEmoji && (
+                              <span className="text-base">
+                                {partida.timeAEmoji}
+                              </span>
+                            )}
                             <span className="text-sm font-bold">
                               {partida.timeA}
                             </span>
                             <span className="text-xs text-zinc-400">vs</span>
+                            {partida.timeBEmoji && (
+                              <span className="text-base">
+                                {partida.timeBEmoji}
+                              </span>
+                            )}
                             <span className="text-sm font-bold">
                               {partida.timeB}
                             </span>
@@ -537,6 +561,9 @@ export function DashboardPalpites({
                         Placar Oficial
                       </span>
                       <div className="flex items-center gap-2">
+                        {item.timeAEmoji && (
+                          <span className="text-base">{item.timeAEmoji}</span>
+                        )}
                         <span className="text-xs font-bold">{item.timeA}</span>
                         <span className="bg-zinc-100 dark:bg-zinc-800/80 px-2 py-0.5 rounded-md font-black text-sm">
                           {item.placarOficialA}
@@ -545,6 +572,9 @@ export function DashboardPalpites({
                         <span className="bg-zinc-100 dark:bg-zinc-800/80 px-2 py-0.5 rounded-md font-black text-sm">
                           {item.placarOficialB}
                         </span>
+                        {item.timeBEmoji && (
+                          <span className="text-base">{item.timeBEmoji}</span>
+                        )}
                         <span className="text-xs font-bold">{item.timeB}</span>
                       </div>
                     </div>

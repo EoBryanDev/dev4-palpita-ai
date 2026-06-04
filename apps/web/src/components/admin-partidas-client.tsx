@@ -31,6 +31,8 @@ export interface IPartidaAdmin {
   rodadaId: string;
   timeA: string;
   timeB: string;
+  timeAEmoji?: string;
+  timeBEmoji?: string;
   golsTimeA: number | null;
   golsTimeB: number | null;
   dataInicio: string;
@@ -38,14 +40,23 @@ export interface IPartidaAdmin {
   rodadaNome: string;
 }
 
+export interface ITimeAdmin {
+  id: string;
+  nome: string;
+  emoji: string;
+  grupo: string;
+}
+
 interface IAdminPartidasClientProps {
   rodadas: IRodadaAdmin[];
   partidas: IPartidaAdmin[];
+  times: ITimeAdmin[];
 }
 
 export function AdminPartidasClient({
   rodadas,
   partidas,
+  times,
 }: IAdminPartidasClientProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -119,8 +130,8 @@ export function AdminPartidasClient({
     startTransition(async () => {
       const res = await criarPartida(
         partidaRodadaId,
-        partidaTimeA.trim(),
-        partidaTimeB.trim(),
+        partidaTimeA,
+        partidaTimeB,
         partidaDataInicio,
       );
       if (res.success) {
@@ -299,16 +310,21 @@ export function AdminPartidasClient({
                 >
                   Time A (Mandante)
                 </label>
-                <input
+                <select
                   id="partidaTimeA"
-                  type="text"
                   required
-                  placeholder="Ex: Brasil"
                   value={partidaTimeA}
                   onChange={(e) => setPartidaTimeA(e.target.value)}
                   disabled={isPending}
-                  className="w-full rounded-xl border border-zinc-200 bg-zinc-55/30 px-3 py-2 text-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
-                />
+                  className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm outline-none transition-all cursor-pointer dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
+                >
+                  <option value="">Selecione o Time A...</option>
+                  {times.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.emoji} {t.nome}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -320,16 +336,21 @@ export function AdminPartidasClient({
                 >
                   Time B (Visitante)
                 </label>
-                <input
+                <select
                   id="partidaTimeB"
-                  type="text"
                   required
-                  placeholder="Ex: França"
                   value={partidaTimeB}
                   onChange={(e) => setPartidaTimeB(e.target.value)}
                   disabled={isPending}
-                  className="w-full rounded-xl border border-zinc-200 bg-zinc-55/30 px-3 py-2 text-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
-                />
+                  className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm outline-none transition-all cursor-pointer dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
+                >
+                  <option value="">Selecione o Time B...</option>
+                  {times.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.emoji} {t.nome}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label
@@ -448,8 +469,13 @@ export function AdminPartidasClient({
 
                               {/* Times e Placar */}
                               <div className="flex items-center justify-between gap-2 py-2">
-                                <div className="flex-1 text-right font-black text-sm truncate">
-                                  {partida.timeA}
+                                <div className="flex-1 text-right font-black text-sm truncate flex items-center justify-end gap-1.5">
+                                  <span>{partida.timeA}</span>
+                                  {partida.timeAEmoji && (
+                                    <span className="text-base">
+                                      {partida.timeAEmoji}
+                                    </span>
+                                  )}
                                 </div>
 
                                 {/* Area Placar */}
@@ -501,8 +527,13 @@ export function AdminPartidasClient({
                                   )}
                                 </div>
 
-                                <div className="flex-1 text-left font-black text-sm truncate">
-                                  {partida.timeB}
+                                <div className="flex-1 text-left font-black text-sm truncate flex items-center justify-start gap-1.5">
+                                  {partida.timeBEmoji && (
+                                    <span className="text-base">
+                                      {partida.timeBEmoji}
+                                    </span>
+                                  )}
+                                  <span>{partida.timeB}</span>
                                 </div>
                               </div>
 
