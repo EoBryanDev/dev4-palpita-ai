@@ -405,6 +405,9 @@ export function AdminPartidasClient({
                             partida.status === 'FINALIZADO' ||
                             partida.status === 'FINALIZADA';
 
+                          const isJogoNoFuturo =
+                            new Date() < new Date(partida.dataInicio);
+
                           const dataFormatada = new Date(
                             partida.dataInicio,
                           ).toLocaleString('pt-BR', {
@@ -429,6 +432,11 @@ export function AdminPartidasClient({
                                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 flex items-center gap-1">
                                     <CheckCircle className="h-3 w-3 text-emerald-500" />
                                     Finalizado
+                                  </span>
+                                ) : isJogoNoFuturo ? (
+                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100/50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-455 flex items-center gap-1">
+                                    <Calendar className="h-3 w-3 text-blue-500" />
+                                    Futuro
                                   </span>
                                 ) : (
                                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100/50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 flex items-center gap-1">
@@ -468,8 +476,8 @@ export function AdminPartidasClient({
                                             e.target.value,
                                           )
                                         }
-                                        disabled={isPending}
-                                        className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500"
+                                        disabled={isPending || isJogoNoFuturo}
+                                        className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                       />
                                       <span className="text-zinc-400 text-xs">
                                         x
@@ -486,8 +494,8 @@ export function AdminPartidasClient({
                                             e.target.value,
                                           )
                                         }
-                                        disabled={isPending}
-                                        className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500"
+                                        disabled={isPending || isJogoNoFuturo}
+                                        className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                       />
                                     </div>
                                   )}
@@ -500,14 +508,22 @@ export function AdminPartidasClient({
 
                               {/* Ação Finalizar */}
                               {!isFinalizado && (
-                                <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 flex justify-end">
+                                <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
+                                  {isJogoNoFuturo ? (
+                                    <span className="text-[10px] text-zinc-400 dark:text-zinc-500 flex items-center gap-1">
+                                      <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
+                                      Não iniciado
+                                    </span>
+                                  ) : (
+                                    <span />
+                                  )}
                                   <Button
                                     size="sm"
-                                    disabled={isPending}
+                                    disabled={isPending || isJogoNoFuturo}
                                     onClick={() =>
                                       handleLancarResultado(partida.id)
                                     }
-                                    className="bg-zinc-900 hover:bg-zinc-850 text-white font-semibold text-xs px-3 h-8 rounded-xl flex items-center gap-1 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                                    className="bg-zinc-900 hover:bg-zinc-850 text-white font-semibold text-xs px-3 h-8 rounded-xl flex items-center gap-1 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
                                     <CheckCircle className="h-3.5 w-3.5" />
                                     Finalizar Jogo

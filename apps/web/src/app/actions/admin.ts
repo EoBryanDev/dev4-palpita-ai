@@ -332,6 +332,14 @@ export async function lancarResultadoOficial(
         return { success: false, message: 'Esta partida já foi finalizada.' };
       }
 
+      if (new Date() < new Date(match.dataInicio)) {
+        return {
+          success: false,
+          message:
+            'Não é possível lançar o resultado de uma partida que ainda não começou.',
+        };
+      }
+
       // 2. Atualizar o status e o placar
       await tx
         .update(partidas)
