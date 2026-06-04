@@ -1,8 +1,8 @@
 ## 1. Banco de Dados e Persistência
 
-- [/] 1.1 Criar a tabela `times` no schema do banco em `packages/db` e atualizar a tabela `partidas` para referenciar `timeAId` e `timeBId`. (Status: IN_PROGRESS, Início: 14:01)
-- [/] 1.2 Atualizar o arquivo de semente de dados (`packages/db/src/seed.ts`) para incluir o cadastro de times e as rodadas/partidas já associadas aos respectivos IDs. (Status: IN_PROGRESS, Início: 14:01)
-- [/] 1.3 Rodar as migrações locais e reexecutar a semente de dados do banco de dados local (`pnpm db:seed`). (Status: IN_PROGRESS, Início: 14:01)
+- [x] 1.1 Criar a tabela `times` no schema do banco em `packages/db` e atualizar a tabela `partidas` para referenciar `timeAId` e `timeBId`. (Status: DONE, Início: 14:01, Concluído: 14:12)
+- [x] 1.2 Atualizar o arquivo de semente de dados (`packages/db/src/seed.ts`) para incluir o cadastro de times e as rodadas/partidas já associadas aos respectivos IDs. (Status: DONE, Início: 14:01, Concluído: 14:12)
+- [x] 1.3 Rodar as migrações locais e reexecutar a semente de dados do banco de dados local (`pnpm db:seed`). (Status: DONE, Início: 14:01, Concluído: 14:12)
 
 ## 2. Refatoração de Lógica de Negócio e APIs
 
