@@ -38,15 +38,19 @@ export function Header({
     { href: '/times', label: 'Times' },
     { href: '/chaves', label: 'Chaves' },
     { href: '/ranking', label: 'Ranking' },
-    { href: '/palpites', label: 'Palpites' },
   ];
 
-  // Adicionar links protegidos se o usuário estiver logado
+  // Adicionar links protegidos e condicionais se o usuário estiver logado
   if (user) {
-    links.push({ href: '/meu-espaco', label: 'Meu Espaço' });
     if (user.cargo === 'ADMIN') {
-      links.push({ href: '/admin/usuarios', label: 'Admin' });
+      links.push({ href: '/admin/usuarios', label: 'Usuários' });
+      links.push({ href: '/admin/partidas', label: 'Partidas' });
+    } else {
+      links.push({ href: '/palpites', label: 'Palpites' });
+      links.push({ href: '/meu-espaco', label: 'Meu Espaço' });
     }
+  } else {
+    links.push({ href: '/palpites', label: 'Palpites' });
   }
 
   const handleLogout = () => {
