@@ -1,15 +1,21 @@
-import { db, palpites, partidas, rodadas, usuarios } from '@palpita/db';
-import { eq } from 'drizzle-orm';
+import { db, palpites, partidas, rodadas, times, usuarios } from '@palpita/db';
+import { eq, or } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
 import { NextResponse } from 'next/server';
 
 export async function GET(): Promise<NextResponse> {
   try {
+    const timeA = alias(times, 'time_a');
+    const timeB = alias(times, 'time_b');
+
     // 1. Buscar todas as partidas com suas respectivas rodadas
     const dbPartidas = await db
       .select({
         id: partidas.id,
-        timeA: partidas.timeA,
-        timeB: partidas.timeB,
+        timeA: timeA.nome,
+        timeB: timeB.nome,
+        timeAEmoji: timeA.emoji,
+        timeBEmoji: timeB.emoji,
         golsTimeA: partidas.golsTimeA,
         golsTimeB: partidas.golsTimeB,
         dataInicio: partidas.dataInicio,
@@ -17,9 +23,11 @@ export async function GET(): Promise<NextResponse> {
         rodadaNome: rodadas.nome,
       })
       .from(partidas)
-      .innerJoin(rodadas, eq(partidas.rodadaId, rodadas.id));
+      .innerJoin(rodadas, eq(partidas.rodadaId, rodadas.id))
+      .innerJoin(timeA, eq(partidas.timeAId, timeA.id))
+      .innerJoin(timeB, eq(partidas.timeBId, timeB.id));
 
-    // 2. Buscar todos os palpites dos usuários ATIVOS
+    // 2. Buscar todos os palpites dos usuários ATIVOS ou LIBERADOS
     const dbPalpites = await db
       .select({
         id: palpites.id,
@@ -30,7 +38,7 @@ export async function GET(): Promise<NextResponse> {
       })
       .from(palpites)
       .innerJoin(usuarios, eq(palpites.usuarioId, usuarios.id))
-      .where(eq(usuarios.status, 'ATIVO'));
+      .where(or(eq(usuarios.status, 'ATIVO'), eq(usuarios.status, 'LIBERADO')));
 
     // Agrupar palpites por partidaId
     const palpitesPorPartida = new Map<string, typeof dbPalpites>();
@@ -75,6 +83,8 @@ export async function GET(): Promise<NextResponse> {
         id: match.id,
         timeA: match.timeA,
         timeB: match.timeB,
+        timeAEmoji: match.timeAEmoji,
+        timeBEmoji: match.timeBEmoji,
         golsTimeA: match.golsTimeA,
         golsTimeB: match.golsTimeB,
         dataInicio: match.dataInicio,
