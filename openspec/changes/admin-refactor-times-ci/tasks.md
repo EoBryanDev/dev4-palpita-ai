@@ -13,9 +13,9 @@
 
 ## 3. Interface do Usuário (UI) e Páginas
 
-- [ ] 3.1 Criar a página de Dashboard administrativo raiz `/admin` (`apps/web/src/app/admin/page.tsx`) com os resumos estatísticos de usuários e palpites.
-- [ ] 3.2 Atualizar a tela `/admin/partidas` para exibir seletores (dropdowns) de times cadastrados no formulário de criação de partidas e renderizar emojis/nomes dinâmicos.
-- [ ] 3.3 Atualizar o dashboard do competidor `/meu-espaco` e as páginas públicas (`/home`, `/agenda`, `/ranking`) para renderizar os dados das seleções obtidas do relacionamento com a tabela de times.
+- [x] 3.1 Criar a página de Dashboard administrativo raiz `/admin` (`apps/web/src/app/admin/page.tsx`) com os resumos estatísticos de usuários e palpites. (Status: DONE, Início: 14:39, Concluído: 14:41)
+- [x] 3.2 Atualizar a tela `/admin/partidas` para exibir seletores (dropdowns) de times cadastrados no formulário de criação de partidas e renderizar emojis/nomes dinâmicos. (Status: DONE, Início: 14:39, Concluído: 14:41)
+- [x] 3.3 Atualizar o dashboard do competidor `/meu-espaco` e as páginas públicas (`/home`, `/agenda`, `/ranking`) para renderizar os dados das seleções obtidas do relacionamento com a tabela de times. (Status: DONE, Início: 14:39, Concluído: 14:41)
 
 ## 4. Configurações de Ambiente e Integração Contínua (CI)
 
