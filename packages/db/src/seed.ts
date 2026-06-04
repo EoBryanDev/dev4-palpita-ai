@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import { eq } from 'drizzle-orm';
 import { db } from './connection';
-import { palpites, partidas, rodadas, usuarios, times } from './schema';
+import { palpites, partidas, rodadas, times, usuarios } from './schema';
 
 // Carregar variáveis de ambiente
 dotenv.config();
@@ -106,9 +106,19 @@ async function seed() {
 
     // 4. Cadastrar Times de Teste
     const timesMock = [
-      { nome: 'Brasil', emoji: '🇧🇷', confederacao: 'CONMEBOL', grupo: 'Grupo B' },
+      {
+        nome: 'Brasil',
+        emoji: '🇧🇷',
+        confederacao: 'CONMEBOL',
+        grupo: 'Grupo B',
+      },
       { nome: 'Croácia', emoji: '🇭🇷', confederacao: 'UEFA', grupo: 'Grupo F' },
-      { nome: 'Argentina', emoji: '🇦🇷', confederacao: 'CONMEBOL', grupo: 'Grupo C' },
+      {
+        nome: 'Argentina',
+        emoji: '🇦🇷',
+        confederacao: 'CONMEBOL',
+        grupo: 'Grupo C',
+      },
       { nome: 'França', emoji: '🇫🇷', confederacao: 'UEFA', grupo: 'Grupo D' },
       { nome: 'Alemanha', emoji: '🇩🇪', confederacao: 'UEFA', grupo: 'Grupo F' },
       { nome: 'Espanha', emoji: '🇪🇸', confederacao: 'UEFA', grupo: 'Grupo G' },
@@ -135,8 +145,8 @@ async function seed() {
       .insert(partidas)
       .values({
         rodadaId,
-        timeAId: timesMap.get('Brasil')!,
-        timeBId: timesMap.get('Croácia')!,
+        timeAId: timesMap.get('Brasil') ?? '',
+        timeBId: timesMap.get('Croácia') ?? '',
         golsTimeA: 2,
         golsTimeB: 1,
         dataInicio: dataPassado,
@@ -152,8 +162,8 @@ async function seed() {
       .insert(partidas)
       .values({
         rodadaId,
-        timeAId: timesMap.get('Argentina')!,
-        timeBId: timesMap.get('França')!,
+        timeAId: timesMap.get('Argentina') ?? '',
+        timeBId: timesMap.get('França') ?? '',
         dataInicio: dataFuturo1,
         status: 'AGENDADO',
       })
@@ -167,8 +177,8 @@ async function seed() {
       .insert(partidas)
       .values({
         rodadaId,
-        timeAId: timesMap.get('Alemanha')!,
-        timeBId: timesMap.get('Espanha')!,
+        timeAId: timesMap.get('Alemanha') ?? '',
+        timeBId: timesMap.get('Espanha') ?? '',
         dataInicio: dataFuturo2,
         status: 'AGENDADO',
       })
