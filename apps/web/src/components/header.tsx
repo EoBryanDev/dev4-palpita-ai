@@ -43,6 +43,7 @@ export function Header({
   // Adicionar links protegidos e condicionais se o usuário estiver logado
   if (user) {
     if (user.cargo === 'ADMIN') {
+      links.push({ href: '/admin', label: 'Painel Admin' });
       links.push({ href: '/admin/usuarios', label: 'Usuários' });
       links.push({ href: '/admin/partidas', label: 'Partidas' });
     } else {
