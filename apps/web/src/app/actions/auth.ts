@@ -3,6 +3,7 @@
 import { db, usuarios } from '@palpita/db';
 import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
+import { cookies } from 'next/headers';
 
 export interface ILoginResult {
   success: boolean;
@@ -13,6 +14,13 @@ export interface ILoginResult {
     email: string;
     cargo: string;
   };
+}
+
+export interface ISessionUser {
+  id: string;
+  nome: string;
+  email: string;
+  cargo: string;
 }
 
 export async function loginUsuario(
@@ -48,7 +56,7 @@ export async function loginUsuario(
       };
     }
 
-    if (usuario.status !== 'ATIVO') {
+    if (usuario.status !== 'ATIVO' && usuario.status !== 'LIBERADO') {
       return {
         success: false,
         message: 'Sua conta está pendente de liberação ou inativa.',
@@ -61,15 +69,29 @@ export async function loginUsuario(
       return { success: false, message: 'Credenciais inválidas.' };
     }
 
+    const sessionData: ISessionUser = {
+      id: usuario.id,
+      nome: usuario.nome,
+      email: usuario.email,
+      cargo: usuario.cargo,
+    };
+
+    const cookieStore = await cookies();
+    cookieStore.set(
+      'palpita_session',
+      btoa(encodeURIComponent(JSON.stringify(sessionData))),
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 7, // 1 semana
+        path: '/',
+      },
+    );
+
     return {
       success: true,
       message: 'Autenticação realizada com sucesso!',
-      user: {
-        id: usuario.id,
-        nome: usuario.nome,
-        email: usuario.email,
-        cargo: usuario.cargo,
-      },
+      user: sessionData,
     };
   } catch (error) {
     console.error('Erro ao realizar login:', error);
@@ -77,5 +99,37 @@ export async function loginUsuario(
       success: false,
       message: 'Erro interno ao realizar login. Tente novamente mais tarde.',
     };
+  }
+}
+
+export async function logoutUsuario(): Promise<{
+  success: boolean;
+  message: string;
+}> {
+  try {
+    const cookieStore = await cookies();
+    cookieStore.delete('palpita_session');
+    return { success: true, message: 'Logout realizado com sucesso!' };
+  } catch (error) {
+    console.error('Erro ao realizar logout:', error);
+    return {
+      success: false,
+      message: 'Erro interno ao realizar logout. Tente novamente mais tarde.',
+    };
+  }
+}
+
+export async function obterSessao(): Promise<ISessionUser | null> {
+  try {
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get('palpita_session')?.value;
+    if (!sessionCookie) {
+      return null;
+    }
+
+    const sessionStr = decodeURIComponent(atob(sessionCookie));
+    return JSON.parse(sessionStr);
+  } catch (error) {
+    return null;
   }
 }

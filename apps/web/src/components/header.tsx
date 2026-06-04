@@ -1,16 +1,36 @@
 'use client';
 
+import { logoutUsuario, obterSessao } from '@/app/actions/auth';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
-import { Menu, Trophy, X } from 'lucide-react';
+import { LogOut, Menu, Trophy, X } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import type React from 'react';
-import { useState } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 
-export function Header(): React.ReactNode {
+interface ISessionUser {
+  id: string;
+  nome: string;
+  email: string;
+  cargo: string;
+}
+
+export function Header({
+  initialSession = null,
+}: {
+  initialSession?: ISessionUser | null;
+}): React.ReactNode {
   const pathname = usePathname();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState<ISessionUser | null>(initialSession);
+  const [isPending, startTransition] = useTransition();
+
+  // Sincronizar com a sessão inicial que pode ser alterada na navegação do servidor
+  useEffect(() => {
+    setUser(initialSession);
+  }, [initialSession]);
 
   const links = [
     { href: '/home', label: 'Início' },
@@ -18,8 +38,29 @@ export function Header(): React.ReactNode {
     { href: '/times', label: 'Times' },
     { href: '/chaves', label: 'Chaves' },
     { href: '/ranking', label: 'Ranking' },
-    { href: '/palpites', label: 'Palpites' },
   ];
+
+  // Adicionar links protegidos e condicionais se o usuário estiver logado
+  if (user) {
+    if (user.cargo === 'ADMIN') {
+      links.push({ href: '/admin/usuarios', label: 'Usuários' });
+      links.push({ href: '/admin/partidas', label: 'Partidas' });
+    } else {
+      links.push({ href: '/palpites', label: 'Palpites' });
+      links.push({ href: '/meu-espaco', label: 'Meu Espaço' });
+    }
+  } else {
+    links.push({ href: '/palpites', label: 'Palpites' });
+  }
+
+  const handleLogout = () => {
+    startTransition(async () => {
+      await logoutUsuario();
+      setUser(null);
+      router.push('/login');
+      router.refresh();
+    });
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-zinc-200/80 bg-white/80 backdrop-blur-md transition-colors dark:border-zinc-800/80 dark:bg-zinc-950/80">
@@ -37,7 +78,9 @@ export function Header(): React.ReactNode {
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-6">
           {links.map((link) => {
-            const isActive = pathname === link.href;
+            const isActive =
+              pathname === link.href ||
+              (link.href !== '/home' && pathname.startsWith(link.href));
             return (
               <Link
                 key={link.href}
@@ -57,11 +100,34 @@ export function Header(): React.ReactNode {
         {/* Actions (Desktop) */}
         <div className="hidden md:flex items-center gap-4">
           <ThemeToggle />
-          <Link href="/login">
-            <Button className="bg-emerald-600 font-semibold text-white hover:bg-emerald-500 dark:bg-emerald-500 dark:text-zinc-950 dark:hover:bg-emerald-400">
-              Participar
-            </Button>
-          </Link>
+          {user ? (
+            <div className="flex items-center gap-3 pl-2 border-l border-zinc-200 dark:border-zinc-800">
+              <div className="flex flex-col text-right">
+                <span className="text-xs font-bold leading-none">
+                  {user.nome}
+                </span>
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-none">
+                  {user.cargo === 'ADMIN' ? 'Admin' : 'Competidor'}
+                </span>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleLogout}
+                disabled={isPending}
+                className="text-zinc-500 hover:text-red-600 dark:text-zinc-400 dark:hover:text-red-400 h-8 w-8"
+                title="Sair"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <Link href="/login">
+              <Button className="bg-emerald-600 font-semibold text-white hover:bg-emerald-500 dark:bg-emerald-500 dark:text-zinc-950 dark:hover:bg-emerald-400">
+                Participar
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Mobile Toggle */}
@@ -83,7 +149,9 @@ export function Header(): React.ReactNode {
         <div className="border-b border-zinc-200 bg-white px-4 py-4 transition-all dark:border-zinc-800 dark:bg-zinc-950 md:hidden">
           <nav className="flex flex-col gap-4">
             {links.map((link) => {
-              const isActive = pathname === link.href;
+              const isActive =
+                pathname === link.href ||
+                (link.href !== '/home' && pathname.startsWith(link.href));
               return (
                 <Link
                   key={link.href}
@@ -100,11 +168,34 @@ export function Header(): React.ReactNode {
               );
             })}
             <hr className="border-zinc-100 dark:border-zinc-800" />
-            <Link href="/login" onClick={() => setIsOpen(false)}>
-              <Button className="w-full bg-emerald-600 font-semibold text-white hover:bg-emerald-500 dark:bg-emerald-500 dark:text-zinc-950 dark:hover:bg-emerald-400">
-                Participar
-              </Button>
-            </Link>
+            {user ? (
+              <div className="flex items-center justify-between px-2">
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold">{user.nome}</span>
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {user.cargo === 'ADMIN' ? 'Admin' : 'Competidor'}
+                  </span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setIsOpen(false);
+                    handleLogout();
+                  }}
+                  disabled={isPending}
+                  className="text-xs font-bold border-red-500/20 text-red-500 hover:bg-red-50 dark:border-red-500/20 dark:hover:bg-red-950/20"
+                >
+                  Sair
+                </Button>
+              </div>
+            ) : (
+              <Link href="/login" onClick={() => setIsOpen(false)}>
+                <Button className="w-full bg-emerald-600 font-semibold text-white hover:bg-emerald-500 dark:bg-emerald-500 dark:text-zinc-950 dark:hover:bg-emerald-400">
+                  Participar
+                </Button>
+              </Link>
+            )}
           </nav>
         </div>
       )}

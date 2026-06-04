@@ -2,7 +2,17 @@ import { db } from '@palpita/db';
 import bcrypt from 'bcryptjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
-import { loginUsuario } from './auth';
+import { loginUsuario, logoutUsuario, obterSessao } from './auth';
+
+const mockCookiesStore = {
+  set: vi.fn(),
+  get: vi.fn(),
+  delete: vi.fn(),
+};
+
+vi.mock('next/headers', () => ({
+  cookies: vi.fn(() => Promise.resolve(mockCookiesStore)),
+}));
 
 vi.mock('@palpita/db', () => {
   const mockSelect = vi.fn();
@@ -25,6 +35,9 @@ vi.mock('bcryptjs', () => ({
 describe('loginUsuario', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockCookiesStore.set.mockClear();
+    mockCookiesStore.get.mockClear();
+    mockCookiesStore.delete.mockClear();
   });
 
   it('deve retornar erro se o e-mail estiver vazio', async () => {
@@ -172,5 +185,44 @@ describe('loginUsuario', () => {
       email: 'teste@empresa.com',
       cargo: 'COLABORADOR',
     });
+  });
+});
+
+describe('logoutUsuario', () => {
+  it('deve remover o cookie palpita_session e retornar sucesso', async () => {
+    const result = await logoutUsuario();
+    expect(result.success).toBe(true);
+    expect(result.message).toBe('Logout realizado com sucesso!');
+    expect(mockCookiesStore.delete).toHaveBeenCalledWith('palpita_session');
+  });
+});
+
+describe('obterSessao', () => {
+  it('deve retornar null se o cookie palpita_session não estiver presente', async () => {
+    mockCookiesStore.get.mockReturnValueOnce(undefined);
+    const session = await obterSessao();
+    expect(session).toBeNull();
+  });
+
+  it('deve decodificar o cookie e retornar os dados do usuário se estiver presente', async () => {
+    const sessionData = {
+      id: 'user-123',
+      nome: 'Fulano',
+      email: 'teste@empresa.com',
+      cargo: 'COLABORADOR',
+    };
+    const encodedCookie = btoa(encodeURIComponent(JSON.stringify(sessionData)));
+    mockCookiesStore.get.mockReturnValueOnce({ value: encodedCookie });
+
+    const session = await obterSessao();
+    expect(session).toEqual(sessionData);
+  });
+
+  it('deve retornar null se o cookie estiver corrompido ou inválido', async () => {
+    mockCookiesStore.get.mockReturnValueOnce({
+      value: 'cookie-invalido-nao-json',
+    });
+    const session = await obterSessao();
+    expect(session).toBeNull();
   });
 });
