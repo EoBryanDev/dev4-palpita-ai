@@ -21,7 +21,7 @@ describe('TimeoutBanner', () => {
     render(<TimeoutBanner />);
 
     // Assert
-    expect(screen.getByText(/Bloqueio de palpites/i)).toBeDefined();
+    expect(screen.getByText(/começa em/i)).toBeDefined();
     // Verify that "05" (days) is displayed
     const daysElement = screen.getByText('05');
     expect(daysElement).toBeDefined();
@@ -48,12 +48,9 @@ describe('TimeoutBanner', () => {
     vi.setSystemTime(new Date(targetDate + 1000));
 
     // Act
-    render(<TimeoutBanner />);
+    const { container } = render(<TimeoutBanner />);
 
     // Assert
-    const expiredText = screen.getByText(
-      /Palpites para a Rodada 1 encerrados/i,
-    );
-    expect(expiredText).toBeDefined();
+    expect(container.firstChild).toBeNull();
   });
 });
