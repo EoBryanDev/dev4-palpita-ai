@@ -2,7 +2,14 @@ import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import { eq } from 'drizzle-orm';
 import { db } from './connection';
-import { palpites, partidas, rodadas, times, usuarios } from './schema';
+import {
+  configuracoes,
+  palpites,
+  partidas,
+  rodadas,
+  times,
+  usuarios,
+} from './schema';
 
 // Carregar variáveis de ambiente
 dotenv.config();
@@ -482,6 +489,24 @@ async function seed() {
     }
 
     console.log('Palpites de teste criados.');
+
+    // 7. Criar configurações iniciais
+    const configChave = 'valor_palpite';
+    const configExistente = await db
+      .select()
+      .from(configuracoes)
+      .where(eq(configuracoes.chave, configChave))
+      .limit(1);
+
+    if (configExistente.length === 0) {
+      await db.insert(configuracoes).values({
+        chave: configChave,
+        valor: '50.00',
+      });
+      console.log('Configuração "valor_palpite" inicial criada: R$ 50,00.');
+    } else {
+      console.log('Configuração "valor_palpite" já existe.');
+    }
 
     console.log('Seed finalizado com sucesso!');
     process.exit(0);
