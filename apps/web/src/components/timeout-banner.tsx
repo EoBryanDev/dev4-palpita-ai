@@ -59,18 +59,7 @@ export function TimeoutBanner() {
   }
 
   if (timeLeft.isExpired) {
-    return (
-      <div className="bg-red-500/10 dark:bg-red-950/20 text-red-600 dark:text-red-400 border-b border-red-200/50 dark:border-red-950/50 transition-colors">
-        <div className="mx-auto max-w-7xl px-4 py-2 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 shrink-0" />
-            <span className="text-xs sm:text-sm font-semibold">
-              Palpites para a Rodada 1 encerrados! Os jogos já começaram.
-            </span>
-          </div>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   const formatNumber = (num: number) => String(num).padStart(2, '0');
@@ -92,8 +81,7 @@ export function TimeoutBanner() {
             className={`h-4 w-4 shrink-0 ${isUrgent ? 'animate-pulse text-amber-500' : 'text-emerald-200'}`}
           />
           <span className="text-xs sm:text-sm font-medium">
-            Bloqueio de palpites da <span className="font-bold">Rodada 1</span>{' '}
-            em:
+            A Copa do Mundo de 2026 começa em:
           </span>
         </div>
 
