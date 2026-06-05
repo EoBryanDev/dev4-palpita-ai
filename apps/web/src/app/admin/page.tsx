@@ -1,4 +1,6 @@
+import { obterValorPalpite } from '@/app/actions/admin';
 import { obterSessao } from '@/app/actions/auth';
+import { AdminConfiguracoesClient } from '@/components/admin-configuracoes-client';
 import { db, palpites, partidas, rodadas, usuarios } from '@palpita/db';
 import { and, desc, eq, inArray } from 'drizzle-orm';
 import {
@@ -33,6 +35,9 @@ export default async function AdminDashboardPage() {
 
   // 2. Total de usuários com status LIBERADO
   const totalLiberados = allUsers.filter((u) => u.status === 'LIBERADO').length;
+
+  // 2.1 Buscar o valor configurado do palpite
+  const valorPalpite = await obterValorPalpite();
 
   // 3. Total de convites pendentes (usuários no status PENDENTE)
   const totalPendentes = allUsers.filter((u) => u.status === 'PENDENTE').length;
@@ -219,6 +224,12 @@ export default async function AdminDashboardPage() {
               </div>
             )}
           </div>
+
+          {/* Configurações de Valor e Prêmios */}
+          <AdminConfiguracoesClient
+            totalLiberados={totalLiberados}
+            valorInicial={valorPalpite}
+          />
         </div>
 
         {/* Coluna 3: Atalhos Administrativos */}

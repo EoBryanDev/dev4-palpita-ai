@@ -1,6 +1,7 @@
 'use server';
 
 import {
+  configuracoes,
   db,
   partidas,
   rodadas,
@@ -383,5 +384,77 @@ export async function lancarResultadoOficial(
   } catch (error) {
     console.error('Erro ao lançar resultado oficial:', error);
     return { success: false, message: 'Erro interno ao lançar resultado.' };
+  }
+}
+
+/**
+ * Obtém o valor atual configurado para a inscrição do palpite.
+ * Retorna o valor numérico (default R$ 50,00 se não cadastrado).
+ */
+export async function obterValorPalpite(): Promise<number> {
+  try {
+    const config = await db.query.configuracoes.findFirst({
+      where: eq(configuracoes.chave, 'valor_palpite'),
+    });
+    if (!config) return 50;
+    const valorNum = Number.parseFloat(config.valor);
+    return Number.isNaN(valorNum) ? 50 : valorNum;
+  } catch (error) {
+    console.error('Erro ao obter valor do palpite:', error);
+    return 50;
+  }
+}
+
+/**
+ * Salva um novo valor para a inscrição do palpite.
+ */
+export async function salvarValorPalpite(
+  valor: number,
+): Promise<IAdminActionResponse> {
+  const isAdmin = await verificarPermissaoAdmin();
+  if (!isAdmin) {
+    return {
+      success: false,
+      message:
+        'Acesso negado. Apenas administradores podem realizar esta ação.',
+    };
+  }
+
+  if (typeof valor !== 'number' || Number.isNaN(valor) || valor < 0) {
+    return { success: false, message: 'Valor inválido.' };
+  }
+
+  try {
+    await db.transaction(async (tx) => {
+      // 1. Verificar se a configuração já existe
+      const config = await tx.query.configuracoes.findFirst({
+        where: eq(configuracoes.chave, 'valor_palpite'),
+      });
+
+      if (config) {
+        // Atualiza
+        await tx
+          .update(configuracoes)
+          .set({
+            valor: valor.toFixed(2),
+            dataAtualizacao: new Date(),
+          })
+          .where(eq(configuracoes.chave, 'valor_palpite'));
+      } else {
+        // Insere
+        await tx.insert(configuracoes).values({
+          chave: 'valor_palpite',
+          valor: valor.toFixed(2),
+        });
+      }
+    });
+
+    return {
+      success: true,
+      message: 'Valor do palpite atualizado com sucesso!',
+    };
+  } catch (error) {
+    console.error('Erro ao salvar valor do palpite:', error);
+    return { success: false, message: 'Erro interno ao salvar configuração.' };
   }
 }

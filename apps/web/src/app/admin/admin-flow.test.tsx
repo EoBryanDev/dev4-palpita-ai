@@ -10,8 +10,15 @@ vi.mock('@/app/actions/auth', () => ({
 }));
 
 const mockRedirect = vi.fn();
+const mockPush = vi.fn();
+const mockRefresh = vi.fn();
+
 vi.mock('next/navigation', () => ({
   redirect: (url: string) => mockRedirect(url),
+  useRouter: () => ({
+    push: mockPush,
+    refresh: mockRefresh,
+  }),
 }));
 
 vi.mock('@palpita/db', () => {
@@ -21,6 +28,9 @@ vi.mock('@palpita/db', () => {
       select: mockSelect,
       query: {
         rodadas: {
+          findFirst: vi.fn(),
+        },
+        configuracoes: {
           findFirst: vi.fn(),
         },
       },
@@ -43,6 +53,11 @@ vi.mock('@palpita/db', () => {
       numero: 'rodadas.numero',
       nome: 'rodadas.nome',
       ativa: 'rodadas.ativa',
+    },
+    configuracoes: {
+      id: 'configuracoes.id',
+      chave: 'configuracoes.chave',
+      valor: 'configuracoes.valor',
     },
   };
 });
@@ -87,6 +102,10 @@ describe('Admin Dashboard Integration Flow', () => {
       ativa: true,
     };
     (db.query.rodadas.findFirst as Mock).mockResolvedValueOnce(mockRodada);
+    (db.query.configuracoes.findFirst as Mock).mockResolvedValueOnce({
+      chave: 'valor_palpite',
+      valor: '50.00',
+    });
 
     // Mock partidas da rodada: 2 partidas
     const mockPartidas = [{ id: 'p1' }, { id: 'p2' }];
