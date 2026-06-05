@@ -228,6 +228,7 @@ export function AdminUsuariosClient({
                       Solicitado em:{' '}
                       {new Date(solicitacao.dataCriacao).toLocaleDateString(
                         'pt-BR',
+                        { timeZone: 'America/Sao_Paulo' },
                       )}
                     </p>
                   </div>

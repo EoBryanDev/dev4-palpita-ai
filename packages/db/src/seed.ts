@@ -2,7 +2,14 @@ import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import { eq } from 'drizzle-orm';
 import { db } from './connection';
-import { palpites, partidas, rodadas, times, usuarios } from './schema';
+import {
+  configuracoes,
+  palpites,
+  partidas,
+  rodadas,
+  times,
+  usuarios,
+} from './schema';
 
 // Carregar variáveis de ambiente
 dotenv.config();
@@ -104,25 +111,184 @@ async function seed() {
     await db.delete(partidas);
     await db.delete(times);
 
-    // 4. Cadastrar Times de Teste
+    // 4. Cadastrar Times Reais
     const timesMock = [
+      // Grupo A
+      {
+        nome: 'México',
+        emoji: '🇲🇽',
+        confederacao: 'CONCACAF',
+        grupo: 'Grupo A',
+      },
+      {
+        nome: 'África do Sul',
+        emoji: '🇿🇦',
+        confederacao: 'CAF',
+        grupo: 'Grupo A',
+      },
+      {
+        nome: 'Coreia do Sul',
+        emoji: '🇰🇷',
+        confederacao: 'AFC',
+        grupo: 'Grupo A',
+      },
+      {
+        nome: 'República Tcheca',
+        emoji: '🇨🇿',
+        confederacao: 'UEFA',
+        grupo: 'Grupo A',
+      },
+
+      // Grupo B
+      {
+        nome: 'Canadá',
+        emoji: '🇨🇦',
+        confederacao: 'CONCACAF',
+        grupo: 'Grupo B',
+      },
+      { nome: 'Bósnia', emoji: '🇧🇦', confederacao: 'UEFA', grupo: 'Grupo B' },
+      { nome: 'Catar', emoji: '🇶🇦', confederacao: 'AFC', grupo: 'Grupo B' },
+      { nome: 'Suíça', emoji: '🇨🇭', confederacao: 'UEFA', grupo: 'Grupo B' },
+
+      // Grupo C
       {
         nome: 'Brasil',
         emoji: '🇧🇷',
         confederacao: 'CONMEBOL',
-        grupo: 'Grupo B',
+        grupo: 'Grupo C',
       },
-      { nome: 'Croácia', emoji: '🇭🇷', confederacao: 'UEFA', grupo: 'Grupo F' },
+      { nome: 'Marrocos', emoji: '🇲🇦', confederacao: 'CAF', grupo: 'Grupo C' },
+      {
+        nome: 'Haiti',
+        emoji: '🇭🇹',
+        confederacao: 'CONCACAF',
+        grupo: 'Grupo C',
+      },
+      { nome: 'Escócia', emoji: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', confederacao: 'UEFA', grupo: 'Grupo C' },
+
+      // Grupo D
+      {
+        nome: 'Estados Unidos',
+        emoji: '🇺🇸',
+        confederacao: 'CONCACAF',
+        grupo: 'Grupo D',
+      },
+      {
+        nome: 'Paraguai',
+        emoji: '🇵🇾',
+        confederacao: 'CONMEBOL',
+        grupo: 'Grupo D',
+      },
+      { nome: 'Austrália', emoji: '🇦🇺', confederacao: 'AFC', grupo: 'Grupo D' },
+      { nome: 'Turquia', emoji: '🇹🇷', confederacao: 'UEFA', grupo: 'Grupo D' },
+
+      // Grupo E
+      { nome: 'Alemanha', emoji: '🇩🇪', confederacao: 'UEFA', grupo: 'Grupo E' },
+      {
+        nome: 'Curaçao',
+        emoji: '🇨🇼',
+        confederacao: 'CONCACAF',
+        grupo: 'Grupo E',
+      },
+      {
+        nome: 'Costa do Marfim',
+        emoji: '🇨🇮',
+        confederacao: 'CAF',
+        grupo: 'Grupo E',
+      },
+      {
+        nome: 'Equador',
+        emoji: '🇪🇨',
+        confederacao: 'CONMEBOL',
+        grupo: 'Grupo E',
+      },
+
+      // Grupo F
+      { nome: 'Holanda', emoji: '🇳🇱', confederacao: 'UEFA', grupo: 'Grupo F' },
+      { nome: 'Japão', emoji: '🇯🇵', confederacao: 'AFC', grupo: 'Grupo F' },
+      { nome: 'Suécia', emoji: '🇸🇪', confederacao: 'UEFA', grupo: 'Grupo F' },
+      { nome: 'Tunísia', emoji: '🇹🇳', confederacao: 'CAF', grupo: 'Grupo F' },
+
+      // Grupo G
+      { nome: 'Bélgica', emoji: '🇧🇪', confederacao: 'UEFA', grupo: 'Grupo G' },
+      { nome: 'Egito', emoji: '🇪🇬', confederacao: 'CAF', grupo: 'Grupo G' },
+      { nome: 'Irã', emoji: '🇮🇷', confederacao: 'AFC', grupo: 'Grupo G' },
+      {
+        nome: 'Nova Zelândia',
+        emoji: '🇳🇿',
+        confederacao: 'OFC',
+        grupo: 'Grupo G',
+      },
+
+      // Grupo H
+      { nome: 'Espanha', emoji: '🇪🇸', confederacao: 'UEFA', grupo: 'Grupo H' },
+      {
+        nome: 'Cabo Verde',
+        emoji: '🇨🇻',
+        confederacao: 'CAF',
+        grupo: 'Grupo H',
+      },
+      {
+        nome: 'Arábia Saudita',
+        emoji: '🇸🇦',
+        confederacao: 'AFC',
+        grupo: 'Grupo H',
+      },
+      {
+        nome: 'Uruguai',
+        emoji: '🇺🇾',
+        confederacao: 'CONMEBOL',
+        grupo: 'Grupo H',
+      },
+
+      // Grupo I
+      { nome: 'França', emoji: '🇫🇷', confederacao: 'UEFA', grupo: 'Grupo I' },
+      { nome: 'Senegal', emoji: '🇸🇳', confederacao: 'CAF', grupo: 'Grupo I' },
+      { nome: 'Iraque', emoji: '🇮🇶', confederacao: 'AFC', grupo: 'Grupo I' },
+      { nome: 'Noruega', emoji: '🇳🇴', confederacao: 'UEFA', grupo: 'Grupo I' },
+
+      // Grupo J
       {
         nome: 'Argentina',
         emoji: '🇦🇷',
         confederacao: 'CONMEBOL',
-        grupo: 'Grupo C',
+        grupo: 'Grupo J',
       },
-      { nome: 'França', emoji: '🇫🇷', confederacao: 'UEFA', grupo: 'Grupo D' },
-      { nome: 'Alemanha', emoji: '🇩🇪', confederacao: 'UEFA', grupo: 'Grupo F' },
-      { nome: 'Espanha', emoji: '🇪🇸', confederacao: 'UEFA', grupo: 'Grupo G' },
-      { nome: 'Japão', emoji: '🇯🇵', confederacao: 'AFC', grupo: 'Grupo H' },
+      { nome: 'Argélia', emoji: '🇩🇿', confederacao: 'CAF', grupo: 'Grupo J' },
+      { nome: 'Áustria', emoji: '🇦🇹', confederacao: 'UEFA', grupo: 'Grupo J' },
+      { nome: 'Jordânia', emoji: '🇯🇴', confederacao: 'AFC', grupo: 'Grupo J' },
+
+      // Grupo K
+      { nome: 'Portugal', emoji: '🇵🇹', confederacao: 'UEFA', grupo: 'Grupo K' },
+      { nome: 'RD Congo', emoji: '🇨🇩', confederacao: 'CAF', grupo: 'Grupo K' },
+      {
+        nome: 'Uzbequistão',
+        emoji: '🇺🇿',
+        confederacao: 'AFC',
+        grupo: 'Grupo K',
+      },
+      {
+        nome: 'Colômbia',
+        emoji: '🇨🇴',
+        confederacao: 'CONMEBOL',
+        grupo: 'Grupo K',
+      },
+
+      // Grupo L
+      {
+        nome: 'Inglaterra',
+        emoji: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+        confederacao: 'UEFA',
+        grupo: 'Grupo L',
+      },
+      { nome: 'Croácia', emoji: '🇭🇷', confederacao: 'UEFA', grupo: 'Grupo L' },
+      { nome: 'Gana', emoji: '🇬🇭', confederacao: 'CAF', grupo: 'Grupo L' },
+      {
+        nome: 'Panamá',
+        emoji: '🇵🇦',
+        confederacao: 'CONCACAF',
+        grupo: 'Grupo L',
+      },
     ];
 
     const timesInseridos = await db
@@ -134,84 +300,213 @@ async function seed() {
     for (const t of timesInseridos) {
       timesMap.set(t.nome, t.id);
     }
-    console.log('Times de teste criados.');
+    console.log('Times da Copa do Mundo criados.');
 
-    // 5. Criar Partidas de Teste
-    // Partida 1: Concluída (Passado) - Brasil vs Croácia
-    const dataPassado = new Date();
-    dataPassado.setHours(dataPassado.getHours() - 24); // 24 horas atrás
+    // 5. Criar Partidas Reais da Rodada 1
+    const partidasValores = [
+      // Grupo A
+      {
+        timeA: 'México',
+        timeB: 'África do Sul',
+        dataInicio: new Date('2026-06-11T16:00:00-03:00'),
+      },
+      {
+        timeA: 'Coreia do Sul',
+        timeB: 'República Tcheca',
+        dataInicio: new Date('2026-06-11T23:00:00-03:00'),
+      },
+      // Grupo B
+      {
+        timeA: 'Canadá',
+        timeB: 'Bósnia',
+        dataInicio: new Date('2026-06-12T16:00:00-03:00'),
+      },
+      {
+        timeA: 'Catar',
+        timeB: 'Suíça',
+        dataInicio: new Date('2026-06-13T16:00:00-03:00'),
+      },
+      // Grupo C
+      {
+        timeA: 'Brasil',
+        timeB: 'Marrocos',
+        dataInicio: new Date('2026-06-13T19:00:00-03:00'),
+      },
+      {
+        timeA: 'Haiti',
+        timeB: 'Escócia',
+        dataInicio: new Date('2026-06-13T22:00:00-03:00'),
+      },
+      // Grupo D
+      {
+        timeA: 'Estados Unidos',
+        timeB: 'Paraguai',
+        dataInicio: new Date('2026-06-12T22:00:00-03:00'),
+      },
+      {
+        timeA: 'Austrália',
+        timeB: 'Turquia',
+        dataInicio: new Date('2026-06-14T01:00:00-03:00'),
+      },
+      // Grupo E
+      {
+        timeA: 'Alemanha',
+        timeB: 'Curaçao',
+        dataInicio: new Date('2026-06-14T14:00:00-03:00'),
+      },
+      {
+        timeA: 'Costa do Marfim',
+        timeB: 'Equador',
+        dataInicio: new Date('2026-06-14T20:00:00-03:00'),
+      },
+      // Grupo F
+      {
+        timeA: 'Holanda',
+        timeB: 'Japão',
+        dataInicio: new Date('2026-06-14T17:00:00-03:00'),
+      },
+      {
+        timeA: 'Suécia',
+        timeB: 'Tunísia',
+        dataInicio: new Date('2026-06-14T23:00:00-03:00'),
+      },
+      // Grupo G
+      {
+        timeA: 'Bélgica',
+        timeB: 'Egito',
+        dataInicio: new Date('2026-06-15T16:00:00-03:00'),
+      },
+      {
+        timeA: 'Irã',
+        timeB: 'Nova Zelândia',
+        dataInicio: new Date('2026-06-15T22:00:00-03:00'),
+      },
+      // Grupo H
+      {
+        timeA: 'Espanha',
+        timeB: 'Cabo Verde',
+        dataInicio: new Date('2026-06-15T13:00:00-03:00'),
+      },
+      {
+        timeA: 'Arábia Saudita',
+        timeB: 'Uruguai',
+        dataInicio: new Date('2026-06-15T19:00:00-03:00'),
+      },
+      // Grupo I
+      {
+        timeA: 'França',
+        timeB: 'Senegal',
+        dataInicio: new Date('2026-06-16T16:00:00-03:00'),
+      },
+      {
+        timeA: 'Iraque',
+        timeB: 'Noruega',
+        dataInicio: new Date('2026-06-16T19:00:00-03:00'),
+      },
+      // Grupo J
+      {
+        timeA: 'Argentina',
+        timeB: 'Argélia',
+        dataInicio: new Date('2026-06-16T22:00:00-03:00'),
+      },
+      {
+        timeA: 'Áustria',
+        timeB: 'Jordânia',
+        dataInicio: new Date('2026-06-17T01:00:00-03:00'),
+      },
+      // Grupo K
+      {
+        timeA: 'Portugal',
+        timeB: 'RD Congo',
+        dataInicio: new Date('2026-06-17T14:00:00-03:00'),
+      },
+      {
+        timeA: 'Uzbequistão',
+        timeB: 'Colômbia',
+        dataInicio: new Date('2026-06-17T21:00:00-03:00'),
+      },
+      // Grupo L
+      {
+        timeA: 'Inglaterra',
+        timeB: 'Croácia',
+        dataInicio: new Date('2026-06-17T17:00:00-03:00'),
+      },
+      {
+        timeA: 'Gana',
+        timeB: 'Panamá',
+        dataInicio: new Date('2026-06-17T20:00:00-03:00'),
+      },
+    ];
 
-    const partidaFinalizada = await db
-      .insert(partidas)
-      .values({
-        rodadaId,
-        timeAId: timesMap.get('Brasil') ?? '',
-        timeBId: timesMap.get('Croácia') ?? '',
+    const partidasMap = new Map<string, string>();
+    for (const match of partidasValores) {
+      const timeAId = timesMap.get(match.timeA) ?? '';
+      const timeBId = timesMap.get(match.timeB) ?? '';
+      const [inserted] = await db
+        .insert(partidas)
+        .values({
+          rodadaId,
+          timeAId,
+          timeBId,
+          dataInicio: match.dataInicio,
+          status: 'AGENDADO',
+        })
+        .returning({ id: partidas.id });
+
+      partidasMap.set(`${match.timeA} vs ${match.timeB}`, inserted.id);
+    }
+
+    console.log('Todas as partidas da Rodada 1 criadas.');
+
+    // 6. Criar Palpites de Teste
+    // Competidor e Admin palpitaram no jogo de abertura "México vs África do Sul" (futuro)
+    const idMexicoSulAfrica = partidasMap.get('México vs África do Sul');
+    if (idMexicoSulAfrica) {
+      await db.insert(palpites).values({
+        usuarioId: userId,
+        partidaId: idMexicoSulAfrica,
         golsTimeA: 2,
         golsTimeB: 1,
-        dataInicio: dataPassado,
-        status: 'FINALIZADO',
-      })
-      .returning({ id: partidas.id });
+      });
 
-    // Partida 2: Futura (Palpite Pendente) - Argentina vs França
-    const dataFuturo1 = new Date();
-    dataFuturo1.setDate(dataFuturo1.getDate() + 2); // Daqui a 2 dias
+      await db.insert(palpites).values({
+        usuarioId: adminId,
+        partidaId: idMexicoSulAfrica,
+        golsTimeA: 1,
+        golsTimeB: 0,
+      });
+    }
 
-    const partidaPendente = await db
-      .insert(partidas)
-      .values({
-        rodadaId,
-        timeAId: timesMap.get('Argentina') ?? '',
-        timeBId: timesMap.get('França') ?? '',
-        dataInicio: dataFuturo1,
-        status: 'AGENDADO',
-      })
-      .returning({ id: partidas.id });
-
-    // Partida 3: Futura (Com Palpite Salvo) - Alemanha vs Espanha
-    const dataFuturo2 = new Date();
-    dataFuturo2.setDate(dataFuturo2.getDate() + 3); // Daqui a 3 dias
-
-    const partidaComPalpite = await db
-      .insert(partidas)
-      .values({
-        rodadaId,
-        timeAId: timesMap.get('Alemanha') ?? '',
-        timeBId: timesMap.get('Espanha') ?? '',
-        dataInicio: dataFuturo2,
-        status: 'AGENDADO',
-      })
-      .returning({ id: partidas.id });
-
-    console.log('Partidas de teste criadas.');
-
-    // 5. Criar Palpites de Teste
-    // Competidor palpitou 2 x 1 no Brasil x Croácia (acertou exato -> 1 ponto)
-    await db.insert(palpites).values({
-      usuarioId: userId,
-      partidaId: partidaFinalizada[0].id,
-      golsTimeA: 2,
-      golsTimeB: 1,
-    });
-
-    // Admin palpitou 1 x 0 no Brasil x Croácia (acertou vencedor -> 1 ponto pela regra de acerto simples)
-    await db.insert(palpites).values({
-      usuarioId: adminId,
-      partidaId: partidaFinalizada[0].id,
-      golsTimeA: 1,
-      golsTimeB: 0,
-    });
-
-    // Competidor palpitou 2 x 2 no Alemanha x Espanha (futuro)
-    await db.insert(palpites).values({
-      usuarioId: userId,
-      partidaId: partidaComPalpite[0].id,
-      golsTimeA: 2,
-      golsTimeB: 2,
-    });
+    // Competidor palpitou 2 x 2 no Alemanha vs Curaçao (futuro)
+    const idAlemanhaCuracao = partidasMap.get('Alemanha vs Curaçao');
+    if (idAlemanhaCuracao) {
+      await db.insert(palpites).values({
+        usuarioId: userId,
+        partidaId: idAlemanhaCuracao,
+        golsTimeA: 2,
+        golsTimeB: 2,
+      });
+    }
 
     console.log('Palpites de teste criados.');
+
+    // 7. Criar configurações iniciais
+    const configChave = 'valor_palpite';
+    const configExistente = await db
+      .select()
+      .from(configuracoes)
+      .where(eq(configuracoes.chave, configChave))
+      .limit(1);
+
+    if (configExistente.length === 0) {
+      await db.insert(configuracoes).values({
+        chave: configChave,
+        valor: '50.00',
+      });
+      console.log('Configuração "valor_palpite" inicial criada: R$ 50,00.');
+    } else {
+      console.log('Configuração "valor_palpite" já existe.');
+    }
 
     console.log('Seed finalizado com sucesso!');
     process.exit(0);

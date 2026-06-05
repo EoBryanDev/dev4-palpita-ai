@@ -1,7 +1,14 @@
 import { SolicitarConviteForm } from '@/components/solicitar-convite-form';
 import { Button } from '@/components/ui/button';
-import { db, partidas, rodadas, times } from '@palpita/db';
-import { asc, eq } from 'drizzle-orm';
+import {
+  configuracoes,
+  db,
+  partidas,
+  rodadas,
+  times,
+  usuarios,
+} from '@palpita/db';
+import { asc, eq, or } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import {
   AlertTriangle,
@@ -37,6 +44,46 @@ export default async function HomePage({
 }: IHomePageProps): Promise<React.ReactNode> {
   const { timeout } = await searchParams;
   const showTimeoutBanner = timeout === 'true';
+
+  // 1. Buscar valor do palpite
+  let valorPalpite = 50;
+  try {
+    const config = await db.query.configuracoes.findFirst({
+      where: eq(configuracoes.chave, 'valor_palpite'),
+    });
+    if (config) {
+      const parsed = Number.parseFloat(config.valor);
+      if (!Number.isNaN(parsed)) {
+        valorPalpite = parsed;
+      }
+    }
+  } catch (error) {
+    console.error('Erro ao buscar valor_palpite na Home:', error);
+  }
+
+  // 2. Buscar total de usuários ativos
+  let totalUsuariosAtivos = 0;
+  try {
+    const activeUsers = await db
+      .select({ id: usuarios.id })
+      .from(usuarios)
+      .where(or(eq(usuarios.status, 'LIBERADO'), eq(usuarios.status, 'ATIVO')));
+    totalUsuariosAtivos = activeUsers.length;
+  } catch (error) {
+    console.error('Erro ao buscar totalUsuariosAtivos na Home:', error);
+  }
+
+  // 3. Buscar total de confrontos/jogos existentes no banco
+  let totalConfrontos = 0;
+  try {
+    const totalPartidasDb = await db.select({ id: partidas.id }).from(partidas);
+    totalConfrontos = totalPartidasDb.length;
+  } catch (error) {
+    console.error('Erro ao buscar totalConfrontos na Home:', error);
+  }
+
+  // 4. Calcular prêmio total
+  const totalPremios = totalUsuariosAtivos * valorPalpite;
 
   let partidasList: IHomePartida[] = [];
 
@@ -74,6 +121,7 @@ export default async function HomePage({
       golsTimeA: p.golsTimeA,
       golsTimeB: p.golsTimeB,
       dataInicio: new Intl.DateTimeFormat('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
         day: '2-digit',
         month: 'long',
         hour: '2-digit',
@@ -211,7 +259,13 @@ export default async function HomePage({
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
                   Total de Prêmios
                 </p>
-                <p className="text-2xl font-bold">R$ 5.000,00</p>
+                <p className="text-2xl font-bold">
+                  R${' '}
+                  {totalPremios.toLocaleString('pt-BR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </p>
               </div>
             </div>
           </div>
@@ -224,7 +278,10 @@ export default async function HomePage({
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
                   Palpidores Ativos
                 </p>
-                <p className="text-2xl font-bold">142 usuários</p>
+                <p className="text-2xl font-bold">
+                  {totalUsuariosAtivos}{' '}
+                  {totalUsuariosAtivos === 1 ? 'usuário' : 'usuários'}
+                </p>
               </div>
             </div>
           </div>
@@ -235,9 +292,12 @@ export default async function HomePage({
               </div>
               <div>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                  Próximos Confrontos
+                  Confrontos
                 </p>
-                <p className="text-2xl font-bold">12 partidas</p>
+                <p className="text-2xl font-bold">
+                  {totalConfrontos}{' '}
+                  {totalConfrontos === 1 ? 'partida' : 'partidas'}
+                </p>
               </div>
             </div>
           </div>

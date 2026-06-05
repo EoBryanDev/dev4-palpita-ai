@@ -103,6 +103,7 @@ export function PalpitesStats() {
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleString('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
       day: '2-digit',
       month: '2-digit',
       hour: '2-digit',

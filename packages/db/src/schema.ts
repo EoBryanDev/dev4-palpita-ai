@@ -96,3 +96,12 @@ export const tokensConvite = pgTable('tokens_convite', {
   dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
   usado: boolean('usado').default(false).notNull(),
 });
+
+// 6. Tabela de Configurações
+export const configuracoes = pgTable('configuracoes', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  chave: varchar('chave', { length: 100 }).notNull().unique(),
+  valor: varchar('valor', { length: 255 }).notNull(),
+  dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
+  dataAtualizacao: timestamp('data_atualizacao').defaultNow().notNull(),
+});
