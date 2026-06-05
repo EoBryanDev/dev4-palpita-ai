@@ -2,6 +2,8 @@ import TimesClient from '@/components/times-client';
 import { db, times } from '@palpita/db';
 import { asc } from 'drizzle-orm';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Equipes da Copa 2026 | Palpita AI',
   description:
