@@ -4,11 +4,11 @@
 TBD - created by archiving change private-area. Update Purpose after archive.
 ## Requirements
 ### Requirement: Registro de Palpites de Placares Futuros
-O sistema DEVE permitir que o competidor insira ou atualize seus palpites (placar do Time A e placar do Time B) para partidas futuras.
+O sistema MUST permitir que o competidor insira ou atualize seus palpites para partidas futuras, renderizando os nomes e emojis dos times cadastrados dinamicamente.
 
 #### Scenario: Envio de novo palpite com sucesso
 - **WHEN** o usuário seleciona um jogo futuro, insere um placar e clica em salvar
-- **THEN** o sistema valida e grava o palpite no banco de dados, associando-o ao usuário logado e à partida.
+- **THEN** o sistema valida e grava o palpite no banco de dados, associando-o ao usuário logado e à partida, exibindo feedback visual de sucesso.
 
 ### Requirement: Bloqueio Temporal de Palpites (RN02)
 O sistema DEVE impedir o envio ou a alteração de palpites para uma partida a partir do minuto exato de seu início cadastrado.

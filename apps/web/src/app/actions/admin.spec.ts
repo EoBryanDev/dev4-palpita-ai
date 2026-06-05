@@ -40,6 +40,9 @@ vi.mock('@palpita/db', () => {
         partidas: {
           findFirst: vi.fn(),
         },
+        times: {
+          findFirst: vi.fn(),
+        },
       },
     },
     usuarios: {
@@ -59,6 +62,10 @@ vi.mock('@palpita/db', () => {
       id: 'partidas.id',
       rodadaId: 'partidas.rodadaId',
       status: 'partidas.status',
+    },
+    times: {
+      id: 'times.id',
+      nome: 'times.nome',
     },
   };
 });
@@ -83,6 +90,9 @@ describe('Ações Administrativas (admin.ts)', () => {
           findFirst: vi.fn(),
         },
         partidas: {
+          findFirst: vi.fn(),
+        },
+        times: {
           findFirst: vi.fn(),
         },
       },
@@ -317,8 +327,8 @@ describe('Ações Administrativas (admin.ts)', () => {
 
       const res = await criarPartida(
         'rodada-id',
-        'Brasil',
-        'França',
+        'time-a-id',
+        'time-b-id',
         '2026-06-15T15:00:00Z',
       );
       expect(res.success).toBe(false);
@@ -330,8 +340,8 @@ describe('Ações Administrativas (admin.ts)', () => {
 
       const res = await criarPartida(
         'rodada-id',
-        'Brasil',
-        'brasil',
+        'time-a-id',
+        'time-a-id',
         '2026-06-15T15:00:00Z',
       );
       expect(res.success).toBe(false);
@@ -340,23 +350,48 @@ describe('Ações Administrativas (admin.ts)', () => {
 
     it('deve retornar erro se a rodada não for encontrada', async () => {
       (obterSessao as Mock).mockResolvedValueOnce({ cargo: 'ADMIN' });
-      const mockFindFirst = db.query.rodadas.findFirst as Mock;
-      mockFindFirst.mockResolvedValueOnce(null);
+      const mockFindFirstRodada = db.query.rodadas.findFirst as Mock;
+      mockFindFirstRodada.mockResolvedValueOnce(null);
 
       const res = await criarPartida(
         'rodada-id',
-        'Brasil',
-        'França',
+        'time-a-id',
+        'time-b-id',
         '2026-06-15T15:00:00Z',
       );
       expect(res.success).toBe(false);
       expect(res.message).toContain('Rodada não encontrada');
     });
 
-    it('deve cadastrar a partida com sucesso se a rodada existir', async () => {
+    it('deve retornar erro se um ou ambos os times nao forem encontrados', async () => {
       (obterSessao as Mock).mockResolvedValueOnce({ cargo: 'ADMIN' });
-      const mockFindFirst = db.query.rodadas.findFirst as Mock;
-      mockFindFirst.mockResolvedValueOnce({ id: 'rodada-id' });
+      const mockFindFirstRodada = db.query.rodadas.findFirst as Mock;
+      mockFindFirstRodada.mockResolvedValueOnce({ id: 'rodada-id' });
+
+      const mockFindFirstTimes = db.query.times.findFirst as Mock;
+      mockFindFirstTimes.mockResolvedValueOnce(null); // Time A não encontrado
+
+      const res = await criarPartida(
+        'rodada-id',
+        'time-a-id',
+        'time-b-id',
+        '2026-06-15T15:00:00Z',
+      );
+      expect(res.success).toBe(false);
+      expect(res.message).toContain(
+        'Um ou ambos os times não foram encontrados',
+      );
+    });
+
+    it('deve cadastrar a partida com sucesso se a rodada e os times existirem', async () => {
+      (obterSessao as Mock).mockResolvedValueOnce({ cargo: 'ADMIN' });
+      const mockFindFirstRodada = db.query.rodadas.findFirst as Mock;
+      mockFindFirstRodada.mockResolvedValueOnce({ id: 'rodada-id' });
+
+      const mockFindFirstTimes = db.query.times.findFirst as Mock;
+      mockFindFirstTimes
+        .mockResolvedValueOnce({ id: 'time-a-id' }) // Primeira chamada (Time A)
+        .mockResolvedValueOnce({ id: 'time-b-id' }); // Segunda chamada (Time B)
 
       const mockInsert = db.insert as Mock;
       mockInsert.mockImplementationOnce(() => ({
@@ -365,8 +400,8 @@ describe('Ações Administrativas (admin.ts)', () => {
 
       const res = await criarPartida(
         'rodada-id',
-        'Brasil',
-        'França',
+        'time-a-id',
+        'time-b-id',
         '2026-06-15T15:00:00Z',
       );
       expect(res.success).toBe(true);

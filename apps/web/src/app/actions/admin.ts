@@ -1,6 +1,13 @@
 'use server';
 
-import { db, partidas, rodadas, tokensConvite, usuarios } from '@palpita/db';
+import {
+  db,
+  partidas,
+  rodadas,
+  times,
+  tokensConvite,
+  usuarios,
+} from '@palpita/db';
 import { eq } from 'drizzle-orm';
 import { obterSessao } from './auth';
 
@@ -237,8 +244,8 @@ export async function criarRodada(
  */
 export async function criarPartida(
   rodadaId: string,
-  timeA: string,
-  timeB: string,
+  timeAId: string,
+  timeBId: string,
   dataInicioString: string,
 ): Promise<IAdminActionResponse> {
   const isAdmin = await verificarPermissaoAdmin();
@@ -251,15 +258,15 @@ export async function criarPartida(
   }
 
   if (
-    !timeA ||
-    timeA.trim().length === 0 ||
-    !timeB ||
-    timeB.trim().length === 0
+    !timeAId ||
+    timeAId.trim().length === 0 ||
+    !timeBId ||
+    timeBId.trim().length === 0
   ) {
-    return { success: false, message: 'Os nomes dos times são obrigatórios.' };
+    return { success: false, message: 'Os IDs dos times são obrigatórios.' };
   }
 
-  if (timeA.trim().toLowerCase() === timeB.trim().toLowerCase()) {
+  if (timeAId.trim() === timeBId.trim()) {
     return { success: false, message: 'Os times A e B devem ser diferentes.' };
   }
 
@@ -278,10 +285,25 @@ export async function criarPartida(
       return { success: false, message: 'Rodada não encontrada.' };
     }
 
+    // Verificar se os times existem
+    const tA = await db.query.times.findFirst({
+      where: eq(times.id, timeAId),
+    });
+    const tB = await db.query.times.findFirst({
+      where: eq(times.id, timeBId),
+    });
+
+    if (!tA || !tB) {
+      return {
+        success: false,
+        message: 'Um ou ambos os times não foram encontrados.',
+      };
+    }
+
     await db.insert(partidas).values({
       rodadaId,
-      timeA: timeA.trim(),
-      timeB: timeB.trim(),
+      timeAId: timeAId.trim(),
+      timeBId: timeBId.trim(),
       dataInicio,
       status: 'AGENDADO',
     });

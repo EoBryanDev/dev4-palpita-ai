@@ -3,8 +3,8 @@
 import { logoutUsuario } from '@/app/actions/auth';
 import { salvarPalpite } from '@/app/actions/palpites';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 import {
-  AlertCircle,
   AlertTriangle,
   CheckCircle2,
   Clock,
@@ -22,6 +22,8 @@ export interface IPartidaDashboard {
   id: string;
   timeA: string;
   timeB: string;
+  timeAEmoji?: string;
+  timeBEmoji?: string;
   dataInicio: string;
   status: string;
   golsTimeA?: number | null;
@@ -35,6 +37,8 @@ export interface IHistoricoDashboard {
   partidaId: string;
   timeA: string;
   timeB: string;
+  timeAEmoji?: string;
+  timeBEmoji?: string;
   placarOficialA: number;
   placarOficialB: number;
   palpiteA: number;
@@ -67,17 +71,13 @@ export function DashboardPalpites({
   historico,
 }: IDashboardPalpitesProps): React.ReactNode {
   const router = useRouter();
+  const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
   const [logoutPending, startLogout] = useTransition();
 
   // Estado para armazenar os valores temporários digitados nos inputs de palpites
   const [valoresPalpites, setValoresPalpites] = useState<
     Record<string, { golsA: string; golsB: string }>
-  >({});
-
-  // Mensagens de feedback por partida
-  const [feedbacks, setFeedbacks] = useState<
-    Record<string, { success: boolean; message: string }>
   >({});
 
   const isUsuarioLiberado = userStatus === 'LIBERADO';
@@ -110,37 +110,33 @@ export function DashboardPalpites({
     const golsBStr = valores?.golsB ?? String(partida.palpiteGolsB ?? '');
 
     if (golsAStr === '' || golsBStr === '') {
-      setFeedbacks((prev) => ({
-        ...prev,
-        [partidaId]: {
-          success: false,
-          message: 'Preencha ambos os placares para salvar.',
-        },
-      }));
+      toast({
+        title: 'Aviso',
+        description: 'Preencha ambos os placares para salvar.',
+        variant: 'destructive',
+      });
       return;
     }
 
     const golsA = Number.parseInt(golsAStr, 10);
     const golsB = Number.parseInt(golsBStr, 10);
 
-    setFeedbacks((prev) => ({
-      ...prev,
-      [partidaId]: { success: false, message: '' },
-    }));
-
     startTransition(async () => {
       const result = await salvarPalpite(partidaId, golsA, golsB);
-      setFeedbacks((prev) => ({
-        ...prev,
-        [partidaId]: {
-          success: result.success,
-          message: result.message,
-        },
-      }));
 
       if (result.success) {
+        toast({
+          title: 'Palpite salvo!',
+          description: result.message,
+        });
         // Recarregar os dados do servidor para atualizar o dashboard
         router.refresh();
+      } else {
+        toast({
+          title: 'Erro ao salvar',
+          description: result.message,
+          variant: 'destructive',
+        });
       }
     });
   };
@@ -175,7 +171,7 @@ export function DashboardPalpites({
   return (
     <div className="min-h-screen bg-zinc-50 transition-colors dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 pb-16">
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8">
-        {/* Aviso de Conta Pendente de Liberação (RN05) */}
+        {/* Aviso de Conta Pendente de Liberação */}
         {!isUsuarioLiberado && (
           <div className="mb-8 p-4 rounded-2xl border border-amber-200 bg-amber-50/50 dark:border-amber-900/30 dark:bg-amber-950/20 text-amber-800 dark:text-amber-400 flex items-start gap-3 animate-pulse">
             <AlertTriangle className="h-5 w-5 mt-0.5 shrink-0" />
@@ -307,10 +303,20 @@ export function DashboardPalpites({
                           {formatarData(partida.dataInicio)}
                         </span>
                         <div className="flex items-center gap-3">
+                          {partida.timeAEmoji && (
+                            <span className="text-base">
+                              {partida.timeAEmoji}
+                            </span>
+                          )}
                           <span className="text-sm font-bold">
                             {partida.timeA}
                           </span>
                           <span className="text-xs text-zinc-400">vs</span>
+                          {partida.timeBEmoji && (
+                            <span className="text-base">
+                              {partida.timeBEmoji}
+                            </span>
+                          )}
                           <span className="text-sm font-bold">
                             {partida.timeB}
                           </span>
@@ -358,24 +364,6 @@ export function DashboardPalpites({
                           </Button>
                         </div>
                       </div>
-
-                      {/* Feedbacks de validação/sucesso */}
-                      {feedbacks[partida.id]?.message && (
-                        <div
-                          className={`text-xs font-semibold w-full md:w-auto ${
-                            feedbacks[partida.id].success
-                              ? 'text-emerald-600 dark:text-emerald-400'
-                              : 'text-red-500'
-                          } flex items-center gap-1 md:mt-0`}
-                        >
-                          {feedbacks[partida.id].success ? (
-                            <CheckCircle2 className="h-4 w-4 shrink-0" />
-                          ) : (
-                            <AlertCircle className="h-4 w-4 shrink-0" />
-                          )}
-                          <span>{feedbacks[partida.id].message}</span>
-                        </div>
-                      )}
                     </div>
                   ))}
                 </div>
@@ -415,10 +403,20 @@ export function DashboardPalpites({
                             {formatarData(partida.dataInicio)}
                           </span>
                           <div className="flex items-center gap-3">
+                            {partida.timeAEmoji && (
+                              <span className="text-base">
+                                {partida.timeAEmoji}
+                              </span>
+                            )}
                             <span className="text-sm font-bold">
                               {partida.timeA}
                             </span>
                             <span className="text-xs text-zinc-400">vs</span>
+                            {partida.timeBEmoji && (
+                              <span className="text-base">
+                                {partida.timeBEmoji}
+                              </span>
+                            )}
                             <span className="text-sm font-bold">
                               {partida.timeB}
                             </span>
@@ -470,24 +468,6 @@ export function DashboardPalpites({
                             Alterar
                           </Button>
                         </div>
-
-                        {/* Feedbacks de validação/sucesso */}
-                        {feedbacks[partida.id]?.message && (
-                          <div
-                            className={`text-xs font-semibold w-full md:w-auto ${
-                              feedbacks[partida.id].success
-                                ? 'text-emerald-600 dark:text-emerald-400'
-                                : 'text-red-500'
-                            } flex items-center gap-1 md:mt-0`}
-                          >
-                            {feedbacks[partida.id].success ? (
-                              <CheckCircle2 className="h-4 w-4 shrink-0" />
-                            ) : (
-                              <AlertCircle className="h-4 w-4 shrink-0" />
-                            )}
-                            <span>{feedbacks[partida.id].message}</span>
-                          </div>
-                        )}
                       </div>
                     );
                   })}
@@ -537,6 +517,9 @@ export function DashboardPalpites({
                         Placar Oficial
                       </span>
                       <div className="flex items-center gap-2">
+                        {item.timeAEmoji && (
+                          <span className="text-base">{item.timeAEmoji}</span>
+                        )}
                         <span className="text-xs font-bold">{item.timeA}</span>
                         <span className="bg-zinc-100 dark:bg-zinc-800/80 px-2 py-0.5 rounded-md font-black text-sm">
                           {item.placarOficialA}
@@ -545,6 +528,9 @@ export function DashboardPalpites({
                         <span className="bg-zinc-100 dark:bg-zinc-800/80 px-2 py-0.5 rounded-md font-black text-sm">
                           {item.placarOficialB}
                         </span>
+                        {item.timeBEmoji && (
+                          <span className="text-base">{item.timeBEmoji}</span>
+                        )}
                         <span className="text-xs font-bold">{item.timeB}</span>
                       </div>
                     </div>

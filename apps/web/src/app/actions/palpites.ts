@@ -26,7 +26,7 @@ export async function salvarPalpite(
   }
 
   try {
-    // 2. Verificar status de liberação do usuário no banco (RN05)
+    // 2. Verificar status de liberação do usuário no banco
     const user = await db
       .select({ status: usuarios.status })
       .from(usuarios)
@@ -45,7 +45,7 @@ export async function salvarPalpite(
       };
     }
 
-    // 3. Buscar a partida para validar o prazo (RN02)
+    // 3. Buscar a partida para validar o prazo
     const match = await db
       .select({ dataInicio: partidas.dataInicio, status: partidas.status })
       .from(partidas)

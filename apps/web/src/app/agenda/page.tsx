@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
-import { db, partidas, rodadas } from '@palpita/db';
+import { db, partidas, rodadas, times } from '@palpita/db';
 import { asc, eq } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
 import { Calendar, Clock, Trophy } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -20,6 +21,8 @@ interface IPartidaFormatada {
   id: string;
   timeA: string;
   timeB: string;
+  timeAEmoji?: string;
+  timeBEmoji?: string;
   golsTimeA: number | null;
   golsTimeB: number | null;
   dataInicio: Date;
@@ -35,11 +38,16 @@ export default async function AgendaPage({
   let allPartidas: IPartidaFormatada[] = [];
 
   try {
+    const timeA = alias(times, 'time_a');
+    const timeB = alias(times, 'time_b');
+
     const dbPartidas = await db
       .select({
         id: partidas.id,
-        timeA: partidas.timeA,
-        timeB: partidas.timeB,
+        timeA: timeA.nome,
+        timeB: timeB.nome,
+        timeAEmoji: timeA.emoji,
+        timeBEmoji: timeB.emoji,
         golsTimeA: partidas.golsTimeA,
         golsTimeB: partidas.golsTimeB,
         dataInicio: partidas.dataInicio,
@@ -48,12 +56,16 @@ export default async function AgendaPage({
       })
       .from(partidas)
       .innerJoin(rodadas, eq(partidas.rodadaId, rodadas.id))
+      .innerJoin(timeA, eq(partidas.timeAId, timeA.id))
+      .innerJoin(timeB, eq(partidas.timeBId, timeB.id))
       .orderBy(asc(partidas.dataInicio));
 
     allPartidas = dbPartidas.map((p) => ({
       id: p.id,
       timeA: p.timeA,
       timeB: p.timeB,
+      timeAEmoji: p.timeAEmoji,
+      timeBEmoji: p.timeBEmoji,
       golsTimeA: p.golsTimeA,
       golsTimeB: p.golsTimeB,
       dataInicio: p.dataInicio,
@@ -248,8 +260,9 @@ export default async function AgendaPage({
                 <div className="flex items-center justify-between gap-2 py-2">
                   {/* Time A */}
                   <div className="flex flex-1 flex-col items-center gap-2 text-center max-w-[40%]">
-                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-sm font-bold border border-zinc-200 dark:border-zinc-700">
-                      {partida.timeA.slice(0, 3).toUpperCase()}
+                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-2xl border border-zinc-200 dark:border-zinc-700">
+                      {partida.timeAEmoji ||
+                        partida.timeA.slice(0, 3).toUpperCase()}
                     </div>
                     <span className="text-sm font-bold truncate w-full">
                       {partida.timeA}
@@ -275,8 +288,9 @@ export default async function AgendaPage({
 
                   {/* Time B */}
                   <div className="flex flex-1 flex-col items-center gap-2 text-center max-w-[40%]">
-                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-sm font-bold border border-zinc-200 dark:border-zinc-700">
-                      {partida.timeB.slice(0, 3).toUpperCase()}
+                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-2xl border border-zinc-200 dark:border-zinc-700">
+                      {partida.timeBEmoji ||
+                        partida.timeB.slice(0, 3).toUpperCase()}
                     </div>
                     <span className="text-sm font-bold truncate w-full">
                       {partida.timeB}

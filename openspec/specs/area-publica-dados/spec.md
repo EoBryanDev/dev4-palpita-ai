@@ -22,9 +22,9 @@ O sistema DEVE impedir a visualização pública dos palpites individuais detalh
 - **THEN** o sistema permite a visualização pública e transparente do palpite individual daquele usuário para a respectiva partida.
 
 ### Requirement: Analytics Agregado de Palpites
-O sistema DEVE calcular e exibir na rota `/palpites` a estatística agregada (porcentagem de palpites para vitória do time A, vitória do time B ou empate) para cada jogo de forma livre e pública.
+O sistema MUST calcular e exibir na rota `/palpites` a estatística agregada (porcentagem de palpites para vitória do time A, vitória do time B ou empate) para cada jogo, contemplando palpites de usuários que estejam tanto em status "ATIVO" quanto "LIBERADO" no sistema.
 
 #### Scenario: Acesso ao painel de analytics de palpites
 - **WHEN** qualquer visitante acessa a rota `/palpites`
-- **THEN** o sistema exibe gráficos ou barras percentuais de tendência dos palpites coletivos de cada partida cadastrada.
+- **THEN** o sistema busca os palpites agregados de usuários ativos e liberados, calcula as porcentagens e exibe os gráficos de tendência de cada partida cadastrada utilizando as referências das equipes no banco de dados.
 

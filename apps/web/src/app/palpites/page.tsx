@@ -27,7 +27,7 @@ export default function PalpitesPage(): React.ReactNode {
           Acompanhe as tendências e estatísticas coletivas de apostas de cada
           jogo da Copa 2026. Em conformidade com a segurança da competição, os
           palpites individuais são liberados apenas após o início da respectiva
-          partida (RN03).
+          partida.
         </p>
       </div>
 

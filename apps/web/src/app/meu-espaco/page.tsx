@@ -4,8 +4,9 @@ import type {
   IHistoricoDashboard,
   IPartidaDashboard,
 } from '@/components/dashboard-palpites';
-import { db, palpites, partidas, rodadas, usuarios } from '@palpita/db';
+import { db, palpites, partidas, rodadas, times, usuarios } from '@palpita/db';
 import { desc, eq, or } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
 import { redirect } from 'next/navigation';
 
 export default async function MeuEspacoPage() {
@@ -54,11 +55,39 @@ export default async function MeuEspacoPage() {
   }
 
   // 4. Buscar partidas da rodada selecionada
-  let partidasDaRodada: (typeof partidas.$inferSelect)[] = [];
+  let partidasDaRodada: {
+    id: string;
+    rodadaId: string;
+    timeA: string;
+    timeB: string;
+    timeAEmoji: string;
+    timeBEmoji: string;
+    golsTimeA: number | null;
+    golsTimeB: number | null;
+    dataInicio: Date;
+    status: string;
+  }[] = [];
+
   if (rodadaId) {
+    const timeA = alias(times, 'time_a');
+    const timeB = alias(times, 'time_b');
+
     partidasDaRodada = await db
-      .select()
+      .select({
+        id: partidas.id,
+        rodadaId: partidas.rodadaId,
+        timeA: timeA.nome,
+        timeB: timeB.nome,
+        timeAEmoji: timeA.emoji,
+        timeBEmoji: timeB.emoji,
+        golsTimeA: partidas.golsTimeA,
+        golsTimeB: partidas.golsTimeB,
+        dataInicio: partidas.dataInicio,
+        status: partidas.status,
+      })
       .from(partidas)
+      .innerJoin(timeA, eq(partidas.timeAId, timeA.id))
+      .innerJoin(timeB, eq(partidas.timeBId, timeB.id))
       .where(eq(partidas.rodadaId, rodadaId));
   }
 
@@ -81,6 +110,8 @@ export default async function MeuEspacoPage() {
         id: partida.id,
         timeA: partida.timeA,
         timeB: partida.timeB,
+        timeAEmoji: partida.timeAEmoji,
+        timeBEmoji: partida.timeBEmoji,
         dataInicio: partida.dataInicio.toISOString(),
         status: partida.status,
         golsTimeA: partida.golsTimeA,
@@ -191,9 +222,23 @@ export default async function MeuEspacoPage() {
   }
 
   // 8. Histórico de palpites do competidor (jogos finalizados que ele palpitou)
+  const timeA = alias(times, 'time_a');
+  const timeB = alias(times, 'time_b');
+
   const todasPartidasFinalizadas = await db
-    .select()
+    .select({
+      id: partidas.id,
+      timeA: timeA.nome,
+      timeB: timeB.nome,
+      timeAEmoji: timeA.emoji,
+      timeBEmoji: timeB.emoji,
+      golsTimeA: partidas.golsTimeA,
+      golsTimeB: partidas.golsTimeB,
+      dataInicio: partidas.dataInicio,
+    })
     .from(partidas)
+    .innerJoin(timeA, eq(partidas.timeAId, timeA.id))
+    .innerJoin(timeB, eq(partidas.timeBId, timeB.id))
     .where(eq(partidas.status, 'FINALIZADO'));
 
   const historico: IHistoricoDashboard[] = [];
@@ -211,6 +256,8 @@ export default async function MeuEspacoPage() {
         partidaId: match.id,
         timeA: match.timeA,
         timeB: match.timeB,
+        timeAEmoji: match.timeAEmoji,
+        timeBEmoji: match.timeBEmoji,
         placarOficialA: match.golsTimeA,
         placarOficialB: match.golsTimeB,
         palpiteA: palpite.golsTimeA,

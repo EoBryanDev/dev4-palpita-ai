@@ -1,7 +1,8 @@
 import { SolicitarConviteForm } from '@/components/solicitar-convite-form';
 import { Button } from '@/components/ui/button';
-import { db, partidas, rodadas } from '@palpita/db';
+import { db, partidas, rodadas, times } from '@palpita/db';
 import { asc, eq } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
 import {
   AlertTriangle,
   Calendar,
@@ -18,6 +19,8 @@ interface IHomePartida {
   id: string;
   timeA: string;
   timeB: string;
+  timeAEmoji?: string;
+  timeBEmoji?: string;
   golsTimeA: number | null;
   golsTimeB: number | null;
   dataInicio: string;
@@ -38,12 +41,17 @@ export default async function HomePage({
   let partidasList: IHomePartida[] = [];
 
   try {
+    const timeA = alias(times, 'time_a');
+    const timeB = alias(times, 'time_b');
+
     // Tenta buscar partidas reais do banco de dados
     const partidasDb = await db
       .select({
         id: partidas.id,
-        timeA: partidas.timeA,
-        timeB: partidas.timeB,
+        timeA: timeA.nome,
+        timeB: timeB.nome,
+        timeAEmoji: timeA.emoji,
+        timeBEmoji: timeB.emoji,
         golsTimeA: partidas.golsTimeA,
         golsTimeB: partidas.golsTimeB,
         dataInicio: partidas.dataInicio,
@@ -52,6 +60,8 @@ export default async function HomePage({
       })
       .from(partidas)
       .innerJoin(rodadas, eq(partidas.rodadaId, rodadas.id))
+      .innerJoin(timeA, eq(partidas.timeAId, timeA.id))
+      .innerJoin(timeB, eq(partidas.timeBId, timeB.id))
       .orderBy(asc(partidas.dataInicio))
       .limit(6);
 
@@ -59,6 +69,8 @@ export default async function HomePage({
       id: p.id,
       timeA: p.timeA,
       timeB: p.timeB,
+      timeAEmoji: p.timeAEmoji,
+      timeBEmoji: p.timeBEmoji,
       golsTimeA: p.golsTimeA,
       golsTimeB: p.golsTimeB,
       dataInicio: new Intl.DateTimeFormat('pt-BR', {
@@ -128,7 +140,7 @@ export default async function HomePage({
                   <span className="font-bold">Segurança:</span>
                 )}{' '}
                 Os links de convite e ativação expiram em exatamente 5 minutos
-                por segurança (RN04).
+                por segurança.
               </p>
             </div>
             {showTimeoutBanner && (
@@ -231,7 +243,7 @@ export default async function HomePage({
           </div>
         </section>
 
-        {/* Regras de Pontuação (RN01) */}
+        {/* Regras de Pontuação */}
         <section
           id="regras-pontuacao"
           className="rounded-3xl border border-zinc-200 bg-zinc-50/50 p-8 dark:border-zinc-800 dark:bg-zinc-900/30"
@@ -242,7 +254,7 @@ export default async function HomePage({
               Regulamento Oficial
             </div>
             <h2 className="text-3xl font-bold tracking-tight">
-              Regras de Pontuação (RN01)
+              Regras de Pontuação
             </h2>
             <p className="text-zinc-600 dark:text-zinc-400">
               O sistema de pontuação é simples e direto, premiando tanto a
@@ -318,8 +330,9 @@ export default async function HomePage({
 
                 <div className="my-6 flex items-center justify-between gap-4 font-semibold">
                   <div className="flex flex-1 flex-col items-center gap-2 text-center">
-                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-sm font-bold border border-zinc-200 dark:border-zinc-700">
-                      {partida.timeA.slice(0, 3).toUpperCase()}
+                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-2xl border border-zinc-200 dark:border-zinc-700">
+                      {partida.timeAEmoji ||
+                        partida.timeA.slice(0, 3).toUpperCase()}
                     </div>
                     <span className="text-sm truncate w-full">
                       {partida.timeA}
@@ -329,8 +342,9 @@ export default async function HomePage({
                   <span className="text-zinc-400 text-xs">VS</span>
 
                   <div className="flex flex-1 flex-col items-center gap-2 text-center">
-                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-sm font-bold border border-zinc-200 dark:border-zinc-700">
-                      {partida.timeB.slice(0, 3).toUpperCase()}
+                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-2xl border border-zinc-200 dark:border-zinc-700">
+                      {partida.timeBEmoji ||
+                        partida.timeB.slice(0, 3).toUpperCase()}
                     </div>
                     <span className="text-sm truncate w-full">
                       {partida.timeB}

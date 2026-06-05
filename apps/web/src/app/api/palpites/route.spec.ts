@@ -11,8 +11,8 @@ vi.mock('@palpita/db', () => {
     },
     partidas: {
       id: 'partidas.id',
-      timeA: 'partidas.timeA',
-      timeB: 'partidas.timeB',
+      timeAId: 'partidas.timeAId',
+      timeBId: 'partidas.timeBId',
       golsTimeA: 'partidas.golsTimeA',
       golsTimeB: 'partidas.golsTimeB',
       dataInicio: 'partidas.dataInicio',
@@ -34,6 +34,11 @@ vi.mock('@palpita/db', () => {
       id: 'usuarios.id',
       nome: 'usuarios.nome',
       status: 'usuarios.status',
+    },
+    times: {
+      id: 'times.id',
+      nome: 'times.nome',
+      emoji: 'times.emoji',
     },
   };
 });
@@ -57,6 +62,8 @@ describe('GET /api/palpites', () => {
         id: 'm1',
         timeA: 'Brasil',
         timeB: 'Uruguai',
+        timeAEmoji: '🇧🇷',
+        timeBEmoji: '🇺🇾',
         golsTimeA: null,
         golsTimeB: null,
         dataInicio: new Date('2026-06-03T18:00:00Z'),
@@ -92,16 +99,27 @@ describe('GET /api/palpites', () => {
 
     const mockSelect = db.select as Mock;
     mockSelect.mockImplementationOnce(() => ({
-      from: vi.fn(() => ({
-        innerJoin: vi.fn(() => Promise.resolve(mockMatches)),
-      })),
+      from: vi.fn(() => {
+        // biome-ignore lint/suspicious/noExplicitAny: mock query builder
+        const query: any = {
+          innerJoin: vi.fn(() => query),
+          // biome-ignore lint/suspicious/noThenProperty: thenable mock query
+          then: (resolve: (value: unknown) => void) => resolve(mockMatches),
+        };
+        return query;
+      }),
     }));
     mockSelect.mockImplementationOnce(() => ({
-      from: vi.fn(() => ({
-        innerJoin: vi.fn(() => ({
-          where: vi.fn(() => Promise.resolve(mockGuesses)),
-        })),
-      })),
+      from: vi.fn(() => {
+        // biome-ignore lint/suspicious/noExplicitAny: mock query builder
+        const query: any = {
+          innerJoin: vi.fn(() => query),
+          where: vi.fn(() => query),
+          // biome-ignore lint/suspicious/noThenProperty: thenable mock query
+          then: (resolve: (value: unknown) => void) => resolve(mockGuesses),
+        };
+        return query;
+      }),
     }));
 
     const response = await GET();
@@ -111,6 +129,8 @@ describe('GET /api/palpites', () => {
     expect(json).toHaveLength(1);
 
     const matchStats = json[0];
+    expect(matchStats.timeAEmoji).toBe('🇧🇷');
+    expect(matchStats.timeBEmoji).toBe('🇺🇾');
     expect(matchStats.estatisticas).toEqual({
       total: 3,
       vitoriasA: 2,
@@ -121,12 +141,12 @@ describe('GET /api/palpites', () => {
       pctEmpates: 33, // 1/3 = 33.3% -> 33%
     });
 
-    // Como o jogo não começou, palpites individuais devem estar bloqueados (RN03)
+    // Como o jogo não começou, palpites individuais devem estar bloqueados
     expect(matchStats.palpitesIndividuaisLiberados).toBe(false);
     expect(matchStats.palpitesIndividuais).toEqual([]);
   });
 
-  it('deve liberar palpites individuais se a partida ja tiver iniciado (RN03)', async () => {
+  it('deve liberar palpites individuais se a partida ja tiver iniciado', async () => {
     // Configura tempo do servidor para após o inicio da partida
     vi.setSystemTime(new Date('2026-06-03T19:00:00Z'));
 
@@ -135,6 +155,8 @@ describe('GET /api/palpites', () => {
         id: 'm1',
         timeA: 'Brasil',
         timeB: 'Uruguai',
+        timeAEmoji: '🇧🇷',
+        timeBEmoji: '🇺🇾',
         golsTimeA: null,
         golsTimeB: null,
         dataInicio: new Date('2026-06-03T18:00:00Z'),
@@ -155,16 +177,27 @@ describe('GET /api/palpites', () => {
 
     const mockSelect = db.select as Mock;
     mockSelect.mockImplementationOnce(() => ({
-      from: vi.fn(() => ({
-        innerJoin: vi.fn(() => Promise.resolve(mockMatches)),
-      })),
+      from: vi.fn(() => {
+        // biome-ignore lint/suspicious/noExplicitAny: mock query builder
+        const query: any = {
+          innerJoin: vi.fn(() => query),
+          // biome-ignore lint/suspicious/noThenProperty: thenable mock query
+          then: (resolve: (value: unknown) => void) => resolve(mockMatches),
+        };
+        return query;
+      }),
     }));
     mockSelect.mockImplementationOnce(() => ({
-      from: vi.fn(() => ({
-        innerJoin: vi.fn(() => ({
-          where: vi.fn(() => Promise.resolve(mockGuesses)),
-        })),
-      })),
+      from: vi.fn(() => {
+        // biome-ignore lint/suspicious/noExplicitAny: mock query builder
+        const query: any = {
+          innerJoin: vi.fn(() => query),
+          where: vi.fn(() => query),
+          // biome-ignore lint/suspicious/noThenProperty: thenable mock query
+          then: (resolve: (value: unknown) => void) => resolve(mockGuesses),
+        };
+        return query;
+      }),
     }));
 
     const response = await GET();

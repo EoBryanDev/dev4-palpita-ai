@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import { eq } from 'drizzle-orm';
 import { db } from './connection';
-import { palpites, partidas, rodadas, usuarios } from './schema';
+import { palpites, partidas, rodadas, times, usuarios } from './schema';
 
 // Carregar variáveis de ambiente
 dotenv.config();
@@ -99,11 +99,44 @@ async function seed() {
       console.log('Rodada 1 já existe.');
     }
 
-    // Limpar partidas e palpites antigos para rodar o seed de forma limpa
+    // Limpar partidas, palpites e times antigos para rodar o seed de forma limpa
     await db.delete(palpites);
     await db.delete(partidas);
+    await db.delete(times);
 
-    // 4. Criar Partidas de Teste
+    // 4. Cadastrar Times de Teste
+    const timesMock = [
+      {
+        nome: 'Brasil',
+        emoji: '🇧🇷',
+        confederacao: 'CONMEBOL',
+        grupo: 'Grupo B',
+      },
+      { nome: 'Croácia', emoji: '🇭🇷', confederacao: 'UEFA', grupo: 'Grupo F' },
+      {
+        nome: 'Argentina',
+        emoji: '🇦🇷',
+        confederacao: 'CONMEBOL',
+        grupo: 'Grupo C',
+      },
+      { nome: 'França', emoji: '🇫🇷', confederacao: 'UEFA', grupo: 'Grupo D' },
+      { nome: 'Alemanha', emoji: '🇩🇪', confederacao: 'UEFA', grupo: 'Grupo F' },
+      { nome: 'Espanha', emoji: '🇪🇸', confederacao: 'UEFA', grupo: 'Grupo G' },
+      { nome: 'Japão', emoji: '🇯🇵', confederacao: 'AFC', grupo: 'Grupo H' },
+    ];
+
+    const timesInseridos = await db
+      .insert(times)
+      .values(timesMock)
+      .returning({ id: times.id, nome: times.nome });
+
+    const timesMap = new Map<string, string>();
+    for (const t of timesInseridos) {
+      timesMap.set(t.nome, t.id);
+    }
+    console.log('Times de teste criados.');
+
+    // 5. Criar Partidas de Teste
     // Partida 1: Concluída (Passado) - Brasil vs Croácia
     const dataPassado = new Date();
     dataPassado.setHours(dataPassado.getHours() - 24); // 24 horas atrás
@@ -112,8 +145,8 @@ async function seed() {
       .insert(partidas)
       .values({
         rodadaId,
-        timeA: 'Brasil',
-        timeB: 'Croácia',
+        timeAId: timesMap.get('Brasil') ?? '',
+        timeBId: timesMap.get('Croácia') ?? '',
         golsTimeA: 2,
         golsTimeB: 1,
         dataInicio: dataPassado,
@@ -129,8 +162,8 @@ async function seed() {
       .insert(partidas)
       .values({
         rodadaId,
-        timeA: 'Argentina',
-        timeB: 'França',
+        timeAId: timesMap.get('Argentina') ?? '',
+        timeBId: timesMap.get('França') ?? '',
         dataInicio: dataFuturo1,
         status: 'AGENDADO',
       })
@@ -144,8 +177,8 @@ async function seed() {
       .insert(partidas)
       .values({
         rodadaId,
-        timeA: 'Alemanha',
-        timeB: 'Espanha',
+        timeAId: timesMap.get('Alemanha') ?? '',
+        timeBId: timesMap.get('Espanha') ?? '',
         dataInicio: dataFuturo2,
         status: 'AGENDADO',
       })

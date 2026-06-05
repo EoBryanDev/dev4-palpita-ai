@@ -33,14 +33,28 @@ export const usuarios = pgTable('usuarios', {
   dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
 });
 
-// 3. Tabela de Partidas
+// 3. Tabela de Times
+export const times = pgTable('times', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  nome: varchar('nome', { length: 100 }).notNull().unique(),
+  emoji: varchar('emoji', { length: 10 }).notNull(),
+  confederacao: varchar('confederacao', { length: 50 }).notNull(),
+  grupo: varchar('grupo', { length: 10 }).notNull(),
+  dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
+});
+
+// 4. Tabela de Partidas
 export const partidas = pgTable('partidas', {
   id: uuid('id').primaryKey().defaultRandom(),
   rodadaId: uuid('rodada_id')
     .notNull()
     .references(() => rodadas.id, { onDelete: 'cascade' }),
-  timeA: varchar('time_a', { length: 100 }).notNull(),
-  timeB: varchar('time_b', { length: 100 }).notNull(),
+  timeAId: uuid('time_a_id')
+    .notNull()
+    .references(() => times.id, { onDelete: 'restrict' }),
+  timeBId: uuid('time_b_id')
+    .notNull()
+    .references(() => times.id, { onDelete: 'restrict' }),
   golsTimeA: integer('gols_time_a'),
   golsTimeB: integer('gols_time_b'),
   dataInicio: timestamp('data_inicio').notNull(),

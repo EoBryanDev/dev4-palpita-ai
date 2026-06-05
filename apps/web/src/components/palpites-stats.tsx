@@ -335,7 +335,7 @@ export function PalpitesStats() {
                         <div className="flex flex-col items-center justify-center text-center p-3 space-y-2">
                           <Lock className="h-6 w-6 text-zinc-400 dark:text-zinc-650" />
                           <p className="font-semibold text-zinc-750 dark:text-zinc-350">
-                            Bloqueado por Segurança (RN03)
+                            Bloqueado por Segurança
                           </p>
                           <p className="text-zinc-400 text-[10px] leading-relaxed max-w-[280px]">
                             Os palpites individuais ficam ocultos até o horário
