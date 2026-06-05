@@ -19,11 +19,11 @@
 
 ## 4. Configurações de Ambiente e Integração Contínua (CI)
 
-- [ ] 4.1 Criar o arquivo `.env-example` na raiz do projeto contendo as variáveis padrão de ambiente.
-- [ ] 4.2 Configurar o workflow do GitHub Actions em `.github/workflows/ci.yml` configurado para rodar Biome check, testes do Vitest e o build de produção.
+- [x] 4.1 Criar o arquivo `.env-example` na raiz do projeto contendo as variáveis padrão de ambiente. (Status: DONE, Início: 14:50, Concluído: 21:46)
+- [x] 4.2 Configurar o workflow do GitHub Actions em `.github/workflows/ci.yml` configurado para rodar Biome check, testes do Vitest e o build de produção. (Status: DONE, Início: 14:50, Concluído: 21:46)
 
 ## 5. Testes Automatizados de Qualidade
 
-- [ ] 5.1 Atualizar as suítes de testes unitários existentes das Server Actions administrativas e de palpites.
-- [ ] 5.2 Criar novos testes de integração e testes E2E cobrindo as jornadas do usuário e administrador e as modificações aplicadas, seguindo as diretrizes do `docs/rules/testing.md`.
-- [ ] 5.3 Executar validação de linter com Biome (`pnpm lint`), rodar todas as suítes de testes (`pnpm test`) e atestar o sucesso da compilação de build (`pnpm build`).
+- [x] 5.1 Atualizar as suítes de testes unitários existentes das Server Actions administrativas e de palpites. (Status: DONE, Início: 14:50, Concluído: 21:46)
+- [x] 5.2 Criar novos testes de integração e testes E2E cobrindo as jornadas do usuário e administrador e as modificações aplicadas, seguindo as diretrizes do `docs/rules/testing.md`. (Status: DONE, Início: 14:50, Concluído: 21:48)
+- [x] 5.3 Executar validação de linter com Biome (`pnpm lint`), rodar todas as suítes de testes (`pnpm test`) e atestar o sucesso da compilação de build (`pnpm build`). (Status: DONE, Início: 14:50, Concluído: 21:48)
