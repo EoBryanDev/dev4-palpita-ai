@@ -295,52 +295,8 @@ async function seed() {
     }
     console.log('Times da Copa do Mundo criados.');
 
-    // 5. Criar Partidas Reais da Rodada 1 e Jogo de Teste no Passado
-    // Partida de Amistoso (Finalizada para demonstração/testes de palpites/ranking): Brasil vs Espanha
-    const dataPassado = new Date();
-    dataPassado.setHours(dataPassado.getHours() - 24);
-
-    const partidaFinalizada = await db
-      .insert(partidas)
-      .values({
-        rodadaId,
-        timeAId: timesMap.get('Brasil') ?? '',
-        timeBId: timesMap.get('Espanha') ?? '',
-        golsTimeA: 2,
-        golsTimeB: 1,
-        dataInicio: dataPassado,
-        status: 'FINALIZADO',
-      })
-      .returning({ id: partidas.id });
-
-    // Partida 2 (Pendente para demonstração/testes): Argentina vs Argélia (Jogo oficial do Grupo J)
-    const dataArgentina = new Date('2026-06-16T22:00:00-03:00');
-    const partidaPendente = await db
-      .insert(partidas)
-      .values({
-        rodadaId,
-        timeAId: timesMap.get('Argentina') ?? '',
-        timeBId: timesMap.get('Argélia') ?? '',
-        dataInicio: dataArgentina,
-        status: 'AGENDADO',
-      })
-      .returning({ id: partidas.id });
-
-    // Partida 3 (Com Palpite salvo para demonstração/testes): Alemanha vs Curaçao (Jogo oficial do Grupo E)
-    const dataAlemanha = new Date('2026-06-14T14:00:00-03:00');
-    const partidaComPalpite = await db
-      .insert(partidas)
-      .values({
-        rodadaId,
-        timeAId: timesMap.get('Alemanha') ?? '',
-        timeBId: timesMap.get('Curaçao') ?? '',
-        dataInicio: dataAlemanha,
-        status: 'AGENDADO',
-      })
-      .returning({ id: partidas.id });
-
-    // Inserir as outras 22 partidas oficiais da Rodada 1
-    const outrasPartidas = [
+    // 5. Criar Partidas Reais da Rodada 1
+    const partidasValores = [
       // Grupo A
       {
         timeA: 'México',
@@ -385,7 +341,12 @@ async function seed() {
         timeB: 'Turquia',
         dataInicio: new Date('2026-06-14T01:00:00-03:00'),
       },
-      // Grupo E (Alemanha x Curaçao já cadastrado)
+      // Grupo E
+      {
+        timeA: 'Alemanha',
+        timeB: 'Curaçao',
+        dataInicio: new Date('2026-06-14T14:00:00-03:00'),
+      },
       {
         timeA: 'Costa do Marfim',
         timeB: 'Equador',
@@ -435,7 +396,12 @@ async function seed() {
         timeB: 'Noruega',
         dataInicio: new Date('2026-06-16T19:00:00-03:00'),
       },
-      // Grupo J (Argentina x Argélia já cadastrada)
+      // Grupo J
+      {
+        timeA: 'Argentina',
+        timeB: 'Argélia',
+        dataInicio: new Date('2026-06-16T22:00:00-03:00'),
+      },
       {
         timeA: 'Áustria',
         timeB: 'Jordânia',
@@ -465,42 +431,55 @@ async function seed() {
       },
     ];
 
-    for (const match of outrasPartidas) {
-      await db.insert(partidas).values({
-        rodadaId,
-        timeAId: timesMap.get(match.timeA) ?? '',
-        timeBId: timesMap.get(match.timeB) ?? '',
-        dataInicio: match.dataInicio,
-        status: 'AGENDADO',
-      });
+    const partidasMap = new Map<string, string>();
+    for (const match of partidasValores) {
+      const timeAId = timesMap.get(match.timeA) ?? '';
+      const timeBId = timesMap.get(match.timeB) ?? '';
+      const [inserted] = await db
+        .insert(partidas)
+        .values({
+          rodadaId,
+          timeAId,
+          timeBId,
+          dataInicio: match.dataInicio,
+          status: 'AGENDADO',
+        })
+        .returning({ id: partidas.id });
+
+      partidasMap.set(`${match.timeA} vs ${match.timeB}`, inserted.id);
     }
 
     console.log('Todas as partidas da Rodada 1 criadas.');
 
     // 6. Criar Palpites de Teste
-    // Competidor palpitou 2 x 1 no Brasil x Espanha (acertou exato -> 1 ponto)
-    await db.insert(palpites).values({
-      usuarioId: userId,
-      partidaId: partidaFinalizada[0].id,
-      golsTimeA: 2,
-      golsTimeB: 1,
-    });
+    // Competidor e Admin palpitaram no jogo de abertura "México vs África do Sul" (futuro)
+    const idMexicoSulAfrica = partidasMap.get('México vs África do Sul');
+    if (idMexicoSulAfrica) {
+      await db.insert(palpites).values({
+        usuarioId: userId,
+        partidaId: idMexicoSulAfrica,
+        golsTimeA: 2,
+        golsTimeB: 1,
+      });
 
-    // Admin palpitou 1 x 0 no Brasil x Espanha (acertou vencedor -> 1 ponto pela regra de acerto simples)
-    await db.insert(palpites).values({
-      usuarioId: adminId,
-      partidaId: partidaFinalizada[0].id,
-      golsTimeA: 1,
-      golsTimeB: 0,
-    });
+      await db.insert(palpites).values({
+        usuarioId: adminId,
+        partidaId: idMexicoSulAfrica,
+        golsTimeA: 1,
+        golsTimeB: 0,
+      });
+    }
 
-    // Competidor palpitou 2 x 2 no Alemanha x Curaçao (futuro)
-    await db.insert(palpites).values({
-      usuarioId: userId,
-      partidaId: partidaComPalpite[0].id,
-      golsTimeA: 2,
-      golsTimeB: 2,
-    });
+    // Competidor palpitou 2 x 2 no Alemanha vs Curaçao (futuro)
+    const idAlemanhaCuracao = partidasMap.get('Alemanha vs Curaçao');
+    if (idAlemanhaCuracao) {
+      await db.insert(palpites).values({
+        usuarioId: userId,
+        partidaId: idAlemanhaCuracao,
+        golsTimeA: 2,
+        golsTimeB: 2,
+      });
+    }
 
     console.log('Palpites de teste criados.');
 
