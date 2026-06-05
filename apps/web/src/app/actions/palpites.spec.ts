@@ -73,7 +73,7 @@ describe('salvarPalpite', () => {
     expect(result.message).toBe('Usuário não encontrado.');
   });
 
-  it('deve retornar erro se o usuário não estiver com status LIBERADO (RN05)', async () => {
+  it('deve retornar erro se o usuário não estiver com status LIBERADO', async () => {
     (obterSessao as Mock).mockResolvedValueOnce({ id: 'user-123' });
     const mockSelect = db.select as Mock;
 
@@ -120,7 +120,7 @@ describe('salvarPalpite', () => {
     expect(result.message).toBe('Partida não encontrada.');
   });
 
-  it('deve retornar erro se a partida já tiver começado (RN02)', async () => {
+  it('deve retornar erro se a partida já tiver começado', async () => {
     (obterSessao as Mock).mockResolvedValueOnce({ id: 'user-123' });
     const mockSelect = db.select as Mock;
 

@@ -141,12 +141,12 @@ describe('GET /api/palpites', () => {
       pctEmpates: 33, // 1/3 = 33.3% -> 33%
     });
 
-    // Como o jogo não começou, palpites individuais devem estar bloqueados (RN03)
+    // Como o jogo não começou, palpites individuais devem estar bloqueados
     expect(matchStats.palpitesIndividuaisLiberados).toBe(false);
     expect(matchStats.palpitesIndividuais).toEqual([]);
   });
 
-  it('deve liberar palpites individuais se a partida ja tiver iniciado (RN03)', async () => {
+  it('deve liberar palpites individuais se a partida ja tiver iniciado', async () => {
     // Configura tempo do servidor para após o inicio da partida
     vi.setSystemTime(new Date('2026-06-03T19:00:00Z'));
 

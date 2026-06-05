@@ -76,7 +76,7 @@ export async function GET(): Promise<NextResponse> {
       const pctEmpates =
         totalGuesses > 0 ? Math.round((empates / totalGuesses) * 100) : 0;
 
-      // Controle rigoroso da Regra RN03
+      // Controle rigoroso da Regra
       const isStarted = now >= new Date(match.dataInicio);
 
       return {

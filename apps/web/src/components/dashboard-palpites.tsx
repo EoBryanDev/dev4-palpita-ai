@@ -171,7 +171,7 @@ export function DashboardPalpites({
   return (
     <div className="min-h-screen bg-zinc-50 transition-colors dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 pb-16">
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8">
-        {/* Aviso de Conta Pendente de Liberação (RN05) */}
+        {/* Aviso de Conta Pendente de Liberação */}
         {!isUsuarioLiberado && (
           <div className="mb-8 p-4 rounded-2xl border border-amber-200 bg-amber-50/50 dark:border-amber-900/30 dark:bg-amber-950/20 text-amber-800 dark:text-amber-400 flex items-start gap-3 animate-pulse">
             <AlertTriangle className="h-5 w-5 mt-0.5 shrink-0" />

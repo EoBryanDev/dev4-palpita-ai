@@ -152,7 +152,7 @@ export default async function ValidationUserPage({
 
     const expirado = tokenConvite.estaExpirado();
 
-    // 5. Verifica se o link expirou (limite de 5 minutos da RN04) ou se ja foi usado
+    // 5. Verifica se o link expirou (limite de 5 minutos da) ou se ja foi usado
     if (expirado || tokenData.usado) {
       return (
         <div className="flex min-h-screen flex-col bg-zinc-50 font-sans text-zinc-900 transition-colors dark:bg-zinc-950 dark:text-zinc-50">

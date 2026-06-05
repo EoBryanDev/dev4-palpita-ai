@@ -140,7 +140,7 @@ export default async function HomePage({
                   <span className="font-bold">Segurança:</span>
                 )}{' '}
                 Os links de convite e ativação expiram em exatamente 5 minutos
-                por segurança (RN04).
+                por segurança.
               </p>
             </div>
             {showTimeoutBanner && (
@@ -243,7 +243,7 @@ export default async function HomePage({
           </div>
         </section>
 
-        {/* Regras de Pontuação (RN01) */}
+        {/* Regras de Pontuação */}
         <section
           id="regras-pontuacao"
           className="rounded-3xl border border-zinc-200 bg-zinc-50/50 p-8 dark:border-zinc-800 dark:bg-zinc-900/30"
@@ -254,7 +254,7 @@ export default async function HomePage({
               Regulamento Oficial
             </div>
             <h2 className="text-3xl font-bold tracking-tight">
-              Regras de Pontuação (RN01)
+              Regras de Pontuação
             </h2>
             <p className="text-zinc-600 dark:text-zinc-400">
               O sistema de pontuação é simples e direto, premiando tanto a

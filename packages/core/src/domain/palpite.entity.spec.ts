@@ -36,7 +36,7 @@ describe('Palpite Entity', () => {
     expect(() => new Palpite(props)).toThrow('Gols nao podem ser negativos');
   });
 
-  describe('RN02 - Bloqueio de Horario', () => {
+  describe('Bloqueio de Horario', () => {
     it('deve permitir atualizar palpite antes do inicio da partida', () => {
       const dataInicioPartida = new Date('2026-06-15T15:00:00Z');
       const dataReferencia = new Date('2026-06-15T14:59:00Z'); // 1 minuto antes
@@ -97,7 +97,7 @@ describe('Palpite Entity', () => {
     });
   });
 
-  describe('RN01 - Calculo de Pontuacao', () => {
+  describe('Calculo de Pontuacao', () => {
     it('deve retornar 0 pontos se a partida nao tiver resultado lancado (gols nulos)', () => {
       const palpite = new Palpite({
         id: 'palpite-1',

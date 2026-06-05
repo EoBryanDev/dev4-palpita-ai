@@ -87,7 +87,7 @@ describe('DashboardPalpites Component', () => {
     expect(screen.getByText('Fase de Grupos - Rodada 1')).toBeDefined();
   });
 
-  it('deve exibir um aviso e desabilitar formulário se o status for ATIVO (ou seja, pendente de liberação de apostas - RN05)', () => {
+  it('deve exibir um aviso e desabilitar formulário se o status for ATIVO (ou seja, pendente de liberação de apostas)', () => {
     render(<DashboardPalpites {...defaultProps} userStatus="ATIVO" />);
 
     expect(

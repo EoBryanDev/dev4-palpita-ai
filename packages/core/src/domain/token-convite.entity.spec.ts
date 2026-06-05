@@ -19,7 +19,7 @@ describe('TokenConvite Entity', () => {
     expect(token.usado).toBe(false);
   });
 
-  describe('RN04 - Expiracao de Token (5 minutos)', () => {
+  describe('Expiracao de Token (5 minutos)', () => {
     it('nao deve estar expirado logo apos a criacao', () => {
       const dataCriacao = new Date('2026-06-15T10:00:00Z');
       const token = new TokenConvite({

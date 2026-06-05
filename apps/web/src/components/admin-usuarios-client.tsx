@@ -178,7 +178,7 @@ export function AdminUsuariosClient({
             </div>
             <div>
               <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">
-                Apostas Liberadas (RN05)
+                Apostas Liberadas
               </span>
               <span className="text-3xl font-black">{totalLiberados}</span>
             </div>
@@ -380,7 +380,7 @@ export function AdminUsuariosClient({
                         </td>
                         <td className="py-4 px-6 text-right">
                           <div className="flex items-center justify-end gap-2">
-                            {/* Lógica de controle de liberação (RN05) */}
+                            {/* Lógica de controle de liberação */}
                             {usuario.status === 'ATIVO' && !isSelf && (
                               <Button
                                 size="sm"

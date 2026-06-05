@@ -65,7 +65,7 @@ export function TimeoutBanner() {
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 shrink-0" />
             <span className="text-xs sm:text-sm font-semibold">
-              Palpites para a Rodada 1 encerrados! Os jogos já começaram. (RN02)
+              Palpites para a Rodada 1 encerrados! Os jogos já começaram.
             </span>
           </div>
         </div>
