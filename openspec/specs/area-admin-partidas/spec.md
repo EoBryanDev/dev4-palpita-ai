@@ -4,10 +4,10 @@
 TBD - created by archiving change private-area. Update Purpose after archive.
 ## Requirements
 ### Requirement: Gerenciamento de Jogos e Rodadas
-O sistema DEVE permitir que o administrador cadastre e atualize datas, horários e times (Time A e Time B) para cada partida e configure as rodadas do bolão.
+O sistema MUST permitir que o administrador configure as rodadas do bolão e cadastre/atualize as partidas escolhendo obrigatoriamente equipes pré-cadastradas no sistema como Time A e Time B (não permitindo texto livre).
 
 #### Scenario: Cadastro de novo jogo
-- **WHEN** o administrador insere os dados de duas seleções, data/hora do jogo e clica em salvar
+- **WHEN** o administrador cria uma nova partida escolhendo as equipes a partir da listagem de times cadastrados, insere data/hora do jogo e clica em salvar
 - **THEN** a partida é gravada com status "Não Iniciada" e passa a estar disponível no calendário e para preenchimento de palpites.
 
 ### Requirement: Lançamento de Resultados Oficiais e Recálculo de Pontos (RN01)
