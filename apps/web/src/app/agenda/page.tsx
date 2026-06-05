@@ -145,9 +145,19 @@ export default async function AgendaPage({
     ];
   }
 
-  // Agrupa partidas por dia (YYYY-MM-DD)
+  // Helper para obter a data formatada em YYYY-MM-DD no fuso de São Paulo (Brasília)
+  const obterDataSaoPaulo = (date: Date): string => {
+    return new Intl.DateTimeFormat('fr-CA', {
+      timeZone: 'America/Sao_Paulo',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(date);
+  };
+
+  // Agrupa partidas por dia (YYYY-MM-DD) no fuso de Brasília
   const diasDisponiveis = Array.from(
-    new Set(allPartidas.map((p) => p.dataInicio.toISOString().split('T')[0])),
+    new Set(allPartidas.map((p) => obterDataSaoPaulo(p.dataInicio))),
   ).sort();
 
   // Define dia ativo default
@@ -158,7 +168,7 @@ export default async function AgendaPage({
 
   // Filtra as partidas pelo dia ativo
   const partidasDoDia = allPartidas.filter(
-    (p) => p.dataInicio.toISOString().split('T')[0] === activeDia,
+    (p) => obterDataSaoPaulo(p.dataInicio) === activeDia,
   );
 
   return (
@@ -182,12 +192,15 @@ export default async function AgendaPage({
       {diasDisponiveis.length > 0 && (
         <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-none border-b border-zinc-200 dark:border-zinc-800">
           {diasDisponiveis.map((diaStr) => {
-            const date = new Date(`${diaStr}T00:00:00`);
+            // Criamos a data no fuso de Brasília para evitar desalinhamento de dias no formatador
+            const date = new Date(`${diaStr}T12:00:00-03:00`);
             const formatDia = new Intl.DateTimeFormat('pt-BR', {
+              timeZone: 'America/Sao_Paulo',
               day: 'numeric',
               month: 'short',
             }).format(date);
             const formatSemana = new Intl.DateTimeFormat('pt-BR', {
+              timeZone: 'America/Sao_Paulo',
               weekday: 'short',
             }).format(date);
 
@@ -219,6 +232,7 @@ export default async function AgendaPage({
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {partidasDoDia.map((partida) => {
             const timeStr = new Intl.DateTimeFormat('pt-BR', {
+              timeZone: 'America/Sao_Paulo',
               hour: '2-digit',
               minute: '2-digit',
             }).format(partida.dataInicio);

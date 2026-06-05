@@ -74,6 +74,7 @@ export default async function HomePage({
       golsTimeA: p.golsTimeA,
       golsTimeB: p.golsTimeB,
       dataInicio: new Intl.DateTimeFormat('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
         day: '2-digit',
         month: 'long',
         hour: '2-digit',
