@@ -1,44 +1,14 @@
-import { db, palpites, partidas, rodadas, times, usuarios } from '@palpita/db';
-import { eq, or } from 'drizzle-orm';
-import { alias } from 'drizzle-orm/pg-core';
+import { obterPalpitesUsuariosAtivos } from '@/services/palpites.service';
+import { obterPartidas } from '@/services/partidas.service';
 import { NextResponse } from 'next/server';
 
 export async function GET(): Promise<NextResponse> {
   try {
-    const timeA = alias(times, 'time_a');
-    const timeB = alias(times, 'time_b');
-
     // 1. Buscar todas as partidas com suas respectivas rodadas
-    const dbPartidas = await db
-      .select({
-        id: partidas.id,
-        timeA: timeA.nome,
-        timeB: timeB.nome,
-        timeAEmoji: timeA.emoji,
-        timeBEmoji: timeB.emoji,
-        golsTimeA: partidas.golsTimeA,
-        golsTimeB: partidas.golsTimeB,
-        dataInicio: partidas.dataInicio,
-        status: partidas.status,
-        rodadaNome: rodadas.nome,
-      })
-      .from(partidas)
-      .innerJoin(rodadas, eq(partidas.rodadaId, rodadas.id))
-      .innerJoin(timeA, eq(partidas.timeAId, timeA.id))
-      .innerJoin(timeB, eq(partidas.timeBId, timeB.id));
+    const dbPartidas = await obterPartidas();
 
     // 2. Buscar todos os palpites dos usuários ATIVOS ou LIBERADOS
-    const dbPalpites = await db
-      .select({
-        id: palpites.id,
-        partidaId: palpites.partidaId,
-        golsTimeA: palpites.golsTimeA,
-        golsTimeB: palpites.golsTimeB,
-        usuarioNome: usuarios.nome,
-      })
-      .from(palpites)
-      .innerJoin(usuarios, eq(palpites.usuarioId, usuarios.id))
-      .where(or(eq(usuarios.status, 'ATIVO'), eq(usuarios.status, 'LIBERADO')));
+    const dbPalpites = await obterPalpitesUsuariosAtivos();
 
     // Agrupar palpites por partidaId
     const palpitesPorPartida = new Map<string, typeof dbPalpites>();

@@ -1,47 +1,16 @@
 import { GET } from '@/app/api/palpites/route';
-import { db } from '@palpita/db';
+import { obterPalpitesUsuariosAtivos } from '@/services/palpites.service';
+import { obterPartidas } from '@/services/partidas.service';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 
-vi.mock('@palpita/db', () => {
-  const mockSelect = vi.fn();
-  return {
-    db: {
-      select: mockSelect,
-    },
-    partidas: {
-      id: 'partidas.id',
-      timeAId: 'partidas.timeAId',
-      timeBId: 'partidas.timeBId',
-      golsTimeA: 'partidas.golsTimeA',
-      golsTimeB: 'partidas.golsTimeB',
-      dataInicio: 'partidas.dataInicio',
-      status: 'partidas.status',
-      rodadaId: 'partidas.rodadaId',
-    },
-    rodadas: {
-      nome: 'rodadas.nome',
-      id: 'rodadas.id',
-    },
-    palpites: {
-      id: 'palpites.id',
-      partidaId: 'palpites.partidaId',
-      golsTimeA: 'palpites.golsTimeA',
-      golsTimeB: 'palpites.golsTimeB',
-      usuarioId: 'palpites.usuarioId',
-    },
-    usuarios: {
-      id: 'usuarios.id',
-      nome: 'usuarios.nome',
-      status: 'usuarios.status',
-    },
-    times: {
-      id: 'times.id',
-      nome: 'times.nome',
-      emoji: 'times.emoji',
-    },
-  };
-});
+vi.mock('@/services/partidas.service', () => ({
+  obterPartidas: vi.fn(),
+}));
+
+vi.mock('@/services/palpites.service', () => ({
+  obterPalpitesUsuariosAtivos: vi.fn(),
+}));
 
 describe('GET /api/palpites', () => {
   beforeEach(() => {
@@ -97,30 +66,11 @@ describe('GET /api/palpites', () => {
       },
     ];
 
-    const mockSelect = db.select as Mock;
-    mockSelect.mockImplementationOnce(() => ({
-      from: vi.fn(() => {
-        // biome-ignore lint/suspicious/noExplicitAny: mock query builder
-        const query: any = {
-          innerJoin: vi.fn(() => query),
-          // biome-ignore lint/suspicious/noThenProperty: thenable mock query
-          then: (resolve: (value: unknown) => void) => resolve(mockMatches),
-        };
-        return query;
-      }),
-    }));
-    mockSelect.mockImplementationOnce(() => ({
-      from: vi.fn(() => {
-        // biome-ignore lint/suspicious/noExplicitAny: mock query builder
-        const query: any = {
-          innerJoin: vi.fn(() => query),
-          where: vi.fn(() => query),
-          // biome-ignore lint/suspicious/noThenProperty: thenable mock query
-          then: (resolve: (value: unknown) => void) => resolve(mockGuesses),
-        };
-        return query;
-      }),
-    }));
+    const mockObterPartidas = obterPartidas as Mock;
+    const mockObterPalpites = obterPalpitesUsuariosAtivos as Mock;
+
+    mockObterPartidas.mockResolvedValue(mockMatches);
+    mockObterPalpites.mockResolvedValue(mockGuesses);
 
     const response = await GET();
     expect(response.status).toBe(200);
@@ -175,30 +125,11 @@ describe('GET /api/palpites', () => {
       },
     ];
 
-    const mockSelect = db.select as Mock;
-    mockSelect.mockImplementationOnce(() => ({
-      from: vi.fn(() => {
-        // biome-ignore lint/suspicious/noExplicitAny: mock query builder
-        const query: any = {
-          innerJoin: vi.fn(() => query),
-          // biome-ignore lint/suspicious/noThenProperty: thenable mock query
-          then: (resolve: (value: unknown) => void) => resolve(mockMatches),
-        };
-        return query;
-      }),
-    }));
-    mockSelect.mockImplementationOnce(() => ({
-      from: vi.fn(() => {
-        // biome-ignore lint/suspicious/noExplicitAny: mock query builder
-        const query: any = {
-          innerJoin: vi.fn(() => query),
-          where: vi.fn(() => query),
-          // biome-ignore lint/suspicious/noThenProperty: thenable mock query
-          then: (resolve: (value: unknown) => void) => resolve(mockGuesses),
-        };
-        return query;
-      }),
-    }));
+    const mockObterPartidas = obterPartidas as Mock;
+    const mockObterPalpites = obterPalpitesUsuariosAtivos as Mock;
+
+    mockObterPartidas.mockResolvedValue(mockMatches);
+    mockObterPalpites.mockResolvedValue(mockGuesses);
 
     const response = await GET();
     const json = await response.json();
@@ -216,10 +147,8 @@ describe('GET /api/palpites', () => {
   });
 
   it('deve retornar status 500 se houver um erro no banco', async () => {
-    const mockSelect = db.select as Mock;
-    mockSelect.mockImplementationOnce(() => {
-      throw new Error('Database error');
-    });
+    const mockObterPartidas = obterPartidas as Mock;
+    mockObterPartidas.mockRejectedValue(new Error('Database error'));
 
     const response = await GET();
     expect(response.status).toBe(500);
