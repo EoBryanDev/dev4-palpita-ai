@@ -1,5 +1,5 @@
-import { config } from 'dotenv';
 import { join } from 'node:path';
+import { config } from 'dotenv';
 
 // Carrega o .env da raiz do monorepo (dois níveis acima de packages/db)
 config({ path: join(__dirname, '../../.env') });
