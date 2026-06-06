@@ -1,19 +1,19 @@
 ## 1. Setup e Organização de Pastas
 
-- [ ] 1.1 Garantir a criação das pastas `/src/types` e `/src/interface` dentro do app `apps/web/src` se não existirem
-- [ ] 1.2 Mover a store do Zustand de `apps/web/src/lib/store/ui.ts` para `apps/web/src/store/ui-store.ts` e ajustar os imports no componente `ThemeToggle`
+- [x] 1.1 Garantir a criação das pastas `/src/types` e `/src/interface` dentro do app `apps/web/src` se não existirem
+- [x] 1.2 Mover a store do Zustand de `apps/web/src/lib/store/ui.ts` para `apps/web/src/store/ui-store.ts` e ajustar os imports no componente `ThemeToggle`
 
 ## 2. Centralização de Helpers de Formatação
 
-- [ ] 2.1 Criar o arquivo de utilitários `apps/web/src/helpers/date.ts`
-- [ ] 2.2 Migrar formatações de data e configurações de fuso horário de São Paulo para `date.ts`
-- [ ] 2.3 Substituir a lógica de formatação de data inline de `app/agenda/page.tsx`, `components/dashboard-palpites.tsx` e `app/home/page.tsx` pelos helpers centralizados
+- [x] 2.1 Criar o arquivo de utilitários `apps/web/src/helpers/date.ts`
+- [x] 2.2 Migrar formatações de data e configurações de fuso horário de São Paulo para `date.ts`
+- [x] 2.3 Substituir a lógica de formatação de data inline de `app/agenda/page.tsx`, `components/dashboard-palpites.tsx` e `app/home/page.tsx` pelos helpers centralizados
 
 ## 3. Segregação de Tipos e Interfaces
 
-- [ ] 3.1 Extrair as interfaces `IPartidaDashboard` e `IHistoricoDashboard` do componente `dashboard-palpites.tsx` para o arquivo `apps/web/src/interface/IDashboard.ts`
-- [ ] 3.2 Extrair `IPartidaFormatada` do arquivo `app/agenda/page.tsx` para `apps/web/src/interface/IPartida.ts`
-- [ ] 3.3 Extrair `IHomePartida` do arquivo `app/home/page.tsx` para `apps/web/src/interface/IPartida.ts`
+- [x] 3.1 Extrair as interfaces `IPartidaDashboard` e `IHistoricoDashboard` do componente `dashboard-palpites.tsx` para o arquivo `apps/web/src/interface/IDashboard.ts`
+- [x] 3.2 Extrair `IPartidaFormatada` do arquivo `app/agenda/page.tsx` para `apps/web/src/interface/IPartida.ts`
+- [x] 3.3 Extrair `IHomePartida` do arquivo `app/home/page.tsx` para `apps/web/src/interface/IPartida.ts`
 
 ## 4. Extração de Hooks Customizados (Comportamento)
 

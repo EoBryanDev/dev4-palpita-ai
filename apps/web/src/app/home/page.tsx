@@ -1,5 +1,7 @@
 import { SolicitarConviteForm } from '@/components/solicitar-convite-form';
 import { Button } from '@/components/ui/button';
+import { formatToBRLDateTimeLong } from '@/helpers/date';
+import type { IHomePartida } from '@/interface/IPartida';
 import {
   configuracoes,
   db,
@@ -21,19 +23,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import type React from 'react';
-
-interface IHomePartida {
-  id: string;
-  timeA: string;
-  timeB: string;
-  timeAEmoji?: string;
-  timeBEmoji?: string;
-  golsTimeA: number | null;
-  golsTimeB: number | null;
-  dataInicio: string;
-  status: string;
-  rodada: string;
-}
 
 interface IHomePageProps {
   searchParams: Promise<{ timeout?: string }>;
@@ -120,13 +109,7 @@ export default async function HomePage({
       timeBEmoji: p.timeBEmoji,
       golsTimeA: p.golsTimeA,
       golsTimeB: p.golsTimeB,
-      dataInicio: new Intl.DateTimeFormat('pt-BR', {
-        timeZone: 'America/Sao_Paulo',
-        day: '2-digit',
-        month: 'long',
-        hour: '2-digit',
-        minute: '2-digit',
-      }).format(p.dataInicio),
+      dataInicio: formatToBRLDateTimeLong(p.dataInicio),
       status: p.status,
       rodada: p.rodadaNome,
     }));

@@ -4,6 +4,11 @@ import { logoutUsuario } from '@/app/actions/auth';
 import { salvarPalpite } from '@/app/actions/palpites';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { formatToBRLDateTimeShort } from '@/helpers/date';
+import type {
+  IHistoricoDashboard,
+  IPartidaDashboard,
+} from '@/interface/IDashboard';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -17,35 +22,6 @@ import {
 import { useRouter } from 'next/navigation';
 import type React from 'react';
 import { useState, useTransition } from 'react';
-
-export interface IPartidaDashboard {
-  id: string;
-  timeA: string;
-  timeB: string;
-  timeAEmoji?: string;
-  timeBEmoji?: string;
-  dataInicio: string;
-  status: string;
-  golsTimeA?: number | null;
-  golsTimeB?: number | null;
-  palpiteGolsA?: number | null;
-  palpiteGolsB?: number | null;
-  jaPalpitou: boolean;
-}
-
-export interface IHistoricoDashboard {
-  partidaId: string;
-  timeA: string;
-  timeB: string;
-  timeAEmoji?: string;
-  timeBEmoji?: string;
-  placarOficialA: number;
-  placarOficialB: number;
-  palpiteA: number;
-  palpiteB: number;
-  pontosGanhos: number;
-  dataInicio: string;
-}
 
 interface IDashboardPalpitesProps {
   nomeUsuario: string;
@@ -150,14 +126,7 @@ export function DashboardPalpites({
   };
 
   const formatarData = (dataStr: string) => {
-    const data = new Date(dataStr);
-    return data.toLocaleString('pt-BR', {
-      timeZone: 'America/Sao_Paulo',
-      day: '2-digit',
-      month: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    return formatToBRLDateTimeShort(new Date(dataStr));
   };
 
   // Filtragem de partidas da rodada
