@@ -1,7 +1,6 @@
 'use client';
 
 import type React from 'react';
-import { useState } from 'react';
 
 import {
   AlertCircle,
@@ -12,57 +11,23 @@ import {
   Mail,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
-import { loginUsuario } from '@/app/actions/auth';
+import { useLoginForm } from '@/hooks/use-login-form';
 import { Button } from './ui/button';
 
 export function LoginForm() {
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [lembrarMe, setLembrarMe] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const router = useRouter();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMsg(null);
-
-    if (!email || email.trim().length === 0) {
-      setErrorMsg('O e-mail é obrigatório.');
-      return;
-    }
-
-    if (!senha || senha.length === 0) {
-      setErrorMsg('A senha é obrigatória.');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const res = await loginUsuario(email, senha);
-      if (res.success) {
-        setSuccess(true);
-        // Armazena no localStorage apenas para simular a persistência da sessão
-        if (lembrarMe) {
-          localStorage.setItem('palpita_user_email', email);
-        }
-        setTimeout(() => {
-          router.push('/meu-espaco');
-          router.refresh();
-        }, 1500);
-      } else {
-        setErrorMsg(res.message);
-      }
-    } catch (err) {
-      setErrorMsg('Ocorreu um erro ao realizar o login. Tente novamente.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    email,
+    setEmail,
+    senha,
+    setSenha,
+    lembrarMe,
+    setLembrarMe,
+    loading,
+    errorMsg,
+    success,
+    handleSubmit,
+  } = useLoginForm();
 
   if (success) {
     return (

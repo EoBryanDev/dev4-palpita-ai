@@ -1,40 +1,13 @@
 'use client';
 
-import { solicitarConvite } from '@/app/actions/convites';
+import { useSolicitarConvite } from '@/hooks/use-solicitar-convite';
 import { AlertCircle, CheckCircle2, Loader2, Sparkles } from 'lucide-react';
 import type React from 'react';
-import { useState } from 'react';
 import { Button } from './ui/button';
 
 export function SolicitarConviteForm() {
-  const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<{
-    success: boolean;
-    message: string;
-  } | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setResult(null);
-    try {
-      const res = await solicitarConvite(nome, email);
-      setResult(res);
-      if (res.success) {
-        setNome('');
-        setEmail('');
-      }
-    } catch (err) {
-      setResult({
-        success: false,
-        message: 'Ocorreu um erro ao enviar a solicitação. Tente novamente.',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { nome, setNome, email, setEmail, loading, result, handleSubmit } =
+    useSolicitarConvite();
 
   return (
     <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white/80 p-6 shadow-xl backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/80">

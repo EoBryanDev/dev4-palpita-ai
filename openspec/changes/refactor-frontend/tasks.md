@@ -17,12 +17,12 @@
 
 ## 4. Extração de Hooks Customizados (Comportamento)
 
-- [ ] 4.1 Criar o hook `apps/web/src/hooks/use-solicitar-convite.ts` e mover toda a lógica de estado, loading e chamada de Server Action do componente `SolicitarConviteForm`
-- [ ] 4.2 Criar o hook `apps/web/src/hooks/use-login-form.ts` e mover estados, lógica de validação de login e chamada da Action do componente `LoginForm`
-- [ ] 4.3 Criar o hook `apps/web/src/hooks/use-countdown.ts` e extrair o cálculo matemático do cronômetro de início da Copa do componente `TimeoutBanner`
-- [ ] 4.4 Criar o hook `apps/web/src/hooks/use-dashboard-palpites.ts` e extrair a manipulação de matriz de palpites, transições de gravação da Server Action e encerramento de sessão de `DashboardPalpites`
+- [x] 4.1 Criar o hook `apps/web/src/hooks/use-solicitar-convite.ts` e mover toda a lógica de estado, loading e chamada de Server Action do componente `SolicitarConviteForm`
+- [x] 4.2 Criar o hook `apps/web/src/hooks/use-login-form.ts` e mover estados, lógica de validação de login e chamada da Action do componente `LoginForm`
+- [x] 4.3 Criar o hook `apps/web/src/hooks/use-countdown.ts` e extrair o cálculo matemático do cronômetro de início da Copa do componente `TimeoutBanner`
+- [x] 4.4 Criar o hook `apps/web/src/hooks/use-dashboard-palpites.ts` e extrair a manipulação de matriz de palpites, transições de gravação da Server Action e encerramento de sessão de `DashboardPalpites`
 
 ## 5. Testes e Validação Final
 
-- [ ] 5.1 Executar a suíte de testes unitários do frontend (`pnpm test`) para garantir regressão zero
-- [ ] 5.2 Executar o linter e o formatador (`pnpm lint` e `pnpm format`) para validação estética
+- [x] 5.1 Executar a suíte de testes unitários do frontend (`pnpm test`) para garantir regressão zero
+- [x] 5.2 Executar o linter e o formatador (`pnpm lint` e `pnpm format`) para validação estética
