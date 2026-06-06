@@ -191,7 +191,7 @@ export default async function HomePage({
       {/* Main Content */}
       <div className="mx-auto w-full max-w-7xl flex-1 p-6 px-6 space-y-12">
         {/* Seção Hero */}
-        <section className="relative overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent p-8 dark:border-zinc-800 md:p-12">
+        <section className="relative overflow-hidden rounded-3xl border border-zinc-200 bg-linear-to-br from-emerald-500/10 via-transparent to-transparent p-8 dark:border-zinc-800 md:p-12">
           <div className="grid gap-8 md:grid-cols-2 items-center">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
