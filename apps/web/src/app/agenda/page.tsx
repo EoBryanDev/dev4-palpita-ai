@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/ui/page-header';
 import {
   formatToBRLDayMonth,
   formatToBRLTime,
@@ -6,9 +7,7 @@ import {
   obterDataSaoPauloISO,
 } from '@/helpers/date';
 import type { IPartidaFormatada } from '@/interface/IPartida';
-import { db, partidas, rodadas, times } from '@palpita/db';
-import { asc, eq } from 'drizzle-orm';
-import { alias } from 'drizzle-orm/pg-core';
+import { obterPartidas } from '@/services/partidas.service';
 import { Calendar, Clock, Trophy } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -32,28 +31,7 @@ export default async function AgendaPage({
   let allPartidas: IPartidaFormatada[] = [];
 
   try {
-    const timeA = alias(times, 'time_a');
-    const timeB = alias(times, 'time_b');
-
-    const dbPartidas = await db
-      .select({
-        id: partidas.id,
-        timeA: timeA.nome,
-        timeB: timeB.nome,
-        timeAEmoji: timeA.emoji,
-        timeBEmoji: timeB.emoji,
-        golsTimeA: partidas.golsTimeA,
-        golsTimeB: partidas.golsTimeB,
-        dataInicio: partidas.dataInicio,
-        status: partidas.status,
-        rodadaNome: rodadas.nome,
-      })
-      .from(partidas)
-      .innerJoin(rodadas, eq(partidas.rodadaId, rodadas.id))
-      .innerJoin(timeA, eq(partidas.timeAId, timeA.id))
-      .innerJoin(timeB, eq(partidas.timeBId, timeB.id))
-      .orderBy(asc(partidas.dataInicio));
-
+    const dbPartidas = await obterPartidas();
     allPartidas = dbPartidas.map((p) => ({
       id: p.id,
       timeA: p.timeA,
@@ -64,7 +42,7 @@ export default async function AgendaPage({
       golsTimeB: p.golsTimeB,
       dataInicio: p.dataInicio,
       status: p.status,
-      rodada: p.rodadaNome,
+      rodada: p.rodadaNome || '',
     }));
   } catch (error) {
     console.error(
@@ -157,20 +135,12 @@ export default async function AgendaPage({
 
   return (
     <div className="mx-auto w-full max-w-7xl p-6 px-6 space-y-8 flex-1">
-      {/* Header */}
-      <div className="space-y-2">
-        <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-          <Calendar className="h-3 w-3" />
-          Calendário de Jogos
-        </div>
-        <h1 className="text-4xl font-extrabold tracking-tight">
-          Agenda da Copa 2026
-        </h1>
-        <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl">
-          Navegue pelos dias de competições, veja os confrontos agendados e
-          acompanhe o andamento oficial dos placares.
-        </p>
-      </div>
+      <PageHeader
+        title="Agenda da Copa 2026"
+        description="Navegue pelos dias de competições, veja os confrontos agendados e acompanhe o andamento oficial dos placares."
+        badgeText="Calendário de Jogos"
+        icon={Calendar}
+      />
 
       {/* Tabs de Dias */}
       {diasDisponiveis.length > 0 && (

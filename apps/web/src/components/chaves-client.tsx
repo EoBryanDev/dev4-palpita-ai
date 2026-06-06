@@ -1,5 +1,6 @@
 'use client';
 
+import { PageHeader } from '@/components/ui/page-header';
 import { GitFork, Layers, Trophy } from 'lucide-react';
 import React, { useState } from 'react';
 
@@ -141,20 +142,12 @@ export default function ChavesClient({ grupos }: IChavesClientProps) {
 
   return (
     <div className="mx-auto w-full max-w-7xl p-6 px-6 space-y-8 flex-1">
-      {/* Header */}
-      <div className="space-y-2">
-        <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-          <Layers className="h-3 w-3" />
-          Fases da Competição
-        </div>
-        <h1 className="text-4xl font-extrabold tracking-tight">
-          Chaveamento & Grupos
-        </h1>
-        <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl">
-          Veja a composição dos grupos e a projeção do chaveamento do mata-mata
-          até a grande final da Copa do Mundo.
-        </p>
-      </div>
+      <PageHeader
+        title="Chaveamento & Grupos"
+        description="Veja a composição dos grupos e a projeção do chaveamento do mata-mata até a grande final da Copa do Mundo."
+        badgeText="Fases da Competição"
+        icon={Layers}
+      />
 
       {/* Navegação entre Fase de Grupos e Mata-mata */}
       <div className="flex bg-zinc-100 dark:bg-zinc-900 p-1 rounded-xl w-fit border border-zinc-200 dark:border-zinc-800">

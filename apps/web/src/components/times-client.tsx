@@ -1,5 +1,6 @@
 'use client';
 
+import { PageHeader } from '@/components/ui/page-header';
 import { Filter, Globe, Search, Trophy } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
@@ -135,20 +136,12 @@ export default function TimesClient({ initialTimes }: ITimesClientProps) {
 
   return (
     <div className="mx-auto w-full max-w-7xl p-6 px-6 space-y-8 flex-1">
-      {/* Header */}
-      <div className="space-y-2">
-        <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-          <Globe className="h-3 w-3" />
-          Seleções Participantes
-        </div>
-        <h1 className="text-4xl font-extrabold tracking-tight">
-          Equipes da Copa 2026
-        </h1>
-        <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl">
-          Explore as seleções classificadas para a maior Copa do Mundo da
-          história. Filtre por grupo ou confederação e veja seus destaques.
-        </p>
-      </div>
+      <PageHeader
+        title="Equipes da Copa 2026"
+        description="Explore as seleções classificadas para a maior Copa do Mundo da história. Filtre por grupo ou confederação e veja seus destaques."
+        badgeText="Seleções Participantes"
+        icon={Globe}
+      />
 
       {/* Barra de Filtros e Busca */}
       <div className="grid gap-4 md:grid-cols-4 bg-zinc-50 dark:bg-zinc-900/30 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">

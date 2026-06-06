@@ -13,6 +13,8 @@ import {
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useLoginForm } from '@/hooks/use-login-form';
 
 export function LoginForm() {
@@ -64,15 +66,10 @@ export function LoginForm() {
 
       <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <div>
-          <label
-            htmlFor="email"
-            className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5"
-          >
-            E-mail
-          </label>
+          <Label htmlFor="email">E-mail</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" />
-            <input
+            <Input
               id="email"
               type="email"
               required
@@ -80,21 +77,16 @@ export function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
-              className="w-full rounded-lg border border-zinc-200 bg-zinc-50/50 pl-10 pr-3 py-2 text-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-850 dark:text-zinc-50"
+              className="pl-10"
             />
           </div>
         </div>
 
         <div>
-          <label
-            htmlFor="senha"
-            className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5"
-          >
-            Senha
-          </label>
+          <Label htmlFor="senha">Senha</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" />
-            <input
+            <Input
               id="senha"
               type="password"
               required
@@ -102,7 +94,7 @@ export function LoginForm() {
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
               disabled={loading}
-              className="w-full rounded-lg border border-zinc-200 bg-zinc-50/50 pl-10 pr-3 py-2 text-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-850 dark:text-zinc-50"
+              className="pl-10"
             />
           </div>
         </div>
