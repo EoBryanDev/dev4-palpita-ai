@@ -1,11 +1,13 @@
 'use client';
 
-import { salvarValorPalpite } from '@/app/actions/admin';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
+import { useMutationSalvarValorPalpite } from '@/hooks/mutations/useMutationConfiguracoes';
 import { Coins, Loader2, Save } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import React, { useState, useTransition } from 'react';
+import React, { useState } from 'react';
 
 import type { IAdminConfiguracoesClientProps } from '@/interface/IAdmin';
 
@@ -14,14 +16,14 @@ export function AdminConfiguracoesClient({
   valorInicial,
 }: IAdminConfiguracoesClientProps) {
   const [valor, setValor] = useState<string>(valorInicial.toString());
-  const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const router = useRouter();
+  const mutation = useMutationSalvarValorPalpite();
 
   const valorNumerico = Number.parseFloat(valor) || 0;
   const totalArrecadado = totalLiberados * valorNumerico;
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const valNum = Number.parseFloat(valor);
     if (Number.isNaN(valNum) || valNum < 0) {
       toast({
@@ -33,31 +35,23 @@ export function AdminConfiguracoesClient({
       return;
     }
 
-    startTransition(async () => {
-      try {
-        const res = await salvarValorPalpite(valNum);
-        if (res.success) {
-          toast({
-            title: 'Configuração Salva',
-            description: res.message,
-          });
-          router.refresh();
-        } else {
-          toast({
-            title: 'Erro ao Salvar',
-            description: res.message,
-            variant: 'destructive',
-          });
-        }
-      } catch (error) {
-        console.error('Erro ao salvar valor do palpite:', error);
-        toast({
-          title: 'Erro de Conexão',
-          description: 'Houve um erro de comunicação com o servidor.',
-          variant: 'destructive',
-        });
-      }
-    });
+    try {
+      const res = await mutation.mutateAsync(valNum);
+      toast({
+        title: 'Configuração Salva',
+        description: res.message,
+      });
+      router.refresh();
+    } catch (error) {
+      console.error('Erro ao salvar valor do palpite:', error);
+      const err = error as { message?: string };
+      toast({
+        title: 'Erro ao Salvar',
+        description:
+          err.message || 'Houve um erro de comunicação com o servidor.',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -77,17 +71,12 @@ export function AdminConfiguracoesClient({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
         {/* Input do Valor */}
         <div className="space-y-2">
-          <label
-            htmlFor="valor-palpite"
-            className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block"
-          >
-            Valor Individual (R$)
-          </label>
+          <Label htmlFor="valor-palpite">Valor Individual (R$)</Label>
           <div className="relative">
             <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400">
               R$
             </span>
-            <input
+            <Input
               id="valor-palpite"
               type="number"
               min="0"
@@ -95,8 +84,8 @@ export function AdminConfiguracoesClient({
               placeholder="0.00"
               value={valor}
               onChange={(e) => setValor(e.target.value)}
-              disabled={isPending}
-              className="w-full rounded-2xl border border-zinc-200 bg-zinc-50/50 pl-9 pr-4 py-3.5 text-sm font-bold outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-50"
+              disabled={mutation.isPending}
+              className="pl-9 font-bold py-3.5 rounded-2xl"
             />
           </div>
         </div>
@@ -127,15 +116,15 @@ export function AdminConfiguracoesClient({
       <div className="flex justify-end border-t border-zinc-100 dark:border-zinc-800/80 pt-4">
         <Button
           onClick={handleSave}
-          disabled={isPending}
+          disabled={mutation.isPending}
           className="bg-emerald-600 text-zinc-50 hover:bg-emerald-500 dark:bg-emerald-50 dark:text-zinc-950 dark:hover:bg-emerald-200 rounded-2xl py-5 px-5 font-bold flex items-center gap-2 transition-all shadow-sm"
         >
-          {isPending ? (
+          {mutation.isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
             <Save className="h-4 w-4" />
           )}
-          {isPending ? 'Salvando...' : 'Salvar Configuração'}
+          {mutation.isPending ? 'Salvando...' : 'Salvar Configuração'}
         </Button>
       </div>
     </div>

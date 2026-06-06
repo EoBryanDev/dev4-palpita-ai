@@ -1,12 +1,15 @@
 'use client';
 
-import {
-  criarPartida,
-  criarRodada,
-  lancarResultadoOficial,
-} from '@/app/actions/admin';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
+import {
+  useMutationCriarPartida,
+  useMutationCriarRodada,
+  useMutationLancarResultadoOficial,
+} from '@/hooks/mutations/useMutationPartidas';
 import {
   AlertTriangle,
   Calendar,
@@ -17,7 +20,7 @@ import {
   Trophy,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 
 import type {
   IAdminPartidasClientProps,
@@ -33,7 +36,15 @@ export function AdminPartidasClient({
 }: IAdminPartidasClientProps) {
   const router = useRouter();
   const { toast } = useToast();
-  const [isPending, startTransition] = useTransition();
+
+  const mutationCriarRodada = useMutationCriarRodada();
+  const mutationCriarPartida = useMutationCriarPartida();
+  const mutationLancarResultadoOficial = useMutationLancarResultadoOficial();
+
+  const isPending =
+    mutationCriarRodada.isPending ||
+    mutationCriarPartida.isPending ||
+    mutationLancarResultadoOficial.isPending;
 
   // Estados para Criação de Rodada
   const [novaRodadaNum, setNovaRodadaNum] = useState('');
@@ -50,7 +61,7 @@ export function AdminPartidasClient({
     Record<string, { golsA: string; golsB: string }>
   >({});
 
-  const handleCriarRodada = (e: React.FormEvent) => {
+  const handleCriarRodada = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!novaRodadaNum || !novaRodadaNome) {
       toast({
@@ -61,30 +72,29 @@ export function AdminPartidasClient({
       return;
     }
 
-    startTransition(async () => {
-      const res = await criarRodada(
-        Number(novaRodadaNum),
-        novaRodadaNome.trim(),
-      );
-      if (res.success) {
-        toast({
-          title: 'Rodada Criada!',
-          description: res.message,
-        });
-        setNovaRodadaNum('');
-        setNovaRodadaNome('');
-        router.refresh();
-      } else {
-        toast({
-          title: 'Erro ao criar rodada',
-          description: res.message,
-          variant: 'destructive',
-        });
-      }
-    });
+    try {
+      const res = await mutationCriarRodada.mutateAsync({
+        numero: Number(novaRodadaNum),
+        nome: novaRodadaNome.trim(),
+      });
+      toast({
+        title: 'Rodada Criada!',
+        description: res.message,
+      });
+      setNovaRodadaNum('');
+      setNovaRodadaNome('');
+      router.refresh();
+    } catch (error) {
+      const err = error as { message?: string };
+      toast({
+        title: 'Erro ao criar rodada',
+        description: err.message || 'Erro ao criar rodada.',
+        variant: 'destructive',
+      });
+    }
   };
 
-  const handleCriarPartida = (e: React.FormEvent) => {
+  const handleCriarPartida = async (e: React.FormEvent) => {
     e.preventDefault();
     if (
       !partidaRodadaId ||
@@ -100,33 +110,32 @@ export function AdminPartidasClient({
       return;
     }
 
-    startTransition(async () => {
-      const res = await criarPartida(
-        partidaRodadaId,
-        partidaTimeA,
-        partidaTimeB,
-        partidaDataInicio,
-      );
-      if (res.success) {
-        toast({
-          title: 'Partida Criada!',
-          description: res.message,
-        });
-        setPartidaTimeA('');
-        setPartidaTimeB('');
-        setPartidaDataInicio('');
-        router.refresh();
-      } else {
-        toast({
-          title: 'Erro ao criar partida',
-          description: res.message,
-          variant: 'destructive',
-        });
-      }
-    });
+    try {
+      const res = await mutationCriarPartida.mutateAsync({
+        rodadaId: partidaRodadaId,
+        timeAId: partidaTimeA,
+        timeBId: partidaTimeB,
+        dataInicio: partidaDataInicio,
+      });
+      toast({
+        title: 'Partida Criada!',
+        description: res.message,
+      });
+      setPartidaTimeA('');
+      setPartidaTimeB('');
+      setPartidaDataInicio('');
+      router.refresh();
+    } catch (error) {
+      const err = error as { message?: string };
+      toast({
+        title: 'Erro ao criar partida',
+        description: err.message || 'Erro ao criar partida.',
+        variant: 'destructive',
+      });
+    }
   };
 
-  const handleLancarResultado = (partidaId: string) => {
+  const handleLancarResultado = async (partidaId: string) => {
     const placar = placares[partidaId];
     if (!placar || placar.golsA === '' || placar.golsB === '') {
       toast({
@@ -137,26 +146,25 @@ export function AdminPartidasClient({
       return;
     }
 
-    startTransition(async () => {
-      const res = await lancarResultadoOficial(
+    try {
+      const res = await mutationLancarResultadoOficial.mutateAsync({
         partidaId,
-        Number(placar.golsA),
-        Number(placar.golsB),
-      );
-      if (res.success) {
-        toast({
-          title: 'Resultado Lançado!',
-          description: res.message,
-        });
-        router.refresh();
-      } else {
-        toast({
-          title: 'Erro ao lançar placar',
-          description: res.message,
-          variant: 'destructive',
-        });
-      }
-    });
+        golsTimeA: Number(placar.golsA),
+        golsTimeB: Number(placar.golsB),
+      });
+      toast({
+        title: 'Resultado Lançado!',
+        description: res.message,
+      });
+      router.refresh();
+    } catch (error) {
+      const err = error as { message?: string };
+      toast({
+        title: 'Erro ao lançar placar',
+        description: err.message || 'Erro ao lançar placar.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handlePlacarChange = (
@@ -195,13 +203,8 @@ export function AdminPartidasClient({
           </h3>
           <form onSubmit={handleCriarRodada} className="space-y-3">
             <div>
-              <label
-                htmlFor="novaRodadaNum"
-                className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-1"
-              >
-                Número da Rodada
-              </label>
-              <input
+              <Label htmlFor="novaRodadaNum">Número da Rodada</Label>
+              <Input
                 id="novaRodadaNum"
                 type="number"
                 min="1"
@@ -210,17 +213,11 @@ export function AdminPartidasClient({
                 value={novaRodadaNum}
                 onChange={(e) => setNovaRodadaNum(e.target.value)}
                 disabled={isPending}
-                className="w-full rounded-xl border border-zinc-200 bg-zinc-55/30 px-3 py-2 text-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
               />
             </div>
             <div>
-              <label
-                htmlFor="novaRodadaNome"
-                className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-1"
-              >
-                Nome da Rodada
-              </label>
-              <input
+              <Label htmlFor="novaRodadaNome">Nome da Rodada</Label>
+              <Input
                 id="novaRodadaNome"
                 type="text"
                 required
@@ -228,7 +225,6 @@ export function AdminPartidasClient({
                 value={novaRodadaNome}
                 onChange={(e) => setNovaRodadaNome(e.target.value)}
                 disabled={isPending}
-                className="w-full rounded-xl border border-zinc-200 bg-zinc-55/30 px-3 py-2 text-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
               />
             </div>
             <Button
@@ -254,19 +250,13 @@ export function AdminPartidasClient({
           >
             <div className="space-y-3">
               <div>
-                <label
-                  htmlFor="partidaRodadaId"
-                  className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-1"
-                >
-                  Rodada Correspondente
-                </label>
-                <select
+                <Label htmlFor="partidaRodadaId">Rodada Correspondente</Label>
+                <Select
                   id="partidaRodadaId"
                   required
                   value={partidaRodadaId}
                   onChange={(e) => setPartidaRodadaId(e.target.value)}
                   disabled={isPending}
-                  className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm outline-none transition-all cursor-pointer dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
                 >
                   <option value="">Selecione a rodada...</option>
                   {rodadas.map((r) => (
@@ -274,22 +264,16 @@ export function AdminPartidasClient({
                       Rodada {r.numero} - {r.nome}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
               <div>
-                <label
-                  htmlFor="partidaTimeA"
-                  className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-1"
-                >
-                  Time A (Mandante)
-                </label>
-                <select
+                <Label htmlFor="partidaTimeA">Time A (Mandante)</Label>
+                <Select
                   id="partidaTimeA"
                   required
                   value={partidaTimeA}
                   onChange={(e) => setPartidaTimeA(e.target.value)}
                   disabled={isPending}
-                  className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm outline-none transition-all cursor-pointer dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
                 >
                   <option value="">Selecione o Time A...</option>
                   {times.map((t) => (
@@ -297,25 +281,19 @@ export function AdminPartidasClient({
                       {t.emoji} {t.nome}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label
-                  htmlFor="partidaTimeB"
-                  className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-1"
-                >
-                  Time B (Visitante)
-                </label>
-                <select
+                <Label htmlFor="partidaTimeB">Time B (Visitante)</Label>
+                <Select
                   id="partidaTimeB"
                   required
                   value={partidaTimeB}
                   onChange={(e) => setPartidaTimeB(e.target.value)}
                   disabled={isPending}
-                  className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm outline-none transition-all cursor-pointer dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
                 >
                   <option value="">Selecione o Time B...</option>
                   {times.map((t) => (
@@ -323,23 +301,19 @@ export function AdminPartidasClient({
                       {t.emoji} {t.nome}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
               <div>
-                <label
-                  htmlFor="partidaDataInicio"
-                  className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-1"
-                >
+                <Label htmlFor="partidaDataInicio">
                   Data e Horário de Início
-                </label>
-                <input
+                </Label>
+                <Input
                   id="partidaDataInicio"
                   type="datetime-local"
                   required
                   value={partidaDataInicio}
                   onChange={(e) => setPartidaDataInicio(e.target.value)}
                   disabled={isPending}
-                  className="w-full rounded-xl border border-zinc-200 bg-zinc-55/30 px-3 py-2 text-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
                 />
               </div>
             </div>

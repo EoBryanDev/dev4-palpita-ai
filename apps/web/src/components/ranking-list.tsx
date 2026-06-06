@@ -2,18 +2,10 @@
 
 import { useMemo, useState } from 'react';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQueryRanking } from '@/hooks/queries/useQueryRanking';
 import { AlertCircle, Loader2, Medal, Search, Trophy } from 'lucide-react';
 
 import type { IRankUser } from '@/interface/IRanking';
-
-const fetchRanking = async (): Promise<IRankUser[]> => {
-  const res = await fetch('/api/ranking');
-  if (!res.ok) {
-    throw new Error('Erro ao buscar a classificação.');
-  }
-  return res.json();
-};
 
 export function RankingList() {
   const [search, setSearch] = useState('');
@@ -24,11 +16,7 @@ export function RankingList() {
     isError,
     error,
     refetch,
-  } = useQuery<IRankUser[]>({
-    queryKey: ['ranking'],
-    queryFn: fetchRanking,
-    staleTime: 1000 * 60 * 5, // 5 minutos de cache
-  });
+  } = useQueryRanking();
 
   const filteredRanking = useMemo(() => {
     return ranking.filter((user) =>
