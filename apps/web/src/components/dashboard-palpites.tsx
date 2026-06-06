@@ -6,25 +6,18 @@ import { formatToBRLDateTimeShort } from '@/helpers/date';
 import { useDashboardPalpites } from '@/hooks/use-dashboard-palpites';
 import type {
   IDashboardPalpitesProps,
-  IHistoricoDashboard,
-  IPartidaDashboard,
 } from '@/interface/IDashboard';
 import {
   AlertTriangle,
   CheckCircle2,
   Clock,
-  LogOut,
   Save,
   ShieldCheck,
   Trophy,
-  User,
 } from 'lucide-react';
 import type React from 'react';
 
 export function DashboardPalpites({
-  nomeUsuario,
-  emailUsuario,
-  cargoUsuario,
   userStatus,
   pontos,
   posicao,
@@ -35,7 +28,6 @@ export function DashboardPalpites({
   const {
     valoresPalpites,
     isPending,
-    logoutPending,
     handleInputChange,
     handleSalvar,
     handleLogout,
