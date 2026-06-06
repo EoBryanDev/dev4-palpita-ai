@@ -4,7 +4,7 @@ import { PageHeader } from '@/components/ui/page-header';
 import { Filter, Globe, Search, Trophy } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
-import type { IDbTime, ITimesClientProps } from '@/interface/ITimes';
+import type { ITimesClientProps } from '@/interface/ITimes';
 
 const DETALHES_EXTRAS: Record<
   string,

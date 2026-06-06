@@ -5,8 +5,6 @@ import { useMemo, useState } from 'react';
 import { useQueryRanking } from '@/hooks/queries/useQueryRanking';
 import { AlertCircle, Loader2, Medal, Search, Trophy } from 'lucide-react';
 
-import type { IRankUser } from '@/interface/IRanking';
-
 export function RankingList() {
   const [search, setSearch] = useState('');
 
