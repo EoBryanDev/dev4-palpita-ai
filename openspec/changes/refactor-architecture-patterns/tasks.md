@@ -2,7 +2,7 @@
 
 - [x] 1.1 Criar o helper de moeda e precisão `apps/web/src/helpers/currency.ts` para controle e conversão de strings e inteiros (centavos)
 - [x] 1.2 Atualizar o helper de datas `apps/web/src/helpers/date.ts` para suportar detecção de fuso horário local e conversão UTC no horário de Brasília (`-03:00`)
-- [ ] 1.3 Criar o componente visual `<LocalDate />` hidratável em `apps/web/src/components/ui/local-date.tsx` para exibição dinâmica e segura contra hydration mismatch
+- [x] 1.3 Criar o componente visual `<LocalDate />` hidratável em `apps/web/src/components/ui/local-date.tsx` para exibição dinâmica e segura contra hydration mismatch
 
 ## 2. Componentes de UI e Tailwind DRY
 
