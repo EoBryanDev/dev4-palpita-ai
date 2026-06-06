@@ -1,9 +1,8 @@
 import { obterSessao } from '@/app/actions/auth';
 import { AdminPartidasClient } from '@/components/admin-partidas-client';
 import { obterPartidas } from '@/services/partidas.service';
+import { obterRodadas } from '@/services/rodadas.service';
 import { obterTimes } from '@/services/times.service';
-import { db, rodadas } from '@palpita/db';
-import { desc } from 'drizzle-orm';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
@@ -21,10 +20,7 @@ export default async function AdminPartidasPage() {
   }
 
   // 1. Buscar todas as rodadas
-  const allRodadas = await db
-    .select()
-    .from(rodadas)
-    .orderBy(desc(rodadas.numero));
+  const allRodadas = await obterRodadas();
 
   // 2. Buscar todas as partidas e fazer join com rodada e times para obter nomes e emojis
   const allPartidas = await obterPartidas();

@@ -2,9 +2,10 @@ import { obterValorPalpite } from '@/app/actions/admin';
 import { obterSessao } from '@/app/actions/auth';
 import { AdminConfiguracoesClient } from '@/components/admin-configuracoes-client';
 import { StatCard } from '@/components/ui/stat-card';
+import { obterPalpitesConfirmadosCount } from '@/services/palpites.service';
 import { obterPartidas } from '@/services/partidas.service';
-import { db, palpites, rodadas, usuarios } from '@palpita/db';
-import { and, desc, eq, inArray } from 'drizzle-orm';
+import { obterRodadaAtiva } from '@/services/rodadas.service';
+import { obterResumoStatusUsuarios } from '@/services/usuarios.service';
 import {
   ArrowRight,
   Calendar,
@@ -32,7 +33,7 @@ export default async function AdminDashboardPage() {
   }
 
   // 1. Total de usuários
-  const allUsers = await db.select().from(usuarios);
+  const allUsers = await obterResumoStatusUsuarios();
   const totalUsuarios = allUsers.length;
 
   // 2. Total de usuários com status LIBERADO
@@ -45,13 +46,7 @@ export default async function AdminDashboardPage() {
   const totalPendentes = allUsers.filter((u) => u.status === 'PENDENTE').length;
 
   // 4. Buscar a rodada ativa, ou senão a última rodada criada
-  const rodadaAtiva =
-    (await db.query.rodadas.findFirst({
-      where: eq(rodadas.ativa, true),
-    })) ||
-    (await db.query.rodadas.findFirst({
-      orderBy: desc(rodadas.numero),
-    }));
+  const rodadaAtiva = await obterRodadaAtiva();
 
   let totalPartidas = 0;
   let totalPalpitesRealizados = 0;
@@ -69,17 +64,10 @@ export default async function AdminDashboardPage() {
       const usuariosLiberados = allUsers.filter((u) => u.status === 'LIBERADO');
       const usuarioIds = usuariosLiberados.map((u) => u.id);
 
-      const resultPalpites = await db
-        .select({ id: palpites.id })
-        .from(palpites)
-        .where(
-          and(
-            inArray(palpites.partidaId, partidaIds),
-            inArray(palpites.usuarioId, usuarioIds),
-          ),
-        );
-
-      totalPalpitesRealizados = resultPalpites.length;
+      totalPalpitesRealizados = await obterPalpitesConfirmadosCount(
+        partidaIds,
+        usuarioIds,
+      );
       percentualSubmetidos = Math.round(
         (totalPalpitesRealizados / totalEsperado) * 100,
       );

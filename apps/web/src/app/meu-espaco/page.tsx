@@ -4,10 +4,11 @@ import type {
   IHistoricoDashboard,
   IPartidaDashboard,
 } from '@/interface/IDashboard';
+import { obterPalpitesUsuario } from '@/services/palpites.service';
 import { obterPartidas } from '@/services/partidas.service';
 import { calcularRankingGeral } from '@/services/ranking.service';
-import { db, palpites, rodadas, usuarios } from '@palpita/db';
-import { desc, eq } from 'drizzle-orm';
+import { obterRodadaAtiva } from '@/services/rodadas.service';
+import { obterUsuarioPorId } from '@/services/usuarios.service';
 import { redirect } from 'next/navigation';
 
 export default async function MeuEspacoPage() {
@@ -18,41 +19,19 @@ export default async function MeuEspacoPage() {
   }
 
   // 2. Buscar o usuário
-  const userList = await db
-    .select()
-    .from(usuarios)
-    .where(eq(usuarios.id, session.id))
-    .limit(1);
-
-  if (userList.length === 0) {
+  const user = await obterUsuarioPorId(session.id);
+  if (!user) {
     redirect('/login');
   }
-  const user = userList[0];
 
   // 3. Buscar rodada ativa
-  const rodadasAtivas = await db
-    .select()
-    .from(rodadas)
-    .where(eq(rodadas.ativa, true))
-    .limit(1);
-
+  const rodadaAtiva = await obterRodadaAtiva();
   let rodadaId = '';
   let nomeRodada = 'Nenhuma rodada ativa';
 
-  if (rodadasAtivas.length > 0) {
-    rodadaId = rodadasAtivas[0].id;
-    nomeRodada = rodadasAtivas[0].nome;
-  } else {
-    // Pegar a última rodada criada
-    const ultimasRodadas = await db
-      .select()
-      .from(rodadas)
-      .orderBy(desc(rodadas.numero))
-      .limit(1);
-    if (ultimasRodadas.length > 0) {
-      rodadaId = ultimasRodadas[0].id;
-      nomeRodada = ultimasRodadas[0].nome;
-    }
+  if (rodadaAtiva) {
+    rodadaId = rodadaAtiva.id;
+    nomeRodada = rodadaAtiva.nome;
   }
 
   // 4. Buscar partidas da rodada selecionada
@@ -63,12 +42,9 @@ export default async function MeuEspacoPage() {
   }
 
   // 5. Buscar palpites do usuário logado para todas as partidas
-  const todosPalpitesUsuario = await db
-    .select()
-    .from(palpites)
-    .where(eq(palpites.usuarioId, session.id));
+  const todosPalpitesUsuario = await obterPalpitesUsuario(session.id);
 
-  const palpitesMap = new Map<string, typeof palpites.$inferSelect>();
+  const palpitesMap = new Map<string, (typeof todosPalpitesUsuario)[number]>();
   for (const p of todosPalpitesUsuario) {
     palpitesMap.set(p.partidaId, p);
   }

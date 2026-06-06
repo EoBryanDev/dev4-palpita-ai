@@ -2,16 +2,9 @@ import { SolicitarConviteForm } from '@/components/form/solicitar-convite-form';
 import { Button } from '@/components/ui/button';
 import { formatToBRLDateTimeLong } from '@/helpers/date';
 import type { IHomePartida } from '@/interface/IPartida';
-import {
-  configuracoes,
-  db,
-  partidas,
-  rodadas,
-  times,
-  usuarios,
-} from '@palpita/db';
-import { asc, eq, or } from 'drizzle-orm';
-import { alias } from 'drizzle-orm/pg-core';
+import { obterValorPalpite } from '@/services/configuracoes.service';
+import { obterPartidas } from '@/services/partidas.service';
+import { obterResumoStatusUsuarios } from '@/services/usuarios.service';
 import {
   AlertTriangle,
   Calendar,
@@ -37,15 +30,7 @@ export default async function HomePage({
   // 1. Buscar valor do palpite
   let valorPalpite = 50;
   try {
-    const config = await db.query.configuracoes.findFirst({
-      where: eq(configuracoes.chave, 'valor_palpite'),
-    });
-    if (config) {
-      const parsed = Number.parseFloat(config.valor);
-      if (!Number.isNaN(parsed)) {
-        valorPalpite = parsed;
-      }
-    }
+    valorPalpite = await obterValorPalpite();
   } catch (error) {
     console.error('Erro ao buscar valor_palpite na Home:', error);
   }
@@ -53,55 +38,25 @@ export default async function HomePage({
   // 2. Buscar total de usuários ativos
   let totalUsuariosAtivos = 0;
   try {
-    const activeUsers = await db
-      .select({ id: usuarios.id })
-      .from(usuarios)
-      .where(or(eq(usuarios.status, 'LIBERADO'), eq(usuarios.status, 'ATIVO')));
-    totalUsuariosAtivos = activeUsers.length;
+    const activeUsers = await obterResumoStatusUsuarios();
+    totalUsuariosAtivos = activeUsers.filter(
+      (u) => u.status === 'LIBERADO' || u.status === 'ATIVO',
+    ).length;
   } catch (error) {
     console.error('Erro ao buscar totalUsuariosAtivos na Home:', error);
   }
 
-  // 3. Buscar total de confrontos/jogos existentes no banco
-  let totalConfrontos = 0;
-  try {
-    const totalPartidasDb = await db.select({ id: partidas.id }).from(partidas);
-    totalConfrontos = totalPartidasDb.length;
-  } catch (error) {
-    console.error('Erro ao buscar totalConfrontos na Home:', error);
-  }
-
-  // 4. Calcular prêmio total
+  // Calcular prêmio total
   const totalPremios = totalUsuariosAtivos * valorPalpite;
 
+  // 3. Buscar total de confrontos/jogos existentes no banco
+  let totalConfrontos = 0;
   let partidasList: IHomePartida[] = [];
 
   try {
-    const timeA = alias(times, 'time_a');
-    const timeB = alias(times, 'time_b');
-
-    // Tenta buscar partidas reais do banco de dados
-    const partidasDb = await db
-      .select({
-        id: partidas.id,
-        timeA: timeA.nome,
-        timeB: timeB.nome,
-        timeAEmoji: timeA.emoji,
-        timeBEmoji: timeB.emoji,
-        golsTimeA: partidas.golsTimeA,
-        golsTimeB: partidas.golsTimeB,
-        dataInicio: partidas.dataInicio,
-        status: partidas.status,
-        rodadaNome: rodadas.nome,
-      })
-      .from(partidas)
-      .innerJoin(rodadas, eq(partidas.rodadaId, rodadas.id))
-      .innerJoin(timeA, eq(partidas.timeAId, timeA.id))
-      .innerJoin(timeB, eq(partidas.timeBId, timeB.id))
-      .orderBy(asc(partidas.dataInicio))
-      .limit(6);
-
-    partidasList = partidasDb.map((p) => ({
+    const allPartidas = await obterPartidas();
+    totalConfrontos = allPartidas.length;
+    partidasList = allPartidas.slice(0, 6).map((p) => ({
       id: p.id,
       timeA: p.timeA,
       timeB: p.timeB,
