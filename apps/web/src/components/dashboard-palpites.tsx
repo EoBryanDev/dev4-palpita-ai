@@ -4,9 +4,7 @@ import { Button } from '@/components/ui/button';
 import { StatCard } from '@/components/ui/stat-card';
 import { formatToBRLDateTimeShort } from '@/helpers/date';
 import { useDashboardPalpites } from '@/hooks/use-dashboard-palpites';
-import type {
-  IDashboardPalpitesProps,
-} from '@/interface/IDashboard';
+import type { IDashboardPalpitesProps } from '@/interface/IDashboard';
 import {
   AlertTriangle,
   CheckCircle2,
