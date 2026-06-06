@@ -1,14 +1,14 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
 import {
-  formatToBRLDayMonth,
-  formatToBRLWeekday,
-  formatToBRLTime,
-  formatToBRLDateTimeShort,
   formatToBRLDateTimeLong,
+  formatToBRLDateTimeShort,
+  formatToBRLDayMonth,
+  formatToBRLTime,
+  formatToBRLWeekday,
   obterFusoHorarioUsuario,
 } from '@/helpers/date';
+import React, { useEffect, useState } from 'react';
 
 interface ILocalDateProps {
   date: Date | string;
@@ -16,7 +16,11 @@ interface ILocalDateProps {
   className?: string;
 }
 
-export function LocalDate({ date, format = 'short', className }: ILocalDateProps) {
+export function LocalDate({
+  date,
+  format = 'short',
+  className,
+}: ILocalDateProps) {
   const d = typeof date === 'string' ? new Date(date) : date;
 
   // Função auxiliar de formatação com base no formato escolhido e fuso horário
@@ -30,7 +34,6 @@ export function LocalDate({ date, format = 'short', className }: ILocalDateProps
         return formatToBRLTime(targetDate, tz);
       case 'long':
         return formatToBRLDateTimeLong(targetDate, tz);
-      case 'short':
       default:
         return formatToBRLDateTimeShort(targetDate, tz);
     }
@@ -39,6 +42,7 @@ export function LocalDate({ date, format = 'short', className }: ILocalDateProps
   // Pré-renderiza no servidor usando fuso horário padrão de Brasília (America/Sao_Paulo)
   const [formattedDate, setFormattedDate] = useState(() => formatFn(d));
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: formatFn depends on format, and d/format are the correct triggers
   useEffect(() => {
     const fusoReal = obterFusoHorarioUsuario();
     if (fusoReal !== 'America/Sao_Paulo') {
