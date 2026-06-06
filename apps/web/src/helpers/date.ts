@@ -23,7 +23,10 @@ export function converterParaUTC(dataLocalString: string): Date {
 /**
  * Obtém a data no fuso de Brasília no formato YYYY-MM-DD (usando fr-CA como localidade para padronizar o separador hífen)
  */
-export function obterDataSaoPauloISO(date: Date, timeZone: string = TIME_ZONE): string {
+export function obterDataSaoPauloISO(
+  date: Date,
+  timeZone: string = TIME_ZONE,
+): string {
   return new Intl.DateTimeFormat('fr-CA', {
     timeZone,
     year: 'numeric',
@@ -35,7 +38,10 @@ export function obterDataSaoPauloISO(date: Date, timeZone: string = TIME_ZONE): 
 /**
  * Formata a data para Dia e Mês abreviado (ex: "12 de jun.")
  */
-export function formatToBRLDayMonth(date: Date, timeZone: string = TIME_ZONE): string {
+export function formatToBRLDayMonth(
+  date: Date,
+  timeZone: string = TIME_ZONE,
+): string {
   return new Intl.DateTimeFormat('pt-BR', {
     timeZone,
     day: 'numeric',
@@ -46,7 +52,10 @@ export function formatToBRLDayMonth(date: Date, timeZone: string = TIME_ZONE): s
 /**
  * Obtém o dia da semana abreviado (ex: "sex.")
  */
-export function formatToBRLWeekday(date: Date, timeZone: string = TIME_ZONE): string {
+export function formatToBRLWeekday(
+  date: Date,
+  timeZone: string = TIME_ZONE,
+): string {
   return new Intl.DateTimeFormat('pt-BR', {
     timeZone,
     weekday: 'short',
@@ -56,7 +65,10 @@ export function formatToBRLWeekday(date: Date, timeZone: string = TIME_ZONE): st
 /**
  * Formata a hora e minuto (ex: "16:00")
  */
-export function formatToBRLTime(date: Date, timeZone: string = TIME_ZONE): string {
+export function formatToBRLTime(
+  date: Date,
+  timeZone: string = TIME_ZONE,
+): string {
   return new Intl.DateTimeFormat('pt-BR', {
     timeZone,
     hour: '2-digit',
@@ -67,7 +79,10 @@ export function formatToBRLTime(date: Date, timeZone: string = TIME_ZONE): strin
 /**
  * Formata a data e hora curta (ex: "12/06 16:00")
  */
-export function formatToBRLDateTimeShort(date: Date, timeZone: string = TIME_ZONE): string {
+export function formatToBRLDateTimeShort(
+  date: Date,
+  timeZone: string = TIME_ZONE,
+): string {
   return date.toLocaleString('pt-BR', {
     timeZone,
     day: '2-digit',
@@ -80,7 +95,10 @@ export function formatToBRLDateTimeShort(date: Date, timeZone: string = TIME_ZON
 /**
  * Formata a data longa com hora (ex: "12 de junho, 16:00")
  */
-export function formatToBRLDateTimeLong(date: Date, timeZone: string = TIME_ZONE): string {
+export function formatToBRLDateTimeLong(
+  date: Date,
+  timeZone: string = TIME_ZONE,
+): string {
   return new Intl.DateTimeFormat('pt-BR', {
     timeZone,
     day: '2-digit',
