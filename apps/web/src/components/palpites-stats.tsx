@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQueryPalpitesStats } from '@/hooks/queries/useQueryPalpitesStats';
 import {
   AlertCircle,
   BarChart3,
@@ -17,14 +17,6 @@ import {
 
 import type { IPalpiteIndividual, IPartidaStats } from '@/interface/IPalpite';
 
-const fetchPalpitesStats = async (): Promise<IPartidaStats[]> => {
-  const res = await fetch('/api/palpites');
-  if (!res.ok) {
-    throw new Error('Erro ao buscar estatísticas de palpites.');
-  }
-  return res.json();
-};
-
 export function PalpitesStats() {
   const [search, setSearch] = useState('');
   const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
@@ -35,11 +27,7 @@ export function PalpitesStats() {
     isError,
     error,
     refetch,
-  } = useQuery<IPartidaStats[]>({
-    queryKey: ['palpitesStats'],
-    queryFn: fetchPalpitesStats,
-    staleTime: 1000 * 60 * 2, // 2 minutos de cache
-  });
+  } = useQueryPalpitesStats();
 
   const filteredMatches = useMemo(() => {
     return matches.filter(

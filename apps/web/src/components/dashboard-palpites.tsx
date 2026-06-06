@@ -1,29 +1,23 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { StatCard } from '@/components/ui/stat-card';
 import { formatToBRLDateTimeShort } from '@/helpers/date';
 import { useDashboardPalpites } from '@/hooks/use-dashboard-palpites';
 import type {
   IDashboardPalpitesProps,
-  IHistoricoDashboard,
-  IPartidaDashboard,
 } from '@/interface/IDashboard';
 import {
   AlertTriangle,
   CheckCircle2,
   Clock,
-  LogOut,
   Save,
   ShieldCheck,
   Trophy,
-  User,
 } from 'lucide-react';
 import type React from 'react';
 
 export function DashboardPalpites({
-  nomeUsuario,
-  emailUsuario,
-  cargoUsuario,
   userStatus,
   pontos,
   posicao,
@@ -34,7 +28,6 @@ export function DashboardPalpites({
   const {
     valoresPalpites,
     isPending,
-    logoutPending,
     handleInputChange,
     handleSalvar,
     handleLogout,
@@ -77,75 +70,36 @@ export function DashboardPalpites({
 
         {/* Bento Grid de Resumo */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          {/* Card Pontos */}
-          <div className="relative overflow-hidden rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/40">
-            <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-emerald-500/10 to-transparent rounded-bl-full" />
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
-                <Trophy className="h-6 w-6" />
-              </div>
-              <div>
-                <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">
-                  Pontos Acumulados
-                </span>
-                <span className="text-3xl font-black">
-                  {pontos} {pontos === 1 ? 'Ponto' : 'Pontos'}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Card Classificação */}
-          <div className="relative overflow-hidden rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/40">
-            <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-teal-500/10 to-transparent rounded-bl-full" />
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-100 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400">
-                <Trophy className="h-6 w-6" />
-              </div>
-              <div>
-                <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">
-                  Posição no Ranking
-                </span>
-                <span className="text-3xl font-black">#{posicao}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Card Status da Conta */}
-          <div className="relative overflow-hidden rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/40">
-            <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-blue-500/10 to-transparent rounded-bl-full" />
-            <div className="flex items-center gap-4">
-              <div
-                className={`flex h-12 w-12 items-center justify-center rounded-2xl ${
+          <StatCard
+            title="Pontos Acumulados"
+            value={`${pontos} ${pontos === 1 ? 'Ponto' : 'Pontos'}`}
+            icon={Trophy}
+            color="emerald"
+          />
+          <StatCard
+            title="Posição no Ranking"
+            value={`#${posicao}`}
+            icon={Trophy}
+            color="teal"
+          />
+          <StatCard
+            title="Status de Palpites"
+            value={
+              <span
+                className={`text-xl font-bold ${
                   isUsuarioLiberado
-                    ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400'
-                    : 'bg-amber-100 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400'
+                    ? 'text-emerald-600 dark:text-emerald-400'
+                    : 'text-amber-600 dark:text-amber-500'
                 }`}
               >
-                {isUsuarioLiberado ? (
-                  <ShieldCheck className="h-6 w-6" />
-                ) : (
-                  <Clock className="h-6 w-6" />
-                )}
-              </div>
-              <div>
-                <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">
-                  Status de Palpites
-                </span>
-                <span
-                  className={`text-xl font-bold ${
-                    isUsuarioLiberado
-                      ? 'text-emerald-600 dark:text-emerald-400'
-                      : 'text-amber-600 dark:text-amber-500'
-                  }`}
-                >
-                  {isUsuarioLiberado
-                    ? 'Apostas Liberadas'
-                    : 'Pendente de Liberação'}
-                </span>
-              </div>
-            </div>
-          </div>
+                {isUsuarioLiberado
+                  ? 'Apostas Liberadas'
+                  : 'Pendente de Liberação'}
+              </span>
+            }
+            icon={isUsuarioLiberado ? ShieldCheck : Clock}
+            color={isUsuarioLiberado ? 'emerald' : 'amber'}
+          />
         </div>
 
         {/* Rodada Selecionada */}

@@ -2,6 +2,8 @@
 
 import { cadastrarSenha } from '@/app/actions/convites';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { AlertCircle, CheckCircle2, KeyRound, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
@@ -84,13 +86,8 @@ export function DefinirSenhaForm({ tokenId }: IDefinirSenhaFormProps) {
 
       <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <div>
-          <label
-            htmlFor="senha"
-            className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1"
-          >
-            Nova Senha
-          </label>
-          <input
+          <Label htmlFor="senha">Nova Senha</Label>
+          <Input
             id="senha"
             type="password"
             required
@@ -99,18 +96,12 @@ export function DefinirSenhaForm({ tokenId }: IDefinirSenhaFormProps) {
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
             disabled={loading}
-            className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-50"
           />
         </div>
 
         <div>
-          <label
-            htmlFor="confirmarSenha"
-            className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1"
-          >
-            Confirmar Nova Senha
-          </label>
-          <input
+          <Label htmlFor="confirmarSenha">Confirmar Nova Senha</Label>
+          <Input
             id="confirmarSenha"
             type="password"
             required
@@ -119,7 +110,6 @@ export function DefinirSenhaForm({ tokenId }: IDefinirSenhaFormProps) {
             value={confirmarSenha}
             onChange={(e) => setConfirmarSenha(e.target.value)}
             disabled={loading}
-            className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-50"
           />
         </div>
 

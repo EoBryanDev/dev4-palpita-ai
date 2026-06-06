@@ -1,6 +1,8 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useSolicitarConvite } from '@/hooks/use-solicitar-convite';
 import { AlertCircle, CheckCircle2, Loader2, Sparkles } from 'lucide-react';
 import type React from 'react';
@@ -23,13 +25,8 @@ export function SolicitarConviteForm() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label
-            htmlFor="nome"
-            className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1"
-          >
-            Nome Completo
-          </label>
-          <input
+          <Label htmlFor="nome">Nome Completo</Label>
+          <Input
             id="nome"
             type="text"
             required
@@ -37,18 +34,12 @@ export function SolicitarConviteForm() {
             value={nome}
             onChange={(e) => setNome(e.target.value)}
             disabled={loading}
-            className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-50"
           />
         </div>
 
         <div>
-          <label
-            htmlFor="email"
-            className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1"
-          >
-            E-mail
-          </label>
-          <input
+          <Label htmlFor="email">E-mail</Label>
+          <Input
             id="email"
             type="email"
             required
@@ -56,7 +47,6 @@ export function SolicitarConviteForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={loading}
-            className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-50"
           />
         </div>
 

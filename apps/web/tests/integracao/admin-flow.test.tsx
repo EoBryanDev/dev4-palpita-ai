@@ -1,6 +1,7 @@
 import { obterSessao } from '@/app/actions/auth';
 import AdminDashboardPage from '@/app/admin/page';
 import { db } from '@palpita/db';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
@@ -59,6 +60,11 @@ vi.mock('@palpita/db', () => {
       chave: 'configuracoes.chave',
       valor: 'configuracoes.valor',
     },
+    times: {
+      id: 'times.id',
+      nome: 'times.nome',
+      emoji: 'times.emoji',
+    },
   };
 });
 
@@ -89,10 +95,25 @@ describe('Admin Dashboard Integration Flow', () => {
     ];
 
     const mockSelect = db.select as Mock;
+
+    // biome-ignore lint/suspicious/noExplicitAny: Mocking Drizzle query chain
+    const createMockQueryChain = (resolvedValue: any) => {
+      // biome-ignore lint/suspicious/noExplicitAny: Mocking Drizzle query chain
+      const chain: any = {
+        // biome-ignore lint/suspicious/noThenProperty: This needs to be a Thenable to mock Drizzle's awaitable query promise
+        // biome-ignore lint/suspicious/noExplicitAny: Mocking Drizzle query chain
+        then: (onfulfilled: any) =>
+          Promise.resolve(resolvedValue).then(onfulfilled),
+        from: () => chain,
+        innerJoin: () => chain,
+        where: () => chain,
+        orderBy: () => chain,
+      };
+      return chain;
+    };
+
     // Primeiro select: buscar todos os usuários
-    mockSelect.mockImplementationOnce(() => ({
-      from: vi.fn(() => Promise.resolve(mockUsers)),
-    }));
+    mockSelect.mockImplementationOnce(() => createMockQueryChain(mockUsers));
 
     // Mock da rodada ativa
     const mockRodada = {
@@ -109,25 +130,26 @@ describe('Admin Dashboard Integration Flow', () => {
 
     // Mock partidas da rodada: 2 partidas
     const mockPartidas = [{ id: 'p1' }, { id: 'p2' }];
-    mockSelect.mockImplementationOnce(() => ({
-      from: vi.fn(() => ({
-        where: vi.fn(() => Promise.resolve(mockPartidas)),
-      })),
-    }));
+    mockSelect.mockImplementationOnce(() => createMockQueryChain(mockPartidas));
 
     // Mock palpites realizados pelos usuários liberados nas partidas da rodada:
     // Total esperado: 2 usuários liberados * 2 partidas = 4 palpites
     // Simular que foram feitos 3 palpites
     const mockPalpites = [{ id: 'g1' }, { id: 'g2' }, { id: 'g3' }];
-    mockSelect.mockImplementationOnce(() => ({
-      from: vi.fn(() => ({
-        where: vi.fn(() => Promise.resolve(mockPalpites)),
-      })),
-    }));
+    mockSelect.mockImplementationOnce(() => createMockQueryChain(mockPalpites));
 
     // Renderizar o componente assíncrono (Server Component)
     const result = await AdminDashboardPage();
-    render(result);
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
+    render(
+      <QueryClientProvider client={queryClient}>{result}</QueryClientProvider>,
+    );
 
     // Assert total de usuários (3)
     expect(screen.getByText('3')).toBeDefined();

@@ -1,12 +1,13 @@
 'use client';
 
-import {
-  alterarStatusUsuario,
-  aprovarSolicitacao,
-  rejeitarSolicitacao,
-} from '@/app/actions/admin';
 import { Button } from '@/components/ui/button';
+import { StatCard } from '@/components/ui/stat-card';
 import { useToast } from '@/components/ui/use-toast';
+import {
+  useMutationAlterarStatusUsuario,
+  useMutationAprovarSolicitacao,
+  useMutationRejeitarSolicitacao,
+} from '@/hooks/mutations/useMutationUsuarios';
 import {
   Check,
   CheckCircle,
@@ -21,7 +22,7 @@ import {
   X,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 
 import type {
   IAdminUsuariosClientProps,
@@ -34,15 +35,22 @@ export function AdminUsuariosClient({
 }: IAdminUsuariosClientProps) {
   const router = useRouter();
   const { toast } = useToast();
-  const [isPending, startTransition] = useTransition();
+  const mutationAprovar = useMutationAprovarSolicitacao();
+  const mutationRejeitar = useMutationRejeitarSolicitacao();
+  const mutationAlterarStatus = useMutationAlterarStatusUsuario();
+
+  const isPending =
+    mutationAprovar.isPending ||
+    mutationRejeitar.isPending ||
+    mutationAlterarStatus.isPending;
 
   // Armazena links recém-gerados na sessão local para cópia rápida
   const [linksGerados, setLinksGerados] = useState<Record<string, string>>({});
 
-  const handleAprovar = (usuarioId: string) => {
-    startTransition(async () => {
-      const res = await aprovarSolicitacao(usuarioId);
-      if (res.success && res.link) {
+  const handleAprovar = async (usuarioId: string) => {
+    try {
+      const res = await mutationAprovar.mutateAsync(usuarioId);
+      if (res.link) {
         // Obter a URL base atual do navegador
         const urlBase = window.location.origin;
         const linkCompleto = `${urlBase}${res.link}`;
@@ -57,55 +65,57 @@ export function AdminUsuariosClient({
           description: 'O link de ativação foi gerado com sucesso.',
         });
         router.refresh();
-      } else {
-        toast({
-          title: 'Erro ao aprovar',
-          description: res.message,
-          variant: 'destructive',
-        });
       }
-    });
+    } catch (error) {
+      const err = error as { message?: string };
+      toast({
+        title: 'Erro ao aprovar',
+        description: err.message || 'Erro ao processar aprovação.',
+        variant: 'destructive',
+      });
+    }
   };
 
-  const handleRejeitar = (usuarioId: string) => {
-    startTransition(async () => {
-      const res = await rejeitarSolicitacao(usuarioId);
-      if (res.success) {
-        toast({
-          title: 'Solicitação Rejeitada',
-          description: res.message,
-        });
-        router.refresh();
-      } else {
-        toast({
-          title: 'Erro ao rejeitar',
-          description: res.message,
-          variant: 'destructive',
-        });
-      }
-    });
+  const handleRejeitar = async (usuarioId: string) => {
+    try {
+      const res = await mutationRejeitar.mutateAsync(usuarioId);
+      toast({
+        title: 'Solicitação Rejeitada',
+        description: res.message,
+      });
+      router.refresh();
+    } catch (error) {
+      const err = error as { message?: string };
+      toast({
+        title: 'Erro ao rejeitar',
+        description: err.message || 'Erro ao processar rejeição.',
+        variant: 'destructive',
+      });
+    }
   };
 
-  const handleAlterarStatus = (
+  const handleAlterarStatus = async (
     usuarioId: string,
     novoStatus: 'ATIVO' | 'LIBERADO' | 'DESATIVADO',
   ) => {
-    startTransition(async () => {
-      const res = await alterarStatusUsuario(usuarioId, novoStatus);
-      if (res.success) {
-        toast({
-          title: 'Status Atualizado',
-          description: res.message,
-        });
-        router.refresh();
-      } else {
-        toast({
-          title: 'Erro ao atualizar status',
-          description: res.message,
-          variant: 'destructive',
-        });
-      }
-    });
+    try {
+      const res = await mutationAlterarStatus.mutateAsync({
+        usuarioId,
+        novoStatus,
+      });
+      toast({
+        title: 'Status Atualizado',
+        description: res.message,
+      });
+      router.refresh();
+    } catch (error) {
+      const err = error as { message?: string };
+      toast({
+        title: 'Erro ao atualizar status',
+        description: err.message || 'Erro ao atualizar status.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const copiarParaTransferencia = (texto: string) => {
@@ -130,50 +140,24 @@ export function AdminUsuariosClient({
     <div className="space-y-10">
       {/* Cards de Métricas - Bento Style */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="relative overflow-hidden rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/40">
-          <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-emerald-500/10 to-transparent rounded-bl-full" />
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
-              <Users className="h-6 w-6" />
-            </div>
-            <div>
-              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">
-                Total de Usuários
-              </span>
-              <span className="text-3xl font-black">{totalUsuarios}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative overflow-hidden rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/40">
-          <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-amber-500/10 to-transparent rounded-bl-full" />
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
-              <ShieldAlert className="h-6 w-6" />
-            </div>
-            <div>
-              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">
-                Solicitações Pendentes
-              </span>
-              <span className="text-3xl font-black">{pendentesAprovacao}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative overflow-hidden rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/40">
-          <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-teal-500/10 to-transparent rounded-bl-full" />
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-100 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400">
-              <UserCheck className="h-6 w-6" />
-            </div>
-            <div>
-              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">
-                Apostas Liberadas
-              </span>
-              <span className="text-3xl font-black">{totalLiberados}</span>
-            </div>
-          </div>
-        </div>
+        <StatCard
+          title="Total de Usuários"
+          value={totalUsuarios}
+          icon={Users}
+          color="emerald"
+        />
+        <StatCard
+          title="Solicitações Pendentes"
+          value={pendentesAprovacao}
+          icon={ShieldAlert}
+          color="amber"
+        />
+        <StatCard
+          title="Apostas Liberadas"
+          value={totalLiberados}
+          icon={UserCheck}
+          color="teal"
+        />
       </div>
 
       {/* Seção 1: Solicitações de Convites */}

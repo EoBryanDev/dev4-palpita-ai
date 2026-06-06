@@ -1,7 +1,7 @@
 'use client';
 
 import { useCountdown } from '@/hooks/use-countdown';
-import { AlertTriangle, Timer } from 'lucide-react';
+import { Timer } from 'lucide-react';
 import Link from 'next/link';
 import type React from 'react';
 import { Button } from './ui/button';

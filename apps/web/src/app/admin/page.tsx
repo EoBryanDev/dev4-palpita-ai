@@ -1,8 +1,11 @@
 import { obterValorPalpite } from '@/app/actions/admin';
 import { obterSessao } from '@/app/actions/auth';
 import { AdminConfiguracoesClient } from '@/components/admin-configuracoes-client';
-import { db, palpites, partidas, rodadas, usuarios } from '@palpita/db';
-import { and, desc, eq, inArray } from 'drizzle-orm';
+import { StatCard } from '@/components/ui/stat-card';
+import { obterPalpitesConfirmadosCount } from '@/services/palpites.service';
+import { obterPartidas } from '@/services/partidas.service';
+import { obterRodadaAtiva } from '@/services/rodadas.service';
+import { obterResumoStatusUsuarios } from '@/services/usuarios.service';
 import {
   ArrowRight,
   Calendar,
@@ -30,7 +33,7 @@ export default async function AdminDashboardPage() {
   }
 
   // 1. Total de usuários
-  const allUsers = await db.select().from(usuarios);
+  const allUsers = await obterResumoStatusUsuarios();
   const totalUsuarios = allUsers.length;
 
   // 2. Total de usuários com status LIBERADO
@@ -43,13 +46,7 @@ export default async function AdminDashboardPage() {
   const totalPendentes = allUsers.filter((u) => u.status === 'PENDENTE').length;
 
   // 4. Buscar a rodada ativa, ou senão a última rodada criada
-  const rodadaAtiva =
-    (await db.query.rodadas.findFirst({
-      where: eq(rodadas.ativa, true),
-    })) ||
-    (await db.query.rodadas.findFirst({
-      orderBy: desc(rodadas.numero),
-    }));
+  const rodadaAtiva = await obterRodadaAtiva();
 
   let totalPartidas = 0;
   let totalPalpitesRealizados = 0;
@@ -57,10 +54,7 @@ export default async function AdminDashboardPage() {
   let percentualSubmetidos = 0;
 
   if (rodadaAtiva) {
-    const dbPartidas = await db
-      .select()
-      .from(partidas)
-      .where(eq(partidas.rodadaId, rodadaAtiva.id));
+    const dbPartidas = await obterPartidas(rodadaAtiva.id);
 
     totalPartidas = dbPartidas.length;
     totalEsperado = totalLiberados * totalPartidas;
@@ -70,17 +64,10 @@ export default async function AdminDashboardPage() {
       const usuariosLiberados = allUsers.filter((u) => u.status === 'LIBERADO');
       const usuarioIds = usuariosLiberados.map((u) => u.id);
 
-      const resultPalpites = await db
-        .select({ id: palpites.id })
-        .from(palpites)
-        .where(
-          and(
-            inArray(palpites.partidaId, partidaIds),
-            inArray(palpites.usuarioId, usuarioIds),
-          ),
-        );
-
-      totalPalpitesRealizados = resultPalpites.length;
+      totalPalpitesRealizados = await obterPalpitesConfirmadosCount(
+        partidaIds,
+        usuarioIds,
+      );
       percentualSubmetidos = Math.round(
         (totalPalpitesRealizados / totalEsperado) * 100,
       );
@@ -102,71 +89,30 @@ export default async function AdminDashboardPage() {
 
       {/* Bento Grid de Resumo */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10">
-        {/* Card 1: Total de Usuários */}
-        <div className="relative overflow-hidden rounded-3xl border border-zinc-200/85 bg-white p-6 shadow-sm dark:border-zinc-800/85 dark:bg-zinc-900/40">
-          <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-blue-500/10 to-transparent rounded-bl-full" />
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
-              <Users className="h-6 w-6" />
-            </div>
-            <div>
-              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">
-                Total de Usuários
-              </span>
-              <span className="text-3xl font-black">{totalUsuarios}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 2: Usuários Confirmados (LIBERADO) */}
-        <div className="relative overflow-hidden rounded-3xl border border-zinc-200/85 bg-white p-6 shadow-sm dark:border-zinc-800/85 dark:bg-zinc-900/40">
-          <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-emerald-500/10 to-transparent rounded-bl-full" />
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
-              <UserCheck className="h-6 w-6" />
-            </div>
-            <div>
-              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">
-                Confirmados (Liberados)
-              </span>
-              <span className="text-3xl font-black">{totalLiberados}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 3: Convites Pendentes */}
-        <div className="relative overflow-hidden rounded-3xl border border-zinc-200/85 bg-white p-6 shadow-sm dark:border-zinc-800/85 dark:bg-zinc-900/40">
-          <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-amber-500/10 to-transparent rounded-bl-full" />
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
-              <MailWarning className="h-6 w-6" />
-            </div>
-            <div>
-              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">
-                Solicitações Pendentes
-              </span>
-              <span className="text-3xl font-black">{totalPendentes}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 4: Palpites Enviados */}
-        <div className="relative overflow-hidden rounded-3xl border border-zinc-200/85 bg-white p-6 shadow-sm dark:border-zinc-800/85 dark:bg-zinc-900/40">
-          <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-purple-500/10 to-transparent rounded-bl-full" />
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-100 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400">
-              <Percent className="h-6 w-6" />
-            </div>
-            <div>
-              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">
-                Palpites na Rodada
-              </span>
-              <span className="text-3xl font-black">
-                {percentualSubmetidos}%
-              </span>
-            </div>
-          </div>
-        </div>
+        <StatCard
+          title="Total de Usuários"
+          value={totalUsuarios}
+          icon={Users}
+          color="blue"
+        />
+        <StatCard
+          title="Confirmados (Liberados)"
+          value={totalLiberados}
+          icon={UserCheck}
+          color="emerald"
+        />
+        <StatCard
+          title="Solicitações Pendentes"
+          value={totalPendentes}
+          icon={MailWarning}
+          color="amber"
+        />
+        <StatCard
+          title="Palpites na Rodada"
+          value={`${percentualSubmetidos}%`}
+          icon={Percent}
+          color="purple"
+        />
       </div>
 
       {/* Seções Adicionais */}

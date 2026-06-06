@@ -1,6 +1,5 @@
 import TimesClient from '@/components/times-client';
-import { db, times } from '@palpita/db';
-import { asc } from 'drizzle-orm';
+import { obterTimes } from '@/services/times.service';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,15 +10,7 @@ export const metadata = {
 };
 
 export default async function TimesPage() {
-  const dbTimes = await db.select().from(times).orderBy(asc(times.nome));
-
-  const initialTimes = dbTimes.map((t) => ({
-    id: t.id,
-    nome: t.nome,
-    emoji: t.emoji,
-    confederacao: t.confederacao,
-    grupo: t.grupo,
-  }));
+  const initialTimes = await obterTimes();
 
   return <TimesClient initialTimes={initialTimes} />;
 }
