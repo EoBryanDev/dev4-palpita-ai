@@ -1,8 +1,8 @@
+import { loginUsuario, logoutUsuario, obterSessao } from '@/app/actions/auth';
 import { db } from '@palpita/db';
 import bcrypt from 'bcryptjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
-import { loginUsuario, logoutUsuario, obterSessao } from './auth';
 
 const mockCookiesStore = {
   set: vi.fn(),

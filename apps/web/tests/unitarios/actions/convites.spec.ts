@@ -1,8 +1,8 @@
+import { cadastrarSenha, solicitarConvite } from '@/app/actions/convites';
 import { TokenConvite } from '@palpita/core';
 import { db } from '@palpita/db';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
-import { cadastrarSenha, solicitarConvite } from './convites';
 
 vi.mock('@palpita/db', () => {
   const mockSelectResult: unknown[] = [];

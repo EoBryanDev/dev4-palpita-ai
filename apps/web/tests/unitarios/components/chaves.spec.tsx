@@ -1,8 +1,8 @@
+import ChavesPage from '@/app/chaves/page';
 import { db } from '@palpita/db';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
-import ChavesPage from './page';
 
 vi.mock('@palpita/db', () => {
   const mockSelect = vi.fn();

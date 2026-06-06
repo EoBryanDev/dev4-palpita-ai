@@ -1,4 +1,4 @@
-import { SolicitarConviteForm } from '@/components/solicitar-convite-form';
+import { SolicitarConviteForm } from '@/components/form/solicitar-convite-form';
 import { Button } from '@/components/ui/button';
 import { formatToBRLDateTimeLong } from '@/helpers/date';
 import type { IHomePartida } from '@/interface/IPartida';

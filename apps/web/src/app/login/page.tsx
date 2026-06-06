@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import type React from 'react';
 
 import { obterSessao } from '@/app/actions/auth';
-import { LoginForm } from '@/components/login-form';
+import { LoginForm } from '@/components/form/login-form';
 import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {

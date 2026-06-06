@@ -13,7 +13,7 @@ import {
 import Link from 'next/link';
 
 import { useLoginForm } from '@/hooks/use-login-form';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
 
 export function LoginForm() {
   const {

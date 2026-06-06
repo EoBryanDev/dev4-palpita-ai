@@ -5,7 +5,7 @@ import { AlertCircle, CheckCircle2, KeyRound, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
 import { useState } from 'react';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
 
 interface IDefinirSenhaFormProps {
   tokenId: string;

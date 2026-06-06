@@ -1,7 +1,7 @@
+import { GET } from '@/app/api/ranking/route';
 import { db } from '@palpita/db';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
-import { GET } from './route';
 
 vi.mock('@palpita/db', () => {
   const mockSelect = vi.fn();

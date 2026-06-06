@@ -1,10 +1,10 @@
+import { obterSessao } from '@/app/actions/auth';
+import { salvarPalpite } from '@/app/actions/palpites';
 import { db } from '@palpita/db';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
-import { obterSessao } from './auth';
-import { salvarPalpite } from './palpites';
 
-vi.mock('./auth', () => ({
+vi.mock('@/app/actions/auth', () => ({
   obterSessao: vi.fn(),
 }));
 

@@ -3,7 +3,7 @@
 import { useSolicitarConvite } from '@/hooks/use-solicitar-convite';
 import { AlertCircle, CheckCircle2, Loader2, Sparkles } from 'lucide-react';
 import type React from 'react';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
 
 export function SolicitarConviteForm() {
   const { nome, setNome, email, setEmail, loading, result, handleSubmit } =

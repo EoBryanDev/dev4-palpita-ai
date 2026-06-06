@@ -1,6 +1,6 @@
+import { middleware } from '@/middleware';
 import { type NextRequest, NextResponse } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { middleware } from './middleware';
 
 vi.mock('next/server', () => {
   const nextResponseInstance = {

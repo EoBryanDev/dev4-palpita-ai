@@ -1,6 +1,3 @@
-import { db } from '@palpita/db';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Mock } from 'vitest';
 import {
   alterarStatusUsuario,
   aprovarSolicitacao,
@@ -8,10 +5,13 @@ import {
   criarRodada,
   lancarResultadoOficial,
   rejeitarSolicitacao,
-} from './admin';
-import { obterSessao } from './auth';
+} from '@/app/actions/admin';
+import { obterSessao } from '@/app/actions/auth';
+import { db } from '@palpita/db';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 
-vi.mock('./auth', () => ({
+vi.mock('@/app/actions/auth', () => ({
   obterSessao: vi.fn(),
 }));
 

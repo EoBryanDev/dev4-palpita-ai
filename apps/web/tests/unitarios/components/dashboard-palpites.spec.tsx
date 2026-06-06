@@ -1,9 +1,9 @@
 import { logoutUsuario } from '@/app/actions/auth';
 import { salvarPalpite } from '@/app/actions/palpites';
+import { DashboardPalpites } from '@/components/dashboard-palpites';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
-import { DashboardPalpites } from './dashboard-palpites';
 
 vi.mock('@/app/actions/palpites', () => ({
   salvarPalpite: vi.fn(),

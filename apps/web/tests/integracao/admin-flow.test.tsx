@@ -1,9 +1,9 @@
 import { obterSessao } from '@/app/actions/auth';
+import AdminDashboardPage from '@/app/admin/page';
 import { db } from '@palpita/db';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
-import AdminDashboardPage from './page';
 
 vi.mock('@/app/actions/auth', () => ({
   obterSessao: vi.fn(),

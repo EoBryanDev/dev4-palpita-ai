@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 
 import { loginUsuario } from '@/app/actions/auth';
-import { LoginForm } from './login-form';
+import { LoginForm } from '@/components/form/login-form';
 
 vi.mock('@/app/actions/auth', () => ({
   loginUsuario: vi.fn(),

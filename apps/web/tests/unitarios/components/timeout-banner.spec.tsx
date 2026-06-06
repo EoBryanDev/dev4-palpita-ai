@@ -1,6 +1,6 @@
+import { TimeoutBanner } from '@/components/timeout-banner';
 import { render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { TimeoutBanner } from './timeout-banner';
 
 describe('TimeoutBanner', () => {
   beforeEach(() => {

@@ -1,8 +1,8 @@
 import { cadastrarSenha } from '@/app/actions/convites';
+import { DefinirSenhaForm } from '@/components/form/definir-senha-form';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
-import { DefinirSenhaForm } from './definir-senha-form';
 
 vi.mock('@/app/actions/convites', () => ({
   cadastrarSenha: vi.fn(),

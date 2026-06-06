@@ -1,6 +1,6 @@
+import { ScrollToTop } from '@/components/scroll-to-top';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ScrollToTop } from './scroll-to-top';
 
 describe('ScrollToTop', () => {
   beforeEach(() => {

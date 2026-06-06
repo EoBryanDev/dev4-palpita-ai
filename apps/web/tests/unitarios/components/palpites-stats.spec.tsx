@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 
-import { PalpitesStats } from './palpites-stats';
+import { PalpitesStats } from '@/components/palpites-stats';
 
 vi.mock('@tanstack/react-query', () => ({
   useQuery: vi.fn(),
