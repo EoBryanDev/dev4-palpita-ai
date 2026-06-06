@@ -1,4 +1,11 @@
 import { Button } from '@/components/ui/button';
+import {
+  formatToBRLDayMonth,
+  formatToBRLTime,
+  formatToBRLWeekday,
+  obterDataSaoPauloISO,
+} from '@/helpers/date';
+import type { IPartidaFormatada } from '@/interface/IPartida';
 import { db, partidas, rodadas, times } from '@palpita/db';
 import { asc, eq } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
@@ -15,19 +22,6 @@ export const metadata: Metadata = {
 
 interface IAgendaPageProps {
   searchParams: Promise<{ dia?: string }>;
-}
-
-interface IPartidaFormatada {
-  id: string;
-  timeA: string;
-  timeB: string;
-  timeAEmoji?: string;
-  timeBEmoji?: string;
-  golsTimeA: number | null;
-  golsTimeB: number | null;
-  dataInicio: Date;
-  status: string;
-  rodada: string;
 }
 
 export default async function AgendaPage({
@@ -145,19 +139,9 @@ export default async function AgendaPage({
     ];
   }
 
-  // Helper para obter a data formatada em YYYY-MM-DD no fuso de São Paulo (Brasília)
-  const obterDataSaoPaulo = (date: Date): string => {
-    return new Intl.DateTimeFormat('fr-CA', {
-      timeZone: 'America/Sao_Paulo',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).format(date);
-  };
-
   // Agrupa partidas por dia (YYYY-MM-DD) no fuso de Brasília
   const diasDisponiveis = Array.from(
-    new Set(allPartidas.map((p) => obterDataSaoPaulo(p.dataInicio))),
+    new Set(allPartidas.map((p) => obterDataSaoPauloISO(p.dataInicio))),
   ).sort();
 
   // Define dia ativo default
@@ -168,7 +152,7 @@ export default async function AgendaPage({
 
   // Filtra as partidas pelo dia ativo
   const partidasDoDia = allPartidas.filter(
-    (p) => obterDataSaoPaulo(p.dataInicio) === activeDia,
+    (p) => obterDataSaoPauloISO(p.dataInicio) === activeDia,
   );
 
   return (
@@ -194,15 +178,8 @@ export default async function AgendaPage({
           {diasDisponiveis.map((diaStr) => {
             // Criamos a data no fuso de Brasília para evitar desalinhamento de dias no formatador
             const date = new Date(`${diaStr}T12:00:00-03:00`);
-            const formatDia = new Intl.DateTimeFormat('pt-BR', {
-              timeZone: 'America/Sao_Paulo',
-              day: 'numeric',
-              month: 'short',
-            }).format(date);
-            const formatSemana = new Intl.DateTimeFormat('pt-BR', {
-              timeZone: 'America/Sao_Paulo',
-              weekday: 'short',
-            }).format(date);
+            const formatDia = formatToBRLDayMonth(date);
+            const formatSemana = formatToBRLWeekday(date);
 
             const isSelected = diaStr === activeDia;
 
@@ -231,11 +208,7 @@ export default async function AgendaPage({
       {partidasDoDia.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {partidasDoDia.map((partida) => {
-            const timeStr = new Intl.DateTimeFormat('pt-BR', {
-              timeZone: 'America/Sao_Paulo',
-              hour: '2-digit',
-              minute: '2-digit',
-            }).format(partida.dataInicio);
+            const timeStr = formatToBRLTime(partida.dataInicio);
 
             const hasFinished = partida.status === 'ENCERRADA';
             const isLive = partida.status === 'EM_ANDAMENTO';

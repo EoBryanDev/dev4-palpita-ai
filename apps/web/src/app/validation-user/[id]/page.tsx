@@ -1,4 +1,4 @@
-import { DefinirSenhaForm } from '@/components/definir-senha-form';
+import { DefinirSenhaForm } from '@/components/form/definir-senha-form';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { TokenConvite } from '@palpita/core';

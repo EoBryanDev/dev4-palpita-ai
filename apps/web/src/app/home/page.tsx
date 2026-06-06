@@ -1,5 +1,7 @@
-import { SolicitarConviteForm } from '@/components/solicitar-convite-form';
+import { SolicitarConviteForm } from '@/components/form/solicitar-convite-form';
 import { Button } from '@/components/ui/button';
+import { formatToBRLDateTimeLong } from '@/helpers/date';
+import type { IHomePartida } from '@/interface/IPartida';
 import {
   configuracoes,
   db,
@@ -21,19 +23,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import type React from 'react';
-
-interface IHomePartida {
-  id: string;
-  timeA: string;
-  timeB: string;
-  timeAEmoji?: string;
-  timeBEmoji?: string;
-  golsTimeA: number | null;
-  golsTimeB: number | null;
-  dataInicio: string;
-  status: string;
-  rodada: string;
-}
 
 interface IHomePageProps {
   searchParams: Promise<{ timeout?: string }>;
@@ -120,13 +109,7 @@ export default async function HomePage({
       timeBEmoji: p.timeBEmoji,
       golsTimeA: p.golsTimeA,
       golsTimeB: p.golsTimeB,
-      dataInicio: new Intl.DateTimeFormat('pt-BR', {
-        timeZone: 'America/Sao_Paulo',
-        day: '2-digit',
-        month: 'long',
-        hour: '2-digit',
-        minute: '2-digit',
-      }).format(p.dataInicio),
+      dataInicio: formatToBRLDateTimeLong(p.dataInicio),
       status: p.status,
       rodada: p.rodadaNome,
     }));
@@ -208,7 +191,7 @@ export default async function HomePage({
       {/* Main Content */}
       <div className="mx-auto w-full max-w-7xl flex-1 p-6 px-6 space-y-12">
         {/* Seção Hero */}
-        <section className="relative overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent p-8 dark:border-zinc-800 md:p-12">
+        <section className="relative overflow-hidden rounded-3xl border border-zinc-200 bg-linear-to-br from-emerald-500/10 via-transparent to-transparent p-8 dark:border-zinc-800 md:p-12">
           <div className="grid gap-8 md:grid-cols-2 items-center">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">

@@ -91,7 +91,7 @@ export default async function AdminDashboardPage() {
     <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-black tracking-tight bg-gradient-to-r from-emerald-600 to-amber-500 bg-clip-text text-transparent dark:from-emerald-400 dark:to-amber-400">
+        <h1 className="text-3xl font-black tracking-tight bg-linear-to-r from-emerald-600 to-amber-500 bg-clip-text text-transparent dark:from-emerald-400 dark:to-amber-400">
           Painel de Controle do Administrador
         </h1>
         <p className="text-sm text-zinc-550 dark:text-zinc-400 mt-2">
@@ -104,7 +104,7 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10">
         {/* Card 1: Total de Usuários */}
         <div className="relative overflow-hidden rounded-3xl border border-zinc-200/85 bg-white p-6 shadow-sm dark:border-zinc-800/85 dark:bg-zinc-900/40">
-          <div className="absolute top-0 right-0 h-24 w-24 bg-gradient-to-bl from-blue-500/10 to-transparent rounded-bl-full" />
+          <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-blue-500/10 to-transparent rounded-bl-full" />
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
               <Users className="h-6 w-6" />
@@ -120,7 +120,7 @@ export default async function AdminDashboardPage() {
 
         {/* Card 2: Usuários Confirmados (LIBERADO) */}
         <div className="relative overflow-hidden rounded-3xl border border-zinc-200/85 bg-white p-6 shadow-sm dark:border-zinc-800/85 dark:bg-zinc-900/40">
-          <div className="absolute top-0 right-0 h-24 w-24 bg-gradient-to-bl from-emerald-500/10 to-transparent rounded-bl-full" />
+          <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-emerald-500/10 to-transparent rounded-bl-full" />
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
               <UserCheck className="h-6 w-6" />
@@ -136,7 +136,7 @@ export default async function AdminDashboardPage() {
 
         {/* Card 3: Convites Pendentes */}
         <div className="relative overflow-hidden rounded-3xl border border-zinc-200/85 bg-white p-6 shadow-sm dark:border-zinc-800/85 dark:bg-zinc-900/40">
-          <div className="absolute top-0 right-0 h-24 w-24 bg-gradient-to-bl from-amber-500/10 to-transparent rounded-bl-full" />
+          <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-amber-500/10 to-transparent rounded-bl-full" />
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
               <MailWarning className="h-6 w-6" />
@@ -152,7 +152,7 @@ export default async function AdminDashboardPage() {
 
         {/* Card 4: Palpites Enviados */}
         <div className="relative overflow-hidden rounded-3xl border border-zinc-200/85 bg-white p-6 shadow-sm dark:border-zinc-800/85 dark:bg-zinc-900/40">
-          <div className="absolute top-0 right-0 h-24 w-24 bg-gradient-to-bl from-purple-500/10 to-transparent rounded-bl-full" />
+          <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-purple-500/10 to-transparent rounded-bl-full" />
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-100 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400">
               <Percent className="h-6 w-6" />

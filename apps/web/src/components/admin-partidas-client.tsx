@@ -19,39 +19,12 @@ import {
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
-export interface IRodadaAdmin {
-  id: string;
-  numero: number;
-  nome: string;
-  ativa: boolean;
-}
-
-export interface IPartidaAdmin {
-  id: string;
-  rodadaId: string;
-  timeA: string;
-  timeB: string;
-  timeAEmoji?: string;
-  timeBEmoji?: string;
-  golsTimeA: number | null;
-  golsTimeB: number | null;
-  dataInicio: string;
-  status: string;
-  rodadaNome: string;
-}
-
-export interface ITimeAdmin {
-  id: string;
-  nome: string;
-  emoji: string;
-  grupo: string;
-}
-
-interface IAdminPartidasClientProps {
-  rodadas: IRodadaAdmin[];
-  partidas: IPartidaAdmin[];
-  times: ITimeAdmin[];
-}
+import type {
+  IAdminPartidasClientProps,
+  IPartidaAdmin,
+  IRodadaAdmin,
+  ITimeAdmin,
+} from '@/interface/IAdmin';
 
 export function AdminPartidasClient({
   rodadas,

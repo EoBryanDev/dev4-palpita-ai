@@ -7,10 +7,7 @@ import { Coins, Loader2, Save } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useState, useTransition } from 'react';
 
-interface IAdminConfiguracoesClientProps {
-  totalLiberados: number;
-  valorInicial: number;
-}
+import type { IAdminConfiguracoesClientProps } from '@/interface/IAdmin';
 
 export function AdminConfiguracoesClient({
   totalLiberados,
@@ -113,7 +110,7 @@ export function AdminConfiguracoesClient({
             <span className="text-xl font-bold text-zinc-600 dark:text-zinc-400">
               R$
             </span>
-            <span className="text-3xl font-black bg-gradient-to-r from-emerald-600 to-amber-500 bg-clip-text text-transparent dark:from-emerald-400 dark:to-amber-400">
+            <span className="text-3xl font-black bg-linear-to-r from-emerald-600 to-amber-500 bg-clip-text text-transparent dark:from-emerald-400 dark:to-amber-400">
               {totalArrecadado.toLocaleString('pt-BR', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,

@@ -1,9 +1,13 @@
 'use client';
 
-import { logoutUsuario } from '@/app/actions/auth';
-import { salvarPalpite } from '@/app/actions/palpites';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
+import { formatToBRLDateTimeShort } from '@/helpers/date';
+import { useDashboardPalpites } from '@/hooks/use-dashboard-palpites';
+import type {
+  IDashboardPalpitesProps,
+  IHistoricoDashboard,
+  IPartidaDashboard,
+} from '@/interface/IDashboard';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -14,50 +18,7 @@ import {
   Trophy,
   User,
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import type React from 'react';
-import { useState, useTransition } from 'react';
-
-export interface IPartidaDashboard {
-  id: string;
-  timeA: string;
-  timeB: string;
-  timeAEmoji?: string;
-  timeBEmoji?: string;
-  dataInicio: string;
-  status: string;
-  golsTimeA?: number | null;
-  golsTimeB?: number | null;
-  palpiteGolsA?: number | null;
-  palpiteGolsB?: number | null;
-  jaPalpitou: boolean;
-}
-
-export interface IHistoricoDashboard {
-  partidaId: string;
-  timeA: string;
-  timeB: string;
-  timeAEmoji?: string;
-  timeBEmoji?: string;
-  placarOficialA: number;
-  placarOficialB: number;
-  palpiteA: number;
-  palpiteB: number;
-  pontosGanhos: number;
-  dataInicio: string;
-}
-
-interface IDashboardPalpitesProps {
-  nomeUsuario: string;
-  emailUsuario: string;
-  cargoUsuario: string;
-  userStatus: string;
-  pontos: number;
-  posicao: number;
-  nomeRodada: string;
-  partidas: IPartidaDashboard[];
-  historico: IHistoricoDashboard[];
-}
 
 export function DashboardPalpites({
   nomeUsuario,
@@ -70,94 +31,19 @@ export function DashboardPalpites({
   partidas,
   historico,
 }: IDashboardPalpitesProps): React.ReactNode {
-  const router = useRouter();
-  const { toast } = useToast();
-  const [isPending, startTransition] = useTransition();
-  const [logoutPending, startLogout] = useTransition();
-
-  // Estado para armazenar os valores temporários digitados nos inputs de palpites
-  const [valoresPalpites, setValoresPalpites] = useState<
-    Record<string, { golsA: string; golsB: string }>
-  >({});
+  const {
+    valoresPalpites,
+    isPending,
+    logoutPending,
+    handleInputChange,
+    handleSalvar,
+    handleLogout,
+  } = useDashboardPalpites();
 
   const isUsuarioLiberado = userStatus === 'LIBERADO';
 
-  const handleInputChange = (
-    partidaId: string,
-    time: 'A' | 'B',
-    value: string,
-  ) => {
-    // Apenas números inteiros positivos ou string vazia
-    if (value !== '' && !/^\d+$/.test(value)) return;
-
-    setValoresPalpites((prev) => {
-      const atual = prev[partidaId] || { golsA: '', golsB: '' };
-      return {
-        ...prev,
-        [partidaId]: {
-          ...atual,
-          golsA: time === 'A' ? value : atual.golsA,
-          golsB: time === 'B' ? value : atual.golsB,
-        },
-      };
-    });
-  };
-
-  const handleSalvar = (partidaId: string, partida: IPartidaDashboard) => {
-    const valores = valoresPalpites[partidaId];
-    // Se não digitou novos valores, usa o palpite anterior ou assume 0
-    const golsAStr = valores?.golsA ?? String(partida.palpiteGolsA ?? '');
-    const golsBStr = valores?.golsB ?? String(partida.palpiteGolsB ?? '');
-
-    if (golsAStr === '' || golsBStr === '') {
-      toast({
-        title: 'Aviso',
-        description: 'Preencha ambos os placares para salvar.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    const golsA = Number.parseInt(golsAStr, 10);
-    const golsB = Number.parseInt(golsBStr, 10);
-
-    startTransition(async () => {
-      const result = await salvarPalpite(partidaId, golsA, golsB);
-
-      if (result.success) {
-        toast({
-          title: 'Palpite salvo!',
-          description: result.message,
-        });
-        // Recarregar os dados do servidor para atualizar o dashboard
-        router.refresh();
-      } else {
-        toast({
-          title: 'Erro ao salvar',
-          description: result.message,
-          variant: 'destructive',
-        });
-      }
-    });
-  };
-
-  const handleLogout = () => {
-    startLogout(async () => {
-      await logoutUsuario();
-      router.push('/login');
-      router.refresh();
-    });
-  };
-
   const formatarData = (dataStr: string) => {
-    const data = new Date(dataStr);
-    return data.toLocaleString('pt-BR', {
-      timeZone: 'America/Sao_Paulo',
-      day: '2-digit',
-      month: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    return formatToBRLDateTimeShort(new Date(dataStr));
   };
 
   // Filtragem de partidas da rodada
@@ -193,7 +79,7 @@ export function DashboardPalpites({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           {/* Card Pontos */}
           <div className="relative overflow-hidden rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/40">
-            <div className="absolute top-0 right-0 h-24 w-24 bg-gradient-to-bl from-emerald-500/10 to-transparent rounded-bl-full" />
+            <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-emerald-500/10 to-transparent rounded-bl-full" />
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
                 <Trophy className="h-6 w-6" />
@@ -211,7 +97,7 @@ export function DashboardPalpites({
 
           {/* Card Classificação */}
           <div className="relative overflow-hidden rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/40">
-            <div className="absolute top-0 right-0 h-24 w-24 bg-gradient-to-bl from-teal-500/10 to-transparent rounded-bl-full" />
+            <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-teal-500/10 to-transparent rounded-bl-full" />
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-100 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400">
                 <Trophy className="h-6 w-6" />
@@ -227,7 +113,7 @@ export function DashboardPalpites({
 
           {/* Card Status da Conta */}
           <div className="relative overflow-hidden rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/40">
-            <div className="absolute top-0 right-0 h-24 w-24 bg-gradient-to-bl from-blue-500/10 to-transparent rounded-bl-full" />
+            <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-blue-500/10 to-transparent rounded-bl-full" />
             <div className="flex items-center gap-4">
               <div
                 className={`flex h-12 w-12 items-center justify-center rounded-2xl ${

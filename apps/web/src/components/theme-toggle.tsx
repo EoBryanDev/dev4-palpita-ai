@@ -1,6 +1,6 @@
 'use client';
 
-import { useUiStore } from '@/lib/store/ui';
+import { useUiStore } from '@/store/ui-store';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import type React from 'react';
