@@ -7,10 +7,7 @@ import { Coins, Loader2, Save } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useState, useTransition } from 'react';
 
-interface IAdminConfiguracoesClientProps {
-  totalLiberados: number;
-  valorInicial: number;
-}
+import type { IAdminConfiguracoesClientProps } from '@/interface/IAdmin';
 
 export function AdminConfiguracoesClient({
   totalLiberados,

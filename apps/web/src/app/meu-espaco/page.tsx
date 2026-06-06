@@ -3,7 +3,7 @@ import { DashboardPalpites } from '@/components/dashboard-palpites';
 import type {
   IHistoricoDashboard,
   IPartidaDashboard,
-} from '@/components/dashboard-palpites';
+} from '@/interface/IDashboard';
 import { db, palpites, partidas, rodadas, times, usuarios } from '@palpita/db';
 import { desc, eq, or } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';

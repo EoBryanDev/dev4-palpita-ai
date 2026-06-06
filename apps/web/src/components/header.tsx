@@ -9,12 +9,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import type React from 'react';
 import { useEffect, useState, useTransition } from 'react';
 
-interface ISessionUser {
-  id: string;
-  nome: string;
-  email: string;
-  cargo: string;
-}
+import type { ISessionUser } from '@/interface/IHeader';
 
 export function Header({
   initialSession = null,

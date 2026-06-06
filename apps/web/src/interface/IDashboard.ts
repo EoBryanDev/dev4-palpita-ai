@@ -26,3 +26,15 @@ export interface IHistoricoDashboard {
   pontosGanhos: number;
   dataInicio: string;
 }
+
+export interface IDashboardPalpitesProps {
+  nomeUsuario: string;
+  emailUsuario: string;
+  cargoUsuario: string;
+  userStatus: string;
+  pontos: number;
+  posicao: number;
+  nomeRodada: string;
+  partidas: IPartidaDashboard[];
+  historico: IHistoricoDashboard[];
+}

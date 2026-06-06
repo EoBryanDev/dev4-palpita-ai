@@ -23,20 +23,10 @@ import {
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
-export interface IUsuarioAdmin {
-  id: string;
-  nome: string;
-  email: string;
-  status: 'PENDENTE' | 'ATIVO' | 'DESATIVADO' | 'LIBERADO';
-  cargo: 'ADMIN' | 'COLABORADOR';
-  dataCriacao: string;
-  tokenId?: string | null;
-}
-
-interface IAdminUsuariosClientProps {
-  usuarios: IUsuarioAdmin[];
-  adminEmail: string;
-}
+import type {
+  IAdminUsuariosClientProps,
+  IUsuarioAdmin,
+} from '@/interface/IAdmin';
 
 export function AdminUsuariosClient({
   usuarios,

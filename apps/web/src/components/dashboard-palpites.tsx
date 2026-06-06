@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { formatToBRLDateTimeShort } from '@/helpers/date';
 import { useDashboardPalpites } from '@/hooks/use-dashboard-palpites';
 import type {
+  IDashboardPalpitesProps,
   IHistoricoDashboard,
   IPartidaDashboard,
 } from '@/interface/IDashboard';
@@ -18,18 +19,6 @@ import {
   User,
 } from 'lucide-react';
 import type React from 'react';
-
-interface IDashboardPalpitesProps {
-  nomeUsuario: string;
-  emailUsuario: string;
-  cargoUsuario: string;
-  userStatus: string;
-  pontos: number;
-  posicao: number;
-  nomeRodada: string;
-  partidas: IPartidaDashboard[];
-  historico: IHistoricoDashboard[];
-}
 
 export function DashboardPalpites({
   nomeUsuario,

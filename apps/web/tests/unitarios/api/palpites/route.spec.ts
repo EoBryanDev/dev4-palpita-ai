@@ -1,6 +1,6 @@
 import { GET } from '@/app/api/palpites/route';
 import { db } from '@palpita/db';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 
 vi.mock('@palpita/db', () => {

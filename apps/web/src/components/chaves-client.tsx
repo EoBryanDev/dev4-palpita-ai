@@ -3,30 +3,7 @@
 import { GitFork, Layers, Trophy } from 'lucide-react';
 import React, { useState } from 'react';
 
-interface IGroupTeam {
-  nome: string;
-  emoji: string;
-  pontos: number;
-}
-
-interface IGroup {
-  nome: string;
-  times: IGroupTeam[];
-}
-
-interface IBracketMatch {
-  id: string;
-  timeA: string;
-  emojiA: string;
-  timeB: string;
-  emojiB: string;
-  data: string;
-  vencedor?: 'A' | 'B';
-}
-
-interface IChavesClientProps {
-  grupos: IGroup[];
-}
+import type { IBracketMatch, IChavesClientProps } from '@/interface/IChaves';
 
 const BRACKET_MOCK = {
   oitavas: [

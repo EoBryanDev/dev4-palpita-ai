@@ -1,15 +1,13 @@
 'use client';
 
 import { cadastrarSenha } from '@/app/actions/convites';
+import { Button } from '@/components/ui/button';
 import { AlertCircle, CheckCircle2, KeyRound, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 
-interface IDefinirSenhaFormProps {
-  tokenId: string;
-}
+import type { IDefinirSenhaFormProps } from '@/interface/IForm';
 
 export function DefinirSenhaForm({ tokenId }: IDefinirSenhaFormProps) {
   const [senha, setSenha] = useState('');

@@ -3,10 +3,10 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { Footer } from '@/components/footer';
 import { Header } from '@/components/header';
-import { QueryProvider } from '@/components/query-provider';
 import { ScrollToTop } from '@/components/scroll-to-top';
-import { ThemeProvider } from '@/components/theme-provider';
 import { TimeoutBanner } from '@/components/timeout-banner';
+import { QueryProvider } from '@/providers/query-provider';
+import { ThemeProvider } from '@/providers/theme-provider';
 
 import { obterSessao } from '@/app/actions/auth';
 import { Toaster } from '@/components/ui/toaster';

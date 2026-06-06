@@ -5,13 +5,7 @@ import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { AlertCircle, Loader2, Medal, Search, Trophy } from 'lucide-react';
 
-export interface IRankUser {
-  id: string;
-  nome: string;
-  email: string;
-  pontos: number;
-  posicao: number;
-}
+import type { IRankUser } from '@/interface/IRanking';
 
 const fetchRanking = async (): Promise<IRankUser[]> => {
   const res = await fetch('/api/ranking');

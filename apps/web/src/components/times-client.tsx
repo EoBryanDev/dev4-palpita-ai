@@ -3,17 +3,7 @@
 import { Filter, Globe, Search, Trophy } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
-export interface IDbTime {
-  id: string;
-  nome: string;
-  emoji: string;
-  confederacao: string;
-  grupo: string;
-}
-
-interface ITimesClientProps {
-  initialTimes: IDbTime[];
-}
+import type { IDbTime, ITimesClientProps } from '@/interface/ITimes';
 
 const DETALHES_EXTRAS: Record<
   string,
