@@ -66,7 +66,7 @@ export function Header({
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white transition-all group-hover:scale-105 dark:bg-emerald-500">
             <Trophy className="h-5 w-5" />
           </div>
-          <span className="text-xl font-black tracking-wider bg-gradient-to-r from-emerald-600 via-emerald-500 to-amber-500 bg-clip-text text-transparent dark:from-emerald-400 dark:via-emerald-300 dark:to-amber-400">
+          <span className="text-xl font-black tracking-wider bg-linear-to-r from-emerald-600 via-emerald-500 to-amber-500 bg-clip-text text-transparent dark:from-emerald-400 dark:via-emerald-300 dark:to-amber-400">
             PALPITA AI
           </span>
         </Link>

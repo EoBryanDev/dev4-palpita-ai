@@ -79,7 +79,7 @@ export function DashboardPalpites({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           {/* Card Pontos */}
           <div className="relative overflow-hidden rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/40">
-            <div className="absolute top-0 right-0 h-24 w-24 bg-gradient-to-bl from-emerald-500/10 to-transparent rounded-bl-full" />
+            <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-emerald-500/10 to-transparent rounded-bl-full" />
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
                 <Trophy className="h-6 w-6" />
@@ -97,7 +97,7 @@ export function DashboardPalpites({
 
           {/* Card Classificação */}
           <div className="relative overflow-hidden rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/40">
-            <div className="absolute top-0 right-0 h-24 w-24 bg-gradient-to-bl from-teal-500/10 to-transparent rounded-bl-full" />
+            <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-teal-500/10 to-transparent rounded-bl-full" />
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-100 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400">
                 <Trophy className="h-6 w-6" />
@@ -113,7 +113,7 @@ export function DashboardPalpites({
 
           {/* Card Status da Conta */}
           <div className="relative overflow-hidden rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/40">
-            <div className="absolute top-0 right-0 h-24 w-24 bg-gradient-to-bl from-blue-500/10 to-transparent rounded-bl-full" />
+            <div className="absolute top-0 right-0 h-24 w-24 bg-linear-to-bl from-blue-500/10 to-transparent rounded-bl-full" />
             <div className="flex items-center gap-4">
               <div
                 className={`flex h-12 w-12 items-center justify-center rounded-2xl ${

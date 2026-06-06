@@ -48,7 +48,7 @@ export function LoginForm() {
   return (
     <div className="relative w-full max-w-md rounded-2xl border border-zinc-200/80 bg-white/60 p-8 shadow-2xl backdrop-blur-md dark:border-zinc-800/80 dark:bg-zinc-900/60 overflow-hidden">
       {/* Detalhe de gradiente decorativo no topo */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600" />
+      <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-emerald-500 via-teal-500 to-emerald-600" />
 
       <div className="mb-6 text-center">
         <div className="mx-auto rounded-full bg-emerald-50 dark:bg-emerald-950/30 p-3 text-emerald-600 dark:text-emerald-400 w-fit mb-3">
