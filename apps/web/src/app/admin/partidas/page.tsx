@@ -1,8 +1,9 @@
 import { obterSessao } from '@/app/actions/auth';
 import { AdminPartidasClient } from '@/components/admin-partidas-client';
-import { db, partidas, rodadas, times } from '@palpita/db';
-import { asc, desc, eq } from 'drizzle-orm';
-import { alias } from 'drizzle-orm/pg-core';
+import { obterPartidas } from '@/services/partidas.service';
+import { obterTimes } from '@/services/times.service';
+import { db, rodadas } from '@palpita/db';
+import { desc } from 'drizzle-orm';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
@@ -25,32 +26,11 @@ export default async function AdminPartidasPage() {
     .from(rodadas)
     .orderBy(desc(rodadas.numero));
 
-  const timeA = alias(times, 'time_a');
-  const timeB = alias(times, 'time_b');
-
   // 2. Buscar todas as partidas e fazer join com rodada e times para obter nomes e emojis
-  const allPartidas = await db
-    .select({
-      id: partidas.id,
-      rodadaId: partidas.rodadaId,
-      timeA: timeA.nome,
-      timeB: timeB.nome,
-      timeAEmoji: timeA.emoji,
-      timeBEmoji: timeB.emoji,
-      golsTimeA: partidas.golsTimeA,
-      golsTimeB: partidas.golsTimeB,
-      dataInicio: partidas.dataInicio,
-      status: partidas.status,
-      rodadaNome: rodadas.nome,
-    })
-    .from(partidas)
-    .innerJoin(rodadas, eq(partidas.rodadaId, rodadas.id))
-    .innerJoin(timeA, eq(partidas.timeAId, timeA.id))
-    .innerJoin(timeB, eq(partidas.timeBId, timeB.id))
-    .orderBy(asc(partidas.dataInicio));
+  const allPartidas = await obterPartidas();
 
   // 3. Buscar todos os times cadastrados
-  const allTimes = await db.select().from(times).orderBy(asc(times.nome));
+  const allTimes = await obterTimes();
 
   // Mapear dados para formatos compatíveis com Client Component
   const mappedRodadas = allRodadas.map((r) => ({
