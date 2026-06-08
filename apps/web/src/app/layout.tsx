@@ -38,20 +38,26 @@ export default async function RootLayout({
   const session = await obterSessao();
 
   // Buscar a rodada ativa para calcular o prazo de palpites (limite: 30 minutos antes do primeiro jogo)
-  const rodadaAtiva = await obterRodadaAtiva();
+  // Envolvido em try/catch para não quebrar o build caso o DB não esteja acessível
   let targetDate: string | undefined = undefined;
   let labelRodada: string | undefined = undefined;
 
-  if (rodadaAtiva) {
-    const partidasDaRodada = await obterPartidas(rodadaAtiva.id);
-    if (partidasDaRodada.length > 0) {
-      const primeiraPartida = partidasDaRodada[0];
-      const dataLimite = new Date(
-        primeiraPartida.dataInicio.getTime() - 30 * 60 * 1000,
-      );
-      targetDate = dataLimite.toISOString();
-      labelRodada = rodadaAtiva.nome;
+  try {
+    const rodadaAtiva = await obterRodadaAtiva();
+
+    if (rodadaAtiva) {
+      const partidasDaRodada = await obterPartidas(rodadaAtiva.id);
+      if (partidasDaRodada.length > 0) {
+        const primeiraPartida = partidasDaRodada[0];
+        const dataLimite = new Date(
+          primeiraPartida.dataInicio.getTime() - 30 * 60 * 1000,
+        );
+        targetDate = dataLimite.toISOString();
+        labelRodada = rodadaAtiva.nome;
+      }
     }
+  } catch {
+    // Em caso de erro (ex.: DB indisponível durante build), o banner simplesmente não é exibido
   }
 
   return (
