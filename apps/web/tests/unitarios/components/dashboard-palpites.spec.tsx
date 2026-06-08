@@ -67,10 +67,11 @@ const defaultProps = {
       placarOficialB: 1,
       palpiteA: 2,
       palpiteB: 1,
-      pontosGanhos: 1,
+      pontosGanhos: 2,
       dataInicio: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // Passado
     },
   ],
+  isRodadaBloqueada: false,
 };
 
 describe('DashboardPalpites Component', () => {
@@ -121,7 +122,7 @@ describe('DashboardPalpites Component', () => {
     expect(screen.getByText('Croácia')).toBeDefined();
     expect(screen.getByText('Seu Palpite')).toBeDefined();
     expect(screen.getByText('2 x 1')).toBeDefined();
-    expect(screen.getByText('+1 Ponto')).toBeDefined();
+    expect(screen.getByText('+2 Pontos')).toBeDefined();
   });
 
   it('deve chamar a action salvarPalpite com os placares corretos ao enviar um novo palpite', async () => {

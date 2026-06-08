@@ -36,9 +36,17 @@ export default async function MeuEspacoPage() {
 
   // 4. Buscar partidas da rodada selecionada
   let partidasDaRodada: Awaited<ReturnType<typeof obterPartidas>> = [];
+  let isRodadaBloqueada = false;
 
   if (rodadaId) {
     partidasDaRodada = await obterPartidas(rodadaId);
+    if (partidasDaRodada.length > 0) {
+      const primeiraPartida = partidasDaRodada[0];
+      const dataLimite = new Date(
+        primeiraPartida.dataInicio.getTime() - 30 * 60 * 1000,
+      );
+      isRodadaBloqueada = new Date() >= dataLimite;
+    }
   }
 
   // 5. Buscar palpites do usuário logado para todas as partidas
@@ -99,7 +107,16 @@ export default async function MeuEspacoPage() {
         palpite.golsTimeB,
       );
       const vencedorPartida = obterVencedor(match.golsTimeA, match.golsTimeB);
-      const pontosGanhos = vencedorPalpite === vencedorPartida ? 1 : 0;
+
+      const acertouPlacarExato =
+        palpite.golsTimeA === match.golsTimeA &&
+        palpite.golsTimeB === match.golsTimeB;
+
+      const pontosGanhos = acertouPlacarExato
+        ? 2
+        : vencedorPalpite === vencedorPartida
+          ? 1
+          : 0;
 
       historico.push({
         partidaId: match.id,
@@ -128,6 +145,7 @@ export default async function MeuEspacoPage() {
       nomeRodada={nomeRodada}
       partidas={partidasEnriquecidas}
       historico={historico}
+      isRodadaBloqueada={isRodadaBloqueada}
     />
   );
 }

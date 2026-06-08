@@ -18,7 +18,7 @@ describe('TimeoutBanner', () => {
     vi.setSystemTime(new Date(fiveDaysBefore));
 
     // Act
-    render(<TimeoutBanner />);
+    render(<TimeoutBanner targetDate={new Date(targetDate).toISOString()} />);
 
     // Assert
     expect(screen.getByText(/começa em/i)).toBeDefined();
@@ -34,7 +34,7 @@ describe('TimeoutBanner', () => {
     vi.setSystemTime(new Date(twoHoursBefore));
 
     // Act
-    render(<TimeoutBanner />);
+    render(<TimeoutBanner targetDate={new Date(targetDate).toISOString()} />);
 
     // Assert
     // Verify that "02" (hours) is displayed
@@ -48,7 +48,9 @@ describe('TimeoutBanner', () => {
     vi.setSystemTime(new Date(targetDate + 1000));
 
     // Act
-    const { container } = render(<TimeoutBanner />);
+    const { container } = render(
+      <TimeoutBanner targetDate={new Date(targetDate).toISOString()} />,
+    );
 
     // Assert
     expect(container.firstChild).toBeNull();
