@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { FlagImage } from '@/components/ui/flag-image';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
@@ -420,9 +421,11 @@ export function AdminPartidasClient({
                                 <div className="flex-1 text-right font-black text-sm truncate flex items-center justify-end gap-1.5">
                                   <span>{partida.timeA}</span>
                                   {partida.timeAEmoji && (
-                                    <span className="text-base">
-                                      {partida.timeAEmoji}
-                                    </span>
+                                    <FlagImage
+                                      emoji={partida.timeAEmoji}
+                                      alt={partida.timeA}
+                                      className="h-4 w-4 shrink-0"
+                                    />
                                   )}
                                 </div>
 
@@ -477,9 +480,11 @@ export function AdminPartidasClient({
 
                                 <div className="flex-1 text-left font-black text-sm truncate flex items-center justify-start gap-1.5">
                                   {partida.timeBEmoji && (
-                                    <span className="text-base">
-                                      {partida.timeBEmoji}
-                                    </span>
+                                    <FlagImage
+                                      emoji={partida.timeBEmoji}
+                                      alt={partida.timeB}
+                                      className="h-4 w-4 shrink-0"
+                                    />
                                   )}
                                   <span>{partida.timeB}</span>
                                 </div>

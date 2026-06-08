@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { FlagImage } from '@/components/ui/flag-image';
 import { PageHeader } from '@/components/ui/page-header';
 import {
   formatToBRLDayMonth,
@@ -217,9 +218,18 @@ export default async function AgendaPage({
                 <div className="flex items-center justify-between gap-2 py-2">
                   {/* Time A */}
                   <div className="flex flex-1 flex-col items-center gap-2 text-center max-w-[40%]">
-                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-2xl border border-zinc-200 dark:border-zinc-700">
-                      {partida.timeAEmoji ||
-                        partida.timeA.slice(0, 3).toUpperCase()}
+                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden border border-zinc-200 dark:border-zinc-700 select-none">
+                      {partida.timeAEmoji ? (
+                        <FlagImage
+                          emoji={partida.timeAEmoji}
+                          alt={partida.timeA}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-xs font-bold text-zinc-500">
+                          {partida.timeA.slice(0, 3).toUpperCase()}
+                        </span>
+                      )}
                     </div>
                     <span className="text-sm font-bold truncate w-full">
                       {partida.timeA}
@@ -245,9 +255,18 @@ export default async function AgendaPage({
 
                   {/* Time B */}
                   <div className="flex flex-1 flex-col items-center gap-2 text-center max-w-[40%]">
-                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-2xl border border-zinc-200 dark:border-zinc-700">
-                      {partida.timeBEmoji ||
-                        partida.timeB.slice(0, 3).toUpperCase()}
+                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden border border-zinc-200 dark:border-zinc-700 select-none">
+                      {partida.timeBEmoji ? (
+                        <FlagImage
+                          emoji={partida.timeBEmoji}
+                          alt={partida.timeB}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-xs font-bold text-zinc-500">
+                          {partida.timeB.slice(0, 3).toUpperCase()}
+                        </span>
+                      )}
                     </div>
                     <span className="text-sm font-bold truncate w-full">
                       {partida.timeB}

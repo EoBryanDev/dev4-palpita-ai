@@ -1,5 +1,6 @@
 'use client';
 
+import { FlagImage } from '@/components/ui/flag-image';
 import { PageHeader } from '@/components/ui/page-header';
 import { Filter, Globe, Search, Trophy } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
@@ -200,7 +201,11 @@ export default function TimesClient({ initialTimes }: ITimesClientProps) {
             >
               {/* Header do Card */}
               <div className="flex justify-between items-start">
-                <span className="text-4xl select-none">{selecao.emoji}</span>
+                <FlagImage
+                  emoji={selecao.emoji}
+                  alt={selecao.nome}
+                  className="h-10 w-10 shrink-0"
+                />
                 <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 dark:bg-zinc-850 dark:text-zinc-400">
                   {selecao.grupo}
                 </span>

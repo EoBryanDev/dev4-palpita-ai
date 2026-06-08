@@ -1,5 +1,6 @@
 import { SolicitarConviteForm } from '@/components/form/solicitar-convite-form';
 import { Button } from '@/components/ui/button';
+import { FlagImage } from '@/components/ui/flag-image';
 import { formatToBRLDateTimeLong } from '@/helpers/date';
 import type { IHomePartida } from '@/interface/IPartida';
 import { obterValorPalpite } from '@/services/configuracoes.service';
@@ -147,11 +148,53 @@ export default async function HomePage({
       <div className="mx-auto w-full max-w-7xl flex-1 p-6 px-6 space-y-12">
         {/* Seção Hero */}
         <section className="relative overflow-hidden rounded-3xl border border-zinc-200 bg-linear-to-br from-emerald-500/10 via-transparent to-transparent p-8 dark:border-zinc-800 md:p-12">
-          <div className="grid gap-8 md:grid-cols-2 items-center">
+          {/* Elementos Decorativos da Copa 2026 flutuando de forma sutil no fundo */}
+          <div className="absolute top-1/2 right-12 -translate-y-1/2 pointer-events-none opacity-10 dark:opacity-20 hidden lg:block select-none">
+            <div className="relative w-80 h-80">
+              <img
+                src="/2026-wc-logo-usa-copia-removebg-preview.png"
+                alt="Copa 2026 USA"
+                className="absolute top-0 right-0 w-36 h-36 rotate-12 animate-bounce"
+                style={{ animationDuration: '6s' }}
+              />
+              <img
+                src="/2026-wc-logo-mex-copia-removebg-preview.png"
+                alt="Copa 2026 México"
+                className="absolute bottom-0 left-0 w-32 h-32 -rotate-12 animate-bounce"
+                style={{ animationDuration: '8s' }}
+              />
+              <img
+                src="/2026-wc-logo-can-copia-removebg-preview.png"
+                alt="Copa 2026 Canadá"
+                className="absolute top-1/4 left-1/4 w-28 h-28 rotate-6 animate-pulse"
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-2 items-center relative z-10">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                <Sparkles className="h-3 w-3" />
-                Copa do Mundo de 2026
+              <div className="flex items-center gap-3">
+                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                  <Sparkles className="h-3 w-3" />
+                  Copa do Mundo de 2026
+                </div>
+                <div className="flex -space-x-2 select-none">
+                  <img
+                    src="/2026-wc-logo-usa-copia-removebg-preview.png"
+                    className="w-7 h-7 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white object-contain p-0.5"
+                    alt="USA Logo"
+                  />
+                  <img
+                    src="/2026-wc-logo-mex-copia-removebg-preview.png"
+                    className="w-7 h-7 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white object-contain p-0.5"
+                    alt="MEX Logo"
+                  />
+                  <img
+                    src="/2026-wc-logo-can-copia-removebg-preview.png"
+                    className="w-7 h-7 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white object-contain p-0.5"
+                    alt="CAN Logo"
+                  />
+                </div>
               </div>
               <h1 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">
                 Dê seus palpites e domine a classificação
@@ -246,51 +289,122 @@ export default async function HomePage({
           id="regras-pontuacao"
           className="rounded-3xl border border-zinc-200 bg-zinc-50/50 p-8 dark:border-zinc-800 dark:bg-zinc-900/30"
         >
-          <div className="max-w-3xl space-y-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-              <Coins className="h-3 w-3" />
-              Regulamento Oficial
+          <div className="grid gap-8 lg:grid-cols-3">
+            {/* Coluna da esquerda (ocupa 2 colunas no desktop) */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                <Coins className="h-3 w-3" />
+                Regulamento Oficial
+              </div>
+              <h2 className="text-3xl font-bold tracking-tight">
+                Regras de Pontuação
+              </h2>
+              <p className="text-zinc-600 dark:text-zinc-400 text-sm">
+                O sistema de pontuação premia tanto a precisão absoluta do
+                placar quanto a intuição do resultado final do jogo. Veja como
+                pontuar:
+              </p>
+
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm">
+                  <div className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">
+                    2 pts
+                  </div>
+                  <h3 className="text-sm font-bold mt-1">Placar Exato</h3>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                    Você acertou na mosca a quantidade exata de gols de ambas as
+                    seleções.
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm">
+                  <div className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">
+                    1 pt
+                  </div>
+                  <h3 className="text-sm font-bold mt-1">Resultado Final</h3>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                    Você acertou a seleção vencedora ou o empate, mas errou o
+                    placar exato.
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm">
+                  <div className="text-2xl font-extrabold text-zinc-450 dark:text-zinc-500">
+                    0 pt
+                  </div>
+                  <h3 className="text-sm font-bold mt-1">Sem Acertos</h3>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                    Você errou o vencedor e também errou a ocorrência de empate.
+                  </p>
+                </div>
+              </div>
             </div>
-            <h2 className="text-3xl font-bold tracking-tight">
-              Regras de Pontuação
-            </h2>
-            <p className="text-zinc-600 dark:text-zinc-400">
-              O sistema de pontuação é simples e direto, premiando tanto a
-              precisão absoluta quanto a intuição do vencedor da partida. Veja
-              como acumular pontos:
-            </p>
 
-            <div className="grid gap-6 md:grid-cols-3">
-              <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm">
-                <div className="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">
-                  1 pt
+            {/* Coluna da direita (ocupa 1 coluna no desktop): Distribuição de Prêmio */}
+            <div className="flex flex-col justify-between space-y-6 border-t border-zinc-200 pt-6 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8 dark:border-zinc-800">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-3 py-1 text-xs font-semibold text-amber-600 dark:text-amber-400">
+                  <Trophy className="h-3 w-3" />
+                  Prêmio e Pódio
                 </div>
-                <h3 className="text-lg font-bold mt-2">Placar Exato</h3>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-                  Você acertou exatamente a quantidade de gols de ambas as
-                  seleções.
+                <h3 className="text-xl font-bold mt-3 tracking-tight">
+                  Distribuição do Montante
+                </h3>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2">
+                  O prêmio total é gerado pela soma das inscrições dos
+                  participantes ativos e dividido entre os 3 melhores colocados
+                  no final:
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm">
-                <div className="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">
-                  1 pt
+              <div className="space-y-3 bg-white dark:bg-zinc-900/60 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800/80 pb-2">
+                  <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                    Pódio
+                  </span>
+                  <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                    Estimativa
+                  </span>
                 </div>
-                <h3 className="text-lg font-bold mt-2">Resultado Final</h3>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-                  Você errou o placar exato, mas acertou a seleção vencedora ou
-                  a condição de empate.
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm">
-                <div className="text-3xl font-extrabold text-zinc-400">
-                  0 pt
+                <div className="flex items-center justify-between">
+                  <span className="text-xs flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-amber-450 dark:bg-amber-400 animate-pulse" />
+                    1º Lugar (70%)
+                  </span>
+                  <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">
+                    R${' '}
+                    {(totalPremios * 0.7).toLocaleString('pt-BR', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>
                 </div>
-                <h3 className="text-lg font-bold mt-2">Errado</h3>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-                  Você não acertou o vencedor e nem a ocorrência de empate.
-                </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-zinc-400 dark:bg-zinc-350" />
+                    2º Lugar (20%)
+                  </span>
+                  <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">
+                    R${' '}
+                    {(totalPremios * 0.2).toLocaleString('pt-BR', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-orange-450 dark:bg-orange-400" />
+                    3º Lugar (10%)
+                  </span>
+                  <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">
+                    R${' '}
+                    {(totalPremios * 0.1).toLocaleString('pt-BR', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -326,11 +440,20 @@ export default async function HomePage({
                   </span>
                 </div>
 
-                <div className="my-6 flex items-center justify-between gap-4 font-semibold">
+                <div className="my-6 flex items-center justify-between gap-4 font-semibold animate-fade-in">
                   <div className="flex flex-1 flex-col items-center gap-2 text-center">
-                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-2xl border border-zinc-200 dark:border-zinc-700">
-                      {partida.timeAEmoji ||
-                        partida.timeA.slice(0, 3).toUpperCase()}
+                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden border border-zinc-200 dark:border-zinc-700 select-none">
+                      {partida.timeAEmoji ? (
+                        <FlagImage
+                          emoji={partida.timeAEmoji}
+                          alt={partida.timeA}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-xs font-bold text-zinc-500">
+                          {partida.timeA.slice(0, 3).toUpperCase()}
+                        </span>
+                      )}
                     </div>
                     <span className="text-sm truncate w-full">
                       {partida.timeA}
@@ -340,9 +463,18 @@ export default async function HomePage({
                   <span className="text-zinc-400 text-xs">VS</span>
 
                   <div className="flex flex-1 flex-col items-center gap-2 text-center">
-                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-2xl border border-zinc-200 dark:border-zinc-700">
-                      {partida.timeBEmoji ||
-                        partida.timeB.slice(0, 3).toUpperCase()}
+                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden border border-zinc-200 dark:border-zinc-700 select-none">
+                      {partida.timeBEmoji ? (
+                        <FlagImage
+                          emoji={partida.timeBEmoji}
+                          alt={partida.timeB}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-xs font-bold text-zinc-500">
+                          {partida.timeB.slice(0, 3).toUpperCase()}
+                        </span>
+                      )}
                     </div>
                     <span className="text-sm truncate w-full">
                       {partida.timeB}

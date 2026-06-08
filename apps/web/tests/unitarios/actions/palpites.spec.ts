@@ -141,8 +141,25 @@ describe('salvarPalpite', () => {
       from: vi.fn(() => ({
         where: vi.fn(() => ({
           limit: vi.fn(() =>
-            Promise.resolve([{ dataInicio: dataPassado, status: 'AGENDADO' }]),
+            Promise.resolve([
+              {
+                dataInicio: dataPassado,
+                status: 'AGENDADO',
+                rodadaId: 'rodada-123',
+              },
+            ]),
           ),
+        })),
+      })),
+    }));
+
+    // mock da busca da primeira partida da rodada (iniciada no passado)
+    mockSelect.mockImplementationOnce(() => ({
+      from: vi.fn(() => ({
+        where: vi.fn(() => ({
+          orderBy: vi.fn(() => ({
+            limit: vi.fn(() => Promise.resolve([{ dataInicio: dataPassado }])),
+          })),
         })),
       })),
     }));
@@ -150,7 +167,7 @@ describe('salvarPalpite', () => {
     const result = await salvarPalpite('partida-123', 2, 1);
     expect(result.success).toBe(false);
     expect(result.message).toContain(
-      'O prazo para palpitar nesta partida já expirou',
+      'O prazo para palpitar nesta rodada expirou',
     );
   });
 
@@ -176,8 +193,25 @@ describe('salvarPalpite', () => {
       from: vi.fn(() => ({
         where: vi.fn(() => ({
           limit: vi.fn(() =>
-            Promise.resolve([{ dataInicio: dataFuturo, status: 'AGENDADO' }]),
+            Promise.resolve([
+              {
+                dataInicio: dataFuturo,
+                status: 'AGENDADO',
+                rodadaId: 'rodada-123',
+              },
+            ]),
           ),
+        })),
+      })),
+    }));
+
+    // mock da busca da primeira partida da rodada (futura)
+    mockSelect.mockImplementationOnce(() => ({
+      from: vi.fn(() => ({
+        where: vi.fn(() => ({
+          orderBy: vi.fn(() => ({
+            limit: vi.fn(() => Promise.resolve([{ dataInicio: dataFuturo }])),
+          })),
         })),
       })),
     }));
@@ -226,8 +260,25 @@ describe('salvarPalpite', () => {
       from: vi.fn(() => ({
         where: vi.fn(() => ({
           limit: vi.fn(() =>
-            Promise.resolve([{ dataInicio: dataFuturo, status: 'AGENDADO' }]),
+            Promise.resolve([
+              {
+                dataInicio: dataFuturo,
+                status: 'AGENDADO',
+                rodadaId: 'rodada-123',
+              },
+            ]),
           ),
+        })),
+      })),
+    }));
+
+    // mock da busca da primeira partida da rodada (futura)
+    mockSelect.mockImplementationOnce(() => ({
+      from: vi.fn(() => ({
+        where: vi.fn(() => ({
+          orderBy: vi.fn(() => ({
+            limit: vi.fn(() => Promise.resolve([{ dataInicio: dataFuturo }])),
+          })),
         })),
       })),
     }));

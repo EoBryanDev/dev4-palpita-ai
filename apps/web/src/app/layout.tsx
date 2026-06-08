@@ -27,12 +27,32 @@ export const metadata: Metadata = {
     'Dê seus palpites nos jogos da Copa do Mundo e dispute prêmios com seus amigos.',
 };
 
+import { obterPartidas } from '@/services/partidas.service';
+import { obterRodadaAtiva } from '@/services/rodadas.service';
+
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const session = await obterSessao();
+
+  // Buscar a rodada ativa para calcular o prazo de palpites (limite: 30 minutos antes do primeiro jogo)
+  const rodadaAtiva = await obterRodadaAtiva();
+  let targetDate: string | undefined = undefined;
+  let labelRodada: string | undefined = undefined;
+
+  if (rodadaAtiva) {
+    const partidasDaRodada = await obterPartidas(rodadaAtiva.id);
+    if (partidasDaRodada.length > 0) {
+      const primeiraPartida = partidasDaRodada[0];
+      const dataLimite = new Date(
+        primeiraPartida.dataInicio.getTime() - 30 * 60 * 1000,
+      );
+      targetDate = dataLimite.toISOString();
+      labelRodada = rodadaAtiva.nome;
+    }
+  }
 
   return (
     <html
@@ -48,7 +68,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
-            <TimeoutBanner />
+            <TimeoutBanner targetDate={targetDate} labelRodada={labelRodada} />
             <Header initialSession={session} />
             <main className="flex-1 flex flex-col">{children}</main>
             <Footer />

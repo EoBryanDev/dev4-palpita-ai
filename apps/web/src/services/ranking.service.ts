@@ -1,5 +1,5 @@
 import { db, palpites, partidas, usuarios } from '@palpita/db';
-import { eq, or } from 'drizzle-orm';
+import { and, eq, ne, or } from 'drizzle-orm';
 
 export interface IRankedUser {
   id: string;
@@ -16,7 +16,7 @@ const obterVencedor = (golsA: number, golsB: number): 'A' | 'B' | 'EMPATE' => {
 };
 
 export async function calcularRankingGeral(): Promise<IRankedUser[]> {
-  // 1. Buscar usuários ativos ou liberados
+  // 1. Buscar usuários ativos ou liberados que não sejam ADMIN
   const activeUsers = await db
     .select({
       id: usuarios.id,
@@ -24,7 +24,12 @@ export async function calcularRankingGeral(): Promise<IRankedUser[]> {
       email: usuarios.email,
     })
     .from(usuarios)
-    .where(or(eq(usuarios.status, 'ATIVO'), eq(usuarios.status, 'LIBERADO')));
+    .where(
+      and(
+        or(eq(usuarios.status, 'ATIVO'), eq(usuarios.status, 'LIBERADO')),
+        ne(usuarios.cargo, 'ADMIN'),
+      ),
+    );
 
   // 2. Buscar partidas finalizadas
   const finishedMatches = await db
@@ -72,7 +77,13 @@ export async function calcularRankingGeral(): Promise<IRankedUser[]> {
         const vencedorPalpite = obterVencedor(guess.golsTimeA, guess.golsTimeB);
         const vencedorPartida = obterVencedor(match.golsTimeA, match.golsTimeB);
 
-        if (vencedorPalpite === vencedorPartida) {
+        const acertouPlacarExato =
+          guess.golsTimeA === match.golsTimeA &&
+          guess.golsTimeB === match.golsTimeB;
+
+        if (acertouPlacarExato) {
+          pontos += 2;
+        } else if (vencedorPalpite === vencedorPartida) {
           pontos += 1;
         }
       }

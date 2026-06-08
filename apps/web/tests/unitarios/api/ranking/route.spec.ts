@@ -47,14 +47,14 @@ describe('GET /api/ranking', () => {
     ];
 
     const mockPalpites = [
-      // Alice acertou o vencedor de m1 (A) e m2 (EMPATE) -> 2 pontos
-      { usuarioId: 'u1', partidaId: 'm1', golsTimeA: 3, golsTimeB: 0 },
-      { usuarioId: 'u1', partidaId: 'm2', golsTimeA: 0, golsTimeB: 0 },
-      // Bob acertou m1 (A) mas errou m2 (B) -> 1 ponto
+      // Alice acertou placar exato de m1 (2 pt) e m2 (2 pt) -> 4 pontos
+      { usuarioId: 'u1', partidaId: 'm1', golsTimeA: 2, golsTimeB: 1 },
+      { usuarioId: 'u1', partidaId: 'm2', golsTimeA: 1, golsTimeB: 1 },
+      // Bob acertou placar exato de m1 (2 pt) mas errou m2 (0 pt) -> 2 pontos
       { usuarioId: 'u2', partidaId: 'm1', golsTimeA: 2, golsTimeB: 1 },
       { usuarioId: 'u2', partidaId: 'm2', golsTimeA: 1, golsTimeB: 2 },
-      // Charlie errou ambos (B e B) -> 0 pontos
-      { usuarioId: 'u3', partidaId: 'm1', golsTimeA: 0, golsTimeB: 1 },
+      // Charlie errou m2 (0 pt), mas acertou vencedor de m1 (1 pt) -> 1 ponto
+      { usuarioId: 'u3', partidaId: 'm1', golsTimeA: 3, golsTimeB: 0 },
       { usuarioId: 'u3', partidaId: 'm2', golsTimeA: 1, golsTimeB: 3 },
     ];
 
@@ -84,7 +84,7 @@ describe('GET /api/ranking', () => {
       id: 'u1',
       nome: 'Alice',
       email: 'alice@test.com',
-      pontos: 2,
+      pontos: 4,
       posicao: 1,
     });
 
@@ -93,7 +93,7 @@ describe('GET /api/ranking', () => {
       id: 'u2',
       nome: 'Bob',
       email: 'bob@test.com',
-      pontos: 1,
+      pontos: 2,
       posicao: 2,
     });
 
@@ -102,7 +102,7 @@ describe('GET /api/ranking', () => {
       id: 'u3',
       nome: 'Charlie',
       email: 'charlie@test.com',
-      pontos: 0,
+      pontos: 1,
       posicao: 3,
     });
   });
@@ -119,8 +119,8 @@ describe('GET /api/ranking', () => {
     ];
 
     const mockPalpites = [
-      // Alice e Bob acertaram m1 -> 1 ponto cada
-      { usuarioId: 'u1', partidaId: 'm1', golsTimeA: 2, golsTimeB: 1 },
+      // Alice e Bob acertaram vencedor de m1, mas erraram o placar -> 1 ponto cada
+      { usuarioId: 'u1', partidaId: 'm1', golsTimeA: 3, golsTimeB: 0 },
       { usuarioId: 'u2', partidaId: 'm1', golsTimeA: 1, golsTimeB: 0 },
       // Charlie errou -> 0 pontos
       { usuarioId: 'u3', partidaId: 'm1', golsTimeA: 1, golsTimeB: 1 },

@@ -61,11 +61,32 @@ export function RankingList() {
   // Separar o pódio (3 primeiros)
   const podiumUsers = ranking.slice(0, 3);
   const tableUsers = filteredRanking;
+  const todasPontuacoesZeradas =
+    ranking.length === 0 || ranking.every((user) => user.pontos === 0);
 
   return (
     <div className="space-y-8">
+      {/* Banner de status quando a competição ainda não iniciou */}
+      {todasPontuacoesZeradas && search === '' && (
+        <div className="rounded-3xl border border-zinc-200 bg-white/60 p-8 text-center shadow-lg dark:border-zinc-800 dark:bg-zinc-900/60 backdrop-blur-sm max-w-2xl mx-auto flex flex-col items-center justify-center space-y-4">
+          <div className="rounded-full bg-emerald-50 dark:bg-emerald-950/30 p-4 text-emerald-600 dark:text-emerald-400 animate-pulse">
+            <Trophy className="h-8 w-8" />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
+              Aguardando competição iniciar
+            </h3>
+            <p className="text-sm text-zinc-505 dark:text-zinc-400 mt-2 max-w-md">
+              Os palpites já estão abertos! A classificação e o pódio serão
+              ativados assim que as primeiras partidas forem finalizadas e os
+              pontos forem computados.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Visualização do Pódio (Top 3) */}
-      {podiumUsers.length > 0 && search === '' && (
+      {!todasPontuacoesZeradas && podiumUsers.length > 0 && search === '' && (
         <div className="grid gap-6 md:grid-cols-3 items-end max-w-4xl mx-auto pt-6">
           {/* Segundo Lugar */}
           {podiumUsers[1] && (
@@ -182,12 +203,12 @@ export function RankingList() {
                       <td className="px-6 py-4 text-center font-bold">
                         <span
                           className={`inline-flex items-center justify-center rounded-full w-7 h-7 text-xs ${
-                            isTop3
+                            isTop3 && !todasPontuacoesZeradas
                               ? `bg-zinc-100 dark:bg-zinc-800 ${rankColors}`
                               : 'text-zinc-400'
                           }`}
                         >
-                          {user.posicao}º
+                          {todasPontuacoesZeradas ? '-' : `${user.posicao}º`}
                         </span>
                       </td>
                       <td className="px-6 py-4 font-semibold text-zinc-900 dark:text-zinc-100">

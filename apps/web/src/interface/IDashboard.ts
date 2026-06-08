@@ -37,4 +37,5 @@ export interface IDashboardPalpitesProps {
   nomeRodada: string;
   partidas: IPartidaDashboard[];
   historico: IHistoricoDashboard[];
+  isRodadaBloqueada?: boolean;
 }

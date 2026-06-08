@@ -6,8 +6,17 @@ import Link from 'next/link';
 import type React from 'react';
 import { Button } from './ui/button';
 
-export function TimeoutBanner() {
-  const { timeLeft, mounted, isUrgent } = useCountdown();
+export interface TimeoutBannerProps {
+  targetDate?: string;
+  labelRodada?: string;
+}
+
+export function TimeoutBanner({ targetDate, labelRodada }: TimeoutBannerProps) {
+  const { timeLeft, mounted, isUrgent } = useCountdown(targetDate);
+
+  if (!targetDate) {
+    return null;
+  }
 
   if (!mounted) {
     return (
@@ -37,7 +46,9 @@ export function TimeoutBanner() {
             className={`h-4 w-4 shrink-0 ${isUrgent ? 'animate-pulse text-amber-500' : 'text-emerald-200'}`}
           />
           <span className="text-xs sm:text-sm font-medium">
-            A Copa do Mundo de 2026 começa em:
+            {labelRodada
+              ? `Limite para palpitar na ${labelRodada} termina em:`
+              : 'A Copa do Mundo de 2026 começa em:'}
           </span>
         </div>
 
