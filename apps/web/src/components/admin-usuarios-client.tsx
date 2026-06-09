@@ -241,22 +241,37 @@ export function AdminUsuariosClient({
                   ) : null}
 
                   <div className="flex items-center gap-2 shrink-0">
-                    {!linkAprovado ? (
-                      <Button
-                        size="sm"
-                        disabled={isPending}
-                        onClick={() => handleAprovar(solicitacao.id)}
-                        className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-4 h-9 rounded-xl flex items-center gap-1 transition-all dark:bg-emerald-500 dark:text-zinc-950 dark:hover:bg-emerald-400"
-                      >
+                    <Button
+                      size="sm"
+                      disabled={isPending}
+                      onClick={() => handleAprovar(solicitacao.id)}
+                      className={`font-semibold text-xs px-4 h-9 rounded-xl flex items-center gap-1 transition-all ${
+                        linkAprovado
+                          ? 'border-amber-600/20 text-amber-600 hover:bg-amber-50 dark:border-amber-500/20 dark:text-amber-400 dark:hover:bg-amber-950/20'
+                          : 'bg-emerald-600 hover:bg-emerald-500 text-white dark:bg-emerald-500 dark:text-zinc-950 dark:hover:bg-emerald-400'
+                      }`}
+                      variant={linkAprovado ? 'outline' : undefined}
+                    >
+                      {linkAprovado ? (
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          aria-hidden="true"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                          />
+                        </svg>
+                      ) : (
                         <Check className="h-4 w-4" />
-                        Aprovar
-                      </Button>
-                    ) : (
-                      <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 px-3 py-1 bg-emerald-50 dark:bg-emerald-950/20 rounded-full flex items-center gap-1">
-                        <Check className="h-3.5 w-3.5" />
-                        Aprovado
-                      </span>
-                    )}
+                      )}
+                      {linkAprovado ? 'Reenviar Link' : 'Aprovar'}
+                    </Button>
 
                     <Button
                       variant="outline"

@@ -96,6 +96,9 @@ describe('Ações Administrativas (admin.ts)', () => {
           findFirst: vi.fn(),
         },
       },
+      delete: vi.fn(() => ({
+        where: vi.fn(() => Promise.resolve()),
+      })),
       insert: vi.fn(() => ({
         values: vi.fn(() => ({
           returning: vi.fn(() => Promise.resolve([{ id: 'new-token-uuid' }])),
@@ -159,6 +162,7 @@ describe('Ações Administrativas (admin.ts)', () => {
       const res = await aprovarSolicitacao('user-id');
       expect(res.success).toBe(true);
       expect(res.link).toBe('/validation-user/new-token-uuid');
+      expect(txMock.delete).toHaveBeenCalled();
       expect(txMock.insert).toHaveBeenCalled();
     });
   });
