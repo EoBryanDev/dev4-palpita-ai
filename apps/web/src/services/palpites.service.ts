@@ -1,5 +1,5 @@
 import { db, palpites, usuarios } from '@palpita/db';
-import { and, eq, inArray, or } from 'drizzle-orm';
+import { and, eq, inArray, ne, or } from 'drizzle-orm';
 
 export interface IPalpiteServiceData {
   id: string;
@@ -70,7 +70,12 @@ export async function obterPalpitesUsuariosAtivos(): Promise<
     })
     .from(palpites)
     .innerJoin(usuarios, eq(palpites.usuarioId, usuarios.id))
-    .where(or(eq(usuarios.status, 'ATIVO'), eq(usuarios.status, 'LIBERADO')));
+    .where(
+      and(
+        or(eq(usuarios.status, 'ATIVO'), eq(usuarios.status, 'LIBERADO')),
+        ne(usuarios.cargo, 'ADMIN'),
+      ),
+    );
 
   return dbPalpites;
 }

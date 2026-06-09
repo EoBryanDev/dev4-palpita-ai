@@ -1,5 +1,6 @@
 'use client';
 
+import { FlagImage } from '@/components/ui/flag-image';
 import { PageHeader } from '@/components/ui/page-header';
 import { GitFork, Layers, Trophy } from 'lucide-react';
 import React, { useState } from 'react';
@@ -200,7 +201,11 @@ export default function ChavesClient({ grupos }: IChavesClientProps) {
                       <span className="text-zinc-400 font-mono text-xs w-4">
                         {idx + 1}
                       </span>
-                      <span className="text-xl select-none">{time.emoji}</span>
+                      <FlagImage
+                        emoji={time.emoji}
+                        alt={time.nome}
+                        className="h-6 w-6 shrink-0"
+                      />
                       <span className="font-medium text-zinc-800 dark:text-zinc-200">
                         {time.nome}
                       </span>
@@ -229,14 +234,22 @@ export default function ChavesClient({ grupos }: IChavesClientProps) {
                   className="rounded-xl border border-zinc-200 bg-white p-3.5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 text-xs space-y-2"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 font-medium">
-                      <span>{match.emojiA}</span>
+                    <div className="flex items-center gap-2 font-medium text-zinc-400">
+                      <FlagImage
+                        emoji={match.emojiA}
+                        alt={match.timeA}
+                        className="h-5 w-5 shrink-0"
+                      />
                       <span>{match.timeA}</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-850 pt-2">
-                    <div className="flex items-center gap-2 font-medium">
-                      <span>{match.emojiB}</span>
+                    <div className="flex items-center gap-2 font-medium text-zinc-400">
+                      <FlagImage
+                        emoji={match.emojiB}
+                        alt={match.timeB}
+                        className="h-5 w-5 shrink-0"
+                      />
                       <span>{match.timeB}</span>
                     </div>
                   </div>
@@ -292,13 +305,21 @@ export default function ChavesClient({ grupos }: IChavesClientProps) {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 font-medium text-zinc-400">
-                      <span>{match.emojiA}</span>
+                      <FlagImage
+                        emoji={match.emojiA}
+                        alt={match.timeA}
+                        className="h-5 w-5 shrink-0"
+                      />
                       <span>{match.timeA}</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-850 pt-2">
                     <div className="flex items-center gap-2 font-medium text-zinc-400">
-                      <span>{match.emojiB}</span>
+                      <FlagImage
+                        emoji={match.emojiB}
+                        alt={match.timeB}
+                        className="h-5 w-5 shrink-0"
+                      />
                       <span>{match.timeB}</span>
                     </div>
                   </div>

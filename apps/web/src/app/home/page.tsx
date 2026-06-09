@@ -368,7 +368,7 @@ export default async function HomePage({
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-amber-450 dark:bg-amber-400 animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-amber-500 dark:bg-amber-400 animate-pulse" />
                     1º Lugar (70%)
                   </span>
                   <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">
@@ -381,7 +381,7 @@ export default async function HomePage({
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-zinc-400 dark:bg-zinc-350" />
+                    <span className="w-2 h-2 rounded-full bg-zinc-400 dark:bg-zinc-300" />
                     2º Lugar (20%)
                   </span>
                   <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">
@@ -394,7 +394,7 @@ export default async function HomePage({
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-orange-450 dark:bg-orange-400" />
+                    <span className="w-2 h-2 rounded-full bg-orange-500 dark:bg-orange-400" />
                     3º Lugar (10%)
                   </span>
                   <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">

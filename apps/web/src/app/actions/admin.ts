@@ -9,7 +9,7 @@ import {
   tokensConvite,
   usuarios,
 } from '@palpita/db';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { obterSessao } from './auth';
 
 /**
@@ -66,7 +66,17 @@ export async function aprovarSolicitacao(
         };
       }
 
-      // 2. Gerar o token de convite
+      // 2. Remover tokens não-usados existentes (expirados) para este usuário
+      await tx
+        .delete(tokensConvite)
+        .where(
+          and(
+            eq(tokensConvite.usuarioId, usuarioId),
+            eq(tokensConvite.usado, false),
+          ),
+        );
+
+      // 3. Gerar o token de convite
       const result = await tx
         .insert(tokensConvite)
         .values({

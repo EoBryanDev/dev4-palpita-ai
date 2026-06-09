@@ -1,5 +1,5 @@
 import { db, tokensConvite, usuarios } from '@palpita/db';
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq, ne } from 'drizzle-orm';
 
 export interface IUsuarioResumo {
   id: string;
@@ -36,7 +36,8 @@ export async function obterResumoStatusUsuarios(): Promise<IUsuarioResumo[]> {
       id: usuarios.id,
       status: usuarios.status,
     })
-    .from(usuarios);
+    .from(usuarios)
+    .where(ne(usuarios.cargo, 'ADMIN'));
 
   return dbUsers;
 }
