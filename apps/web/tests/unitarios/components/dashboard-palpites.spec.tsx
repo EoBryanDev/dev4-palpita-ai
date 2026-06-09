@@ -30,6 +30,14 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
+vi.mock('@/hooks/use-countdown', () => ({
+  useCountdown: () => ({
+    timeLeft: { days: 5, hours: 12, minutes: 30, seconds: 0, isExpired: false },
+    mounted: true,
+    isUrgent: false,
+  }),
+}));
+
 const defaultProps = {
   nomeUsuario: 'Competidor Teste',
   emailUsuario: 'user@test.com',
@@ -37,25 +45,33 @@ const defaultProps = {
   userStatus: 'LIBERADO',
   pontos: 5,
   posicao: 3,
-  nomeRodada: 'Fase de Grupos - Rodada 1',
-  partidas: [
+  isTudoBloqueado: false,
+  rodadas: [
     {
-      id: 'partida-1',
-      timeA: 'Argentina',
-      timeB: 'França',
-      dataInicio: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(), // Futuro daqui a 1 dia
-      status: 'AGENDADO',
-      jaPalpitou: false,
-    },
-    {
-      id: 'partida-2',
-      timeA: 'Alemanha',
-      timeB: 'Espanha',
-      dataInicio: new Date(Date.now() + 1000 * 60 * 60 * 48).toISOString(), // Futuro daqui a 2 dias
-      status: 'AGENDADO',
-      palpiteGolsA: 2,
-      palpiteGolsB: 2,
-      jaPalpitou: true,
+      id: 'rodada-1',
+      numero: 1,
+      nome: 'Fase de Grupos - Rodada 1',
+      partidas: [
+        {
+          id: 'partida-1',
+          timeA: 'Argentina',
+          timeB: 'França',
+          dataInicio: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(), // Futuro daqui a 1 dia
+          status: 'AGENDADO',
+          jaPalpitou: false,
+        },
+        {
+          id: 'partida-2',
+          timeA: 'Alemanha',
+          timeB: 'Espanha',
+          dataInicio: new Date(Date.now() + 1000 * 60 * 60 * 48).toISOString(), // Futuro daqui a 2 dias
+          status: 'AGENDADO',
+          palpiteGolsA: 2,
+          palpiteGolsB: 2,
+          jaPalpitou: true,
+          rodadaNome: 'Fase de Grupos - Rodada 1',
+        },
+      ],
     },
   ],
   historico: [
@@ -71,7 +87,6 @@ const defaultProps = {
       dataInicio: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // Passado
     },
   ],
-  isRodadaBloqueada: false,
 };
 
 describe('DashboardPalpites Component', () => {
@@ -85,7 +100,7 @@ describe('DashboardPalpites Component', () => {
     expect(screen.getByText('5 Pontos')).toBeDefined();
     expect(screen.getByText('#3')).toBeDefined();
     expect(screen.getByText('Apostas Liberadas')).toBeDefined();
-    expect(screen.getByText('Fase de Grupos - Rodada 1')).toBeDefined();
+    expect(screen.getAllByText('Fase de Grupos - Rodada 1').length).toBe(2);
   });
 
   it('deve exibir um aviso e desabilitar formulário se o status for ATIVO (ou seja, pendente de liberação de apostas)', () => {
@@ -110,9 +125,10 @@ describe('DashboardPalpites Component', () => {
     expect(screen.getByText('Argentina')).toBeDefined();
     expect(screen.getByText('França')).toBeDefined();
 
-    // Palpite salvos: Alemanha vs Espanha
+    // Palpite salvos: Alemanha vs Espanha (lista única com badge da rodada)
     expect(screen.getByText('Alemanha')).toBeDefined();
     expect(screen.getByText('Espanha')).toBeDefined();
+    expect(screen.getAllByText('Fase de Grupos - Rodada 1').length).toBe(2);
   });
 
   it('deve listar o histórico de palpites concluídos com sucesso', () => {

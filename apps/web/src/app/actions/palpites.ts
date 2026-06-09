@@ -45,12 +45,11 @@ export async function salvarPalpite(
       };
     }
 
-    // 3. Buscar a partida para validar o prazo
+    // 3. Buscar a partida para validar o prazo global
     const match = await db
       .select({
         dataInicio: partidas.dataInicio,
         status: partidas.status,
-        rodadaId: partidas.rodadaId,
       })
       .from(partidas)
       .where(eq(partidas.id, partidaId))
@@ -60,30 +59,26 @@ export async function salvarPalpite(
       return { success: false, message: 'Partida não encontrada.' };
     }
 
-    // Buscar a primeira partida desta rodada para estabelecer o limite de tempo
-    const rodadaId = match[0].rodadaId;
-    const partidasDaRodada = await db
+    // Buscar a primeira partida de todo o torneio para estabelecer o prazo limite global
+    const primeiraPartidaTorneio = await db
       .select({ dataInicio: partidas.dataInicio })
       .from(partidas)
-      .where(eq(partidas.rodadaId, rodadaId))
       .orderBy(partidas.dataInicio)
       .limit(1);
 
-    if (partidasDaRodada.length === 0) {
-      return { success: false, message: 'Partidas da rodada não encontradas.' };
+    if (primeiraPartidaTorneio.length === 0) {
+      return { success: false, message: 'Nenhuma partida encontrada.' };
     }
 
-    const primeiraPartida = partidasDaRodada[0];
     const dataLimite = new Date(
-      new Date(primeiraPartida.dataInicio).getTime() - 30 * 60 * 1000,
+      new Date(primeiraPartidaTorneio[0].dataInicio).getTime() - 30 * 60 * 1000,
     );
-    const agora = new Date();
 
-    if (agora >= dataLimite) {
+    if (new Date() >= dataLimite) {
       return {
         success: false,
         message:
-          'O prazo para palpitar nesta rodada expirou (palpites fechados 30 minutos antes do primeiro jogo da rodada).',
+          'O prazo para palpitar expirou (palpites fechados 30 minutos antes do primeiro jogo da Copa do Mundo).',
       };
     }
 

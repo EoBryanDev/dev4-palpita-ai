@@ -1,5 +1,5 @@
 import { db, rodadas } from '@palpita/db';
-import { desc, eq } from 'drizzle-orm';
+import { asc, desc, eq } from 'drizzle-orm';
 
 export interface IRodada {
   id: string;
@@ -12,7 +12,7 @@ export async function obterRodadas(): Promise<IRodada[]> {
   const dbRodadas = await db
     .select()
     .from(rodadas)
-    .orderBy(desc(rodadas.numero));
+    .orderBy(asc(rodadas.numero));
 
   return dbRodadas.map((r) => ({
     id: r.id,

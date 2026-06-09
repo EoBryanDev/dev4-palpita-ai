@@ -3,11 +3,12 @@ import { DashboardPalpites } from '@/components/dashboard-palpites';
 import type {
   IHistoricoDashboard,
   IPartidaDashboard,
+  IRodadaDashboard,
 } from '@/interface/IDashboard';
 import { obterPalpitesUsuario } from '@/services/palpites.service';
 import { obterPartidas } from '@/services/partidas.service';
 import { calcularRankingGeral } from '@/services/ranking.service';
-import { obterRodadaAtiva } from '@/services/rodadas.service';
+import { obterRodadas } from '@/services/rodadas.service';
 import { obterUsuarioPorId } from '@/services/usuarios.service';
 import { redirect } from 'next/navigation';
 
@@ -24,32 +25,10 @@ export default async function MeuEspacoPage() {
     redirect('/login');
   }
 
-  // 3. Buscar rodada ativa
-  const rodadaAtiva = await obterRodadaAtiva();
-  let rodadaId = '';
-  let nomeRodada = 'Nenhuma rodada ativa';
+  // 3. Buscar todas as rodadas
+  const todasRodadas = await obterRodadas();
 
-  if (rodadaAtiva) {
-    rodadaId = rodadaAtiva.id;
-    nomeRodada = rodadaAtiva.nome;
-  }
-
-  // 4. Buscar partidas da rodada selecionada
-  let partidasDaRodada: Awaited<ReturnType<typeof obterPartidas>> = [];
-  let isRodadaBloqueada = false;
-
-  if (rodadaId) {
-    partidasDaRodada = await obterPartidas(rodadaId);
-    if (partidasDaRodada.length > 0) {
-      const primeiraPartida = partidasDaRodada[0];
-      const dataLimite = new Date(
-        primeiraPartida.dataInicio.getTime() - 30 * 60 * 1000,
-      );
-      isRodadaBloqueada = new Date() >= dataLimite;
-    }
-  }
-
-  // 5. Buscar palpites do usuário logado para todas as partidas
+  // 4. Buscar palpites do usuário logado para todas as partidas
   const todosPalpitesUsuario = await obterPalpitesUsuario(session.id);
 
   const palpitesMap = new Map<string, (typeof todosPalpitesUsuario)[number]>();
@@ -57,28 +36,58 @@ export default async function MeuEspacoPage() {
     palpitesMap.set(p.partidaId, p);
   }
 
-  // 6. Enriquecer partidas da rodada para o dashboard
-  const partidasEnriquecidas: IPartidaDashboard[] = partidasDaRodada.map(
-    (partida) => {
-      const palpite = palpitesMap.get(partida.id);
-      return {
-        id: partida.id,
-        timeA: partida.timeA,
-        timeB: partida.timeB,
-        timeAEmoji: partida.timeAEmoji,
-        timeBEmoji: partida.timeBEmoji,
-        dataInicio: partida.dataInicio.toISOString(),
-        status: partida.status,
-        golsTimeA: partida.golsTimeA,
-        golsTimeB: partida.golsTimeB,
-        palpiteGolsA: palpite ? palpite.golsTimeA : null,
-        palpiteGolsB: palpite ? palpite.golsTimeB : null,
-        jaPalpitou: !!palpite,
-      };
-    },
-  );
+  // 5. Buscar todas as partidas e calcular prazo limite global
+  const todasPartidas = await obterPartidas();
+  let prazoLimite: string | undefined;
+  let isTudoBloqueado = false;
 
-  // 7. Calcular pontuação e ranking geral (lógica sincronizada com API/ranking)
+  if (todasPartidas.length > 0) {
+    const primeiraPartida = todasPartidas[0];
+    const deadline = new Date(
+      primeiraPartida.dataInicio.getTime() - 30 * 60 * 1000,
+    );
+    prazoLimite = deadline.toISOString();
+    isTudoBloqueado = new Date() >= deadline;
+  }
+
+  // 6. Enriquecer partidas por rodada
+  const rodadasDashboard: IRodadaDashboard[] = [];
+
+  for (const rodada of todasRodadas) {
+    const partidasDaRodada = todasPartidas.filter(
+      (p) => p.rodadaId === rodada.id,
+    );
+
+    const partidasEnriquecidas: IPartidaDashboard[] = partidasDaRodada.map(
+      (partida) => {
+        const palpite = palpitesMap.get(partida.id);
+        return {
+          id: partida.id,
+          timeA: partida.timeA,
+          timeB: partida.timeB,
+          timeAEmoji: partida.timeAEmoji,
+          timeBEmoji: partida.timeBEmoji,
+          dataInicio: partida.dataInicio.toISOString(),
+          status: partida.status,
+          golsTimeA: partida.golsTimeA,
+          golsTimeB: partida.golsTimeB,
+          palpiteGolsA: palpite ? palpite.golsTimeA : null,
+          palpiteGolsB: palpite ? palpite.golsTimeB : null,
+          jaPalpitou: !!palpite,
+          rodadaNome: rodada.nome,
+        };
+      },
+    );
+
+    rodadasDashboard.push({
+      id: rodada.id,
+      numero: rodada.numero,
+      nome: rodada.nome,
+      partidas: partidasEnriquecidas,
+    });
+  }
+
+  // 6. Calcular pontuação e ranking geral
   const rankedUsers = await calcularRankingGeral();
   const userRank = rankedUsers.find((u) => u.id === session.id);
   const userPontos = userRank ? userRank.pontos : 0;
@@ -93,8 +102,8 @@ export default async function MeuEspacoPage() {
     return 'EMPATE';
   };
 
-  // 8. Histórico de palpites do competidor (jogos finalizados que ele palpitou)
-  const todasPartidasFinalizadas = (await obterPartidas()).filter(
+  // 8. Histórico de palpites do competidor (reusing todasPartidas from step 5)
+  const todasPartidasFinalizadas = todasPartidas.filter(
     (p) => p.status === 'FINALIZADO',
   );
 
@@ -142,10 +151,10 @@ export default async function MeuEspacoPage() {
       userStatus={user.status}
       pontos={userPontos}
       posicao={userPosicao}
-      nomeRodada={nomeRodada}
-      partidas={partidasEnriquecidas}
+      rodadas={rodadasDashboard}
       historico={historico}
-      isRodadaBloqueada={isRodadaBloqueada}
+      prazoLimite={prazoLimite}
+      isTudoBloqueado={isTudoBloqueado}
     />
   );
 }

@@ -12,18 +12,21 @@ import {
   Clock,
   Save,
   ShieldCheck,
+  Timer,
   Trophy,
 } from 'lucide-react';
 import type React from 'react';
+
+import { useCountdown } from '@/hooks/use-countdown';
 
 export function DashboardPalpites({
   userStatus,
   pontos,
   posicao,
-  nomeRodada,
-  partidas,
+  rodadas,
   historico,
-  isRodadaBloqueada = false,
+  prazoLimite,
+  isTudoBloqueado,
 }: IDashboardPalpitesProps): React.ReactNode {
   const {
     valoresPalpites,
@@ -34,20 +37,14 @@ export function DashboardPalpites({
   } = useDashboardPalpites();
 
   const isUsuarioLiberado = userStatus === 'LIBERADO';
-  const isInputHabilitado = isUsuarioLiberado && !isRodadaBloqueada;
+  const isInputHabilitado = isUsuarioLiberado && !isTudoBloqueado;
+  const { timeLeft, mounted, isUrgent } = useCountdown(prazoLimite);
 
   const formatarData = (dataStr: string) => {
     return formatToBRLDateTimeShort(new Date(dataStr));
   };
 
-  // Filtragem de partidas da rodada
-  const partidasFuturas = partidas.filter((p) => {
-    const dataInicio = new Date(p.dataInicio);
-    return dataInicio > new Date() && p.status !== 'FINALIZADO';
-  });
-
-  const palpitesPendentes = partidasFuturas.filter((p) => !p.jaPalpitou);
-  const palpitesSalvos = partidasFuturas.filter((p) => p.jaPalpitou);
+  const formatNumber = (num: number) => String(num).padStart(2, '0');
 
   return (
     <div className="min-h-screen bg-zinc-50 transition-colors dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 pb-16">
@@ -103,249 +100,366 @@ export function DashboardPalpites({
           />
         </div>
 
-        {/* Rodada Selecionada */}
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-black tracking-tight">{nomeRodada}</h2>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              {isRodadaBloqueada
-                ? 'Os palpites para esta rodada foram encerrados.'
-                : 'Preencha seus placares para os próximos jogos da rodada.'}
-            </p>
+        {/* Countdown Banner */}
+        {prazoLimite && !isTudoBloqueado && mounted && !timeLeft.isExpired && (
+          <div
+            className={`mb-8 p-4 rounded-2xl border transition-all duration-300 flex flex-col sm:flex-row items-center justify-between gap-3 ${
+              isUrgent
+                ? 'border-amber-200 bg-amber-50/50 dark:border-amber-900/30 dark:bg-amber-950/20'
+                : 'border-emerald-200 bg-emerald-50/50 dark:border-emerald-900/30 dark:bg-emerald-950/20'
+            }`}
+          >
+            <div className="flex items-center gap-2 text-center sm:text-left">
+              <Timer
+                className={`h-5 w-5 shrink-0 ${
+                  isUrgent ? 'animate-pulse text-amber-500' : 'text-emerald-500'
+                }`}
+              />
+              <span
+                className={`text-sm font-bold ${
+                  isUrgent
+                    ? 'text-amber-700 dark:text-amber-400'
+                    : 'text-emerald-700 dark:text-emerald-400'
+                }`}
+              >
+                Prazo para palpitar termina em:
+              </span>
+            </div>
+            <div className="flex items-center gap-1 font-mono text-sm sm:text-base font-bold">
+              <div className="flex flex-col items-center">
+                <span className="bg-black/5 dark:bg-white/10 px-2 py-0.5 rounded-md min-w-[28px] text-center">
+                  {formatNumber(timeLeft.days)}
+                </span>
+                <span className="text-[8px] uppercase font-sans font-normal opacity-70 mt-0.5">
+                  d
+                </span>
+              </div>
+              <span className="pb-3 text-zinc-300 dark:text-zinc-600">:</span>
+              <div className="flex flex-col items-center">
+                <span className="bg-black/5 dark:bg-white/10 px-2 py-0.5 rounded-md min-w-[28px] text-center">
+                  {formatNumber(timeLeft.hours)}
+                </span>
+                <span className="text-[8px] uppercase font-sans font-normal opacity-70 mt-0.5">
+                  h
+                </span>
+              </div>
+              <span className="pb-3 text-zinc-300 dark:text-zinc-600">:</span>
+              <div className="flex flex-col items-center">
+                <span className="bg-black/5 dark:bg-white/10 px-2 py-0.5 rounded-md min-w-[28px] text-center">
+                  {formatNumber(timeLeft.minutes)}
+                </span>
+                <span className="text-[8px] uppercase font-sans font-normal opacity-70 mt-0.5">
+                  m
+                </span>
+              </div>
+              <span className="pb-3 text-zinc-300 dark:text-zinc-600">:</span>
+              <div className="flex flex-col items-center">
+                <span className="bg-black/5 dark:bg-white/10 px-2 py-0.5 rounded-md min-w-[28px] text-center">
+                  {formatNumber(timeLeft.seconds)}
+                </span>
+                <span className="text-[8px] uppercase font-sans font-normal opacity-70 mt-0.5">
+                  s
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Aviso de Rodada Bloqueada */}
-        {isRodadaBloqueada && (
+        {/* Banner de bloqueio global */}
+        {isTudoBloqueado && (
           <div className="mb-8 p-4 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:border-zinc-800/30 dark:bg-zinc-900/20 text-zinc-700 dark:text-zinc-400 flex items-start gap-3">
-            <Clock className="h-5 w-5 mt-0.5 shrink-0 text-zinc-500" />
+            <Timer className="h-5 w-5 mt-0.5 shrink-0 text-zinc-500" />
             <div>
-              <h4 className="font-bold text-sm">
-                Palpites encerrados para esta rodada
-              </h4>
+              <h4 className="font-bold text-sm">Palpites encerrados</h4>
               <p className="text-xs mt-1">
-                O prazo limite para palpitar nesta rodada expirou (bloqueado 30
-                minutos antes do início do primeiro jogo).
+                O prazo limite para palpitar expirou (bloqueado 30 minutos antes
+                do início do primeiro jogo da Copa do Mundo).
               </p>
             </div>
           </div>
         )}
 
-        {/* Listagem de Palpites */}
+        {/* Listagem de Palpites por Rodada */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Coluna 1 & 2: Palpites (Pendentes e Salvos) */}
-          <div className="lg:col-span-2 space-y-10">
-            {/* Palpites Pendentes */}
-            <div>
-              <h3 className="text-md font-bold mb-4 flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-amber-500" />
-                Palpites Pendentes ({palpitesPendentes.length})
-              </h3>
+          <div className="lg:col-span-2 space-y-16">
+            {rodadas.map((rodada) => {
+              const partidasFuturas = rodada.partidas.filter((p) => {
+                const dataInicio = new Date(p.dataInicio);
+                return dataInicio > new Date() && p.status !== 'FINALIZADO';
+              });
 
-              {palpitesPendentes.length === 0 ? (
-                <div className="rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800 p-8 text-center bg-white/40 dark:bg-zinc-900/10">
-                  <CheckCircle2 className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
-                  <p className="text-sm font-semibold">Tudo em dia!</p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                    Você já palpitou em todos os próximos jogos desta rodada.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {palpitesPendentes.map((partida) => (
-                    <div
-                      key={partida.id}
-                      className="rounded-3xl border border-zinc-200/80 bg-white p-5 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/30 flex flex-col md:flex-row md:items-center justify-between gap-4"
-                    >
-                      <div className="flex flex-col gap-1.5">
-                        <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {formatarData(partida.dataInicio)}
-                        </span>
-                        <div className="flex items-center gap-3 select-none">
-                          {partida.timeAEmoji && (
-                            <FlagImage
-                              emoji={partida.timeAEmoji}
-                              alt={partida.timeA}
-                              className="h-5 w-5"
-                            />
-                          )}
-                          <span className="text-sm font-bold">
-                            {partida.timeA}
-                          </span>
-                          <span className="text-xs text-zinc-400 font-semibold">
-                            vs
-                          </span>
-                          {partida.timeBEmoji && (
-                            <FlagImage
-                              emoji={partida.timeBEmoji}
-                              alt={partida.timeB}
-                              className="h-5 w-5"
-                            />
-                          )}
-                          <span className="text-sm font-bold">
-                            {partida.timeB}
-                          </span>
-                        </div>
-                      </div>
+              const palpitesPendentes = partidasFuturas.filter(
+                (p) => !p.jaPalpitou,
+              );
 
-                      <div className="flex items-center gap-4">
-                        {/* Inputs Placar */}
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="text"
-                            maxLength={2}
-                            placeholder="0"
-                            disabled={!isInputHabilitado || isPending}
-                            value={valoresPalpites[partida.id]?.golsA ?? ''}
-                            onChange={(e) =>
-                              handleInputChange(partida.id, 'A', e.target.value)
-                            }
-                            className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50"
-                          />
-                          <span className="text-zinc-400 font-bold">:</span>
-                          <input
-                            type="text"
-                            maxLength={2}
-                            placeholder="0"
-                            disabled={!isInputHabilitado || isPending}
-                            value={valoresPalpites[partida.id]?.golsB ?? ''}
-                            onChange={(e) =>
-                              handleInputChange(partida.id, 'B', e.target.value)
-                            }
-                            className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50"
-                          />
-                        </div>
-
-                        {/* Botão Salvar */}
-                        <div className="flex flex-col gap-1">
-                          <Button
-                            size="sm"
-                            disabled={!isInputHabilitado || isPending}
-                            onClick={() => handleSalvar(partida.id, partida)}
-                            className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-4 h-10 rounded-xl flex items-center gap-1.5 transition-all dark:bg-emerald-500 dark:text-zinc-950 dark:hover:bg-emerald-400 disabled:opacity-50"
-                          >
-                            <Save className="h-4 w-4" />
-                            Salvar
-                          </Button>
-                        </div>
-                      </div>
+              return (
+                <div key={rodada.id}>
+                  {/* Cabeçalho da Rodada */}
+                  <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <h2 className="text-lg font-black tracking-tight">
+                        {rodada.nome}
+                      </h2>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                  </div>
 
-            {/* Palpites Salvos */}
-            <div>
-              <h3 className="text-md font-bold mb-4 flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                Meus Palpites Salvos ({palpitesSalvos.length})
-              </h3>
+                  {/* Palpites Pendentes */}
+                  <div>
+                    <h3 className="text-md font-bold mb-4 flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-amber-500" />
+                      Palpites Pendentes ({palpitesPendentes.length})
+                    </h3>
 
-              {palpitesSalvos.length === 0 ? (
-                <div className="rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800 p-8 text-center bg-white/40 dark:bg-zinc-900/10 text-zinc-400 dark:text-zinc-600">
-                  <p className="text-xs">
-                    Nenhum palpite salvo para os próximos jogos.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {palpitesSalvos.map((partida) => {
-                    const novosValores = valoresPalpites[partida.id];
-                    const golsA =
-                      novosValores?.golsA ?? String(partida.palpiteGolsA ?? '');
-                    const golsB =
-                      novosValores?.golsB ?? String(partida.palpiteGolsB ?? '');
-
-                    return (
-                      <div
-                        key={partida.id}
-                        className="rounded-3xl border border-zinc-200/80 bg-white p-5 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/30 flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 border-l-emerald-500"
-                      >
-                        <div className="flex flex-col gap-1.5">
-                          <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {formatarData(partida.dataInicio)}
-                          </span>
-                          <div className="flex items-center gap-3 select-none">
-                            {partida.timeAEmoji && (
-                              <FlagImage
-                                emoji={partida.timeAEmoji}
-                                alt={partida.timeA}
-                                className="h-5 w-5"
-                              />
-                            )}
-                            <span className="text-sm font-bold">
-                              {partida.timeA}
-                            </span>
-                            <span className="text-xs text-zinc-400 font-semibold">
-                              vs
-                            </span>
-                            {partida.timeBEmoji && (
-                              <FlagImage
-                                emoji={partida.timeBEmoji}
-                                alt={partida.timeB}
-                                className="h-5 w-5"
-                              />
-                            )}
-                            <span className="text-sm font-bold">
-                              {partida.timeB}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                          {/* Inputs Placar */}
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              maxLength={2}
-                              disabled={!isInputHabilitado || isPending}
-                              value={golsA}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  partida.id,
-                                  'A',
-                                  e.target.value,
-                                )
-                              }
-                              className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50"
-                            />
-                            <span className="text-zinc-400 font-bold">:</span>
-                            <input
-                              type="text"
-                              maxLength={2}
-                              disabled={!isInputHabilitado || isPending}
-                              value={golsB}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  partida.id,
-                                  'B',
-                                  e.target.value,
-                                )
-                              }
-                              className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50"
-                            />
-                          </div>
-
-                          {/* Botão Alterar */}
-                          <Button
-                            size="sm"
-                            disabled={!isInputHabilitado || isPending}
-                            onClick={() => handleSalvar(partida.id, partida)}
-                            className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold text-xs px-4 h-10 rounded-xl flex items-center gap-1.5 transition-all dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 disabled:opacity-50"
-                          >
-                            <Save className="h-4 w-4" />
-                            Alterar
-                          </Button>
-                        </div>
+                    {palpitesPendentes.length === 0 ? (
+                      <div className="rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800 p-8 text-center bg-white/40 dark:bg-zinc-900/10">
+                        <CheckCircle2 className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
+                        <p className="text-sm font-semibold">Tudo em dia!</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                          Você já palpitou em todos os próximos jogos desta
+                          rodada.
+                        </p>
                       </div>
-                    );
-                  })}
+                    ) : (
+                      <div className="space-y-4">
+                        {palpitesPendentes.map((partida) => (
+                          <div
+                            key={partida.id}
+                            className="rounded-3xl border border-zinc-200/80 bg-white p-5 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/30 flex flex-col md:flex-row md:items-center justify-between gap-4"
+                          >
+                            <div className="flex flex-col gap-1.5">
+                              <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {formatarData(partida.dataInicio)}
+                              </span>
+                              <div className="flex items-center gap-3 select-none">
+                                {partida.timeAEmoji && (
+                                  <FlagImage
+                                    emoji={partida.timeAEmoji}
+                                    alt={partida.timeA}
+                                    className="h-5 w-5"
+                                  />
+                                )}
+                                <span className="text-sm font-bold">
+                                  {partida.timeA}
+                                </span>
+                                <span className="text-xs text-zinc-400 font-semibold">
+                                  vs
+                                </span>
+                                {partida.timeBEmoji && (
+                                  <FlagImage
+                                    emoji={partida.timeBEmoji}
+                                    alt={partida.timeB}
+                                    className="h-5 w-5"
+                                  />
+                                )}
+                                <span className="text-sm font-bold">
+                                  {partida.timeB}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-4">
+                              {/* Inputs Placar */}
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  maxLength={2}
+                                  placeholder="0"
+                                  disabled={!isInputHabilitado || isPending}
+                                  value={
+                                    valoresPalpites[partida.id]?.golsA ?? ''
+                                  }
+                                  onChange={(e) =>
+                                    handleInputChange(
+                                      partida.id,
+                                      'A',
+                                      e.target.value,
+                                    )
+                                  }
+                                  className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50"
+                                />
+                                <span className="text-zinc-400 font-bold">
+                                  :
+                                </span>
+                                <input
+                                  type="text"
+                                  maxLength={2}
+                                  placeholder="0"
+                                  disabled={!isInputHabilitado || isPending}
+                                  value={
+                                    valoresPalpites[partida.id]?.golsB ?? ''
+                                  }
+                                  onChange={(e) =>
+                                    handleInputChange(
+                                      partida.id,
+                                      'B',
+                                      e.target.value,
+                                    )
+                                  }
+                                  className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50"
+                                />
+                              </div>
+
+                              {/* Botão Salvar */}
+                              <div className="flex flex-col gap-1">
+                                <Button
+                                  size="sm"
+                                  disabled={!isInputHabilitado || isPending}
+                                  onClick={() =>
+                                    handleSalvar(partida.id, partida)
+                                  }
+                                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-4 h-10 rounded-xl flex items-center gap-1.5 transition-all dark:bg-emerald-500 dark:text-zinc-950 dark:hover:bg-emerald-400 disabled:opacity-50"
+                                >
+                                  <Save className="h-4 w-4" />
+                                  Salvar
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
-            </div>
+              );
+            })}
+
+            {/* Meus Palpites Salvos — lista única */}
+            {(() => {
+              const palpitesSalvos = rodadas.flatMap((r) =>
+                r.partidas.filter((p) => {
+                  const dataInicio = new Date(p.dataInicio);
+                  return (
+                    dataInicio > new Date() &&
+                    p.status !== 'FINALIZADO' &&
+                    p.jaPalpitou
+                  );
+                }),
+              );
+
+              return (
+                <div>
+                  <h2 className="text-lg font-black tracking-tight mb-4">
+                    Meus Palpites Salvos ({palpitesSalvos.length})
+                  </h2>
+
+                  {palpitesSalvos.length === 0 ? (
+                    <div className="rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800 p-8 text-center bg-white/40 dark:bg-zinc-900/10 text-zinc-400 dark:text-zinc-600">
+                      <p className="text-xs">
+                        Nenhum palpite salvo para os próximos jogos.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {palpitesSalvos.map((partida) => {
+                        const novosValores = valoresPalpites[partida.id];
+                        const golsA =
+                          novosValores?.golsA ??
+                          String(partida.palpiteGolsA ?? '');
+                        const golsB =
+                          novosValores?.golsB ??
+                          String(partida.palpiteGolsB ?? '');
+
+                        return (
+                          <div
+                            key={partida.id}
+                            className="rounded-3xl border border-zinc-200/80 bg-white p-5 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/30 flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 border-l-emerald-500"
+                          >
+                            <div className="flex flex-col gap-1.5">
+                              <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {formatarData(partida.dataInicio)}
+                              </span>
+                              {partida.rodadaNome && (
+                                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 rounded-full self-start">
+                                  {partida.rodadaNome}
+                                </span>
+                              )}
+                              <div className="flex items-center gap-3 select-none">
+                                {partida.timeAEmoji && (
+                                  <FlagImage
+                                    emoji={partida.timeAEmoji}
+                                    alt={partida.timeA}
+                                    className="h-5 w-5"
+                                  />
+                                )}
+                                <span className="text-sm font-bold">
+                                  {partida.timeA}
+                                </span>
+                                <span className="text-xs text-zinc-400 font-semibold">
+                                  vs
+                                </span>
+                                {partida.timeBEmoji && (
+                                  <FlagImage
+                                    emoji={partida.timeBEmoji}
+                                    alt={partida.timeB}
+                                    className="h-5 w-5"
+                                  />
+                                )}
+                                <span className="text-sm font-bold">
+                                  {partida.timeB}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-4">
+                              {/* Inputs Placar */}
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  maxLength={2}
+                                  disabled={!isInputHabilitado || isPending}
+                                  value={golsA}
+                                  onChange={(e) =>
+                                    handleInputChange(
+                                      partida.id,
+                                      'A',
+                                      e.target.value,
+                                    )
+                                  }
+                                  className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50"
+                                />
+                                <span className="text-zinc-400 font-bold">
+                                  :
+                                </span>
+                                <input
+                                  type="text"
+                                  maxLength={2}
+                                  disabled={!isInputHabilitado || isPending}
+                                  value={golsB}
+                                  onChange={(e) =>
+                                    handleInputChange(
+                                      partida.id,
+                                      'B',
+                                      e.target.value,
+                                    )
+                                  }
+                                  className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50"
+                                />
+                              </div>
+
+                              {/* Botão Alterar */}
+                              <Button
+                                size="sm"
+                                disabled={!isInputHabilitado || isPending}
+                                onClick={() =>
+                                  handleSalvar(partida.id, partida)
+                                }
+                                className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold text-xs px-4 h-10 rounded-xl flex items-center gap-1.5 transition-all dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 disabled:opacity-50"
+                              >
+                                <Save className="h-4 w-4" />
+                                Alterar
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Coluna 3: Histórico de Palpites (Partidas Finalizadas) */}

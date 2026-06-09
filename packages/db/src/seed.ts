@@ -106,6 +106,54 @@ async function seed() {
       console.log('Rodada 1 já existe.');
     }
 
+    // Rodada 2
+    const rodada2Existente = await db
+      .select()
+      .from(rodadas)
+      .where(eq(rodadas.numero, 2))
+      .limit(1);
+
+    let rodada2Id = '';
+    if (rodada2Existente.length === 0) {
+      const result = await db
+        .insert(rodadas)
+        .values({
+          numero: 2,
+          nome: 'Fase de Grupos - Rodada 2',
+          ativa: true,
+        })
+        .returning({ id: rodadas.id });
+      rodada2Id = result[0].id;
+      console.log('Rodada 2 criada.');
+    } else {
+      rodada2Id = rodada2Existente[0].id;
+      console.log('Rodada 2 já existe.');
+    }
+
+    // Rodada 3
+    const rodada3Existente = await db
+      .select()
+      .from(rodadas)
+      .where(eq(rodadas.numero, 3))
+      .limit(1);
+
+    let rodada3Id = '';
+    if (rodada3Existente.length === 0) {
+      const result = await db
+        .insert(rodadas)
+        .values({
+          numero: 3,
+          nome: 'Fase de Grupos - Rodada 3',
+          ativa: true,
+        })
+        .returning({ id: rodadas.id });
+      rodada3Id = result[0].id;
+      console.log('Rodada 3 criada.');
+    } else {
+      rodada3Id = rodada3Existente[0].id;
+      console.log('Rodada 3 já existe.');
+    }
+
     // Limpar partidas, palpites e times antigos para rodar o seed de forma limpa
     await db.delete(palpites);
     await db.delete(partidas);
@@ -457,6 +505,280 @@ async function seed() {
     }
 
     console.log('Todas as partidas da Rodada 1 criadas.');
+
+    // 5b. Criar Partidas da Rodada 2
+    const rodada2Partidas = [
+      {
+        timeA: 'República Tcheca',
+        timeB: 'África do Sul',
+        dataInicio: new Date('2026-06-18T13:00:00-03:00'),
+      },
+      {
+        timeA: 'Suíça',
+        timeB: 'Bósnia',
+        dataInicio: new Date('2026-06-18T16:00:00-03:00'),
+      },
+      {
+        timeA: 'Canadá',
+        timeB: 'Catar',
+        dataInicio: new Date('2026-06-18T19:00:00-03:00'),
+      },
+      {
+        timeA: 'México',
+        timeB: 'Coreia do Sul',
+        dataInicio: new Date('2026-06-18T22:00:00-03:00'),
+      },
+      {
+        timeA: 'Turquia',
+        timeB: 'Paraguai',
+        dataInicio: new Date('2026-06-19T00:00:00-03:00'),
+      },
+      {
+        timeA: 'Estados Unidos',
+        timeB: 'Austrália',
+        dataInicio: new Date('2026-06-19T16:00:00-03:00'),
+      },
+      {
+        timeA: 'Escócia',
+        timeB: 'Marrocos',
+        dataInicio: new Date('2026-06-19T19:00:00-03:00'),
+      },
+      {
+        timeA: 'Brasil',
+        timeB: 'Haiti',
+        dataInicio: new Date('2026-06-19T21:30:00-03:00'),
+      },
+      {
+        timeA: 'Holanda',
+        timeB: 'Suécia',
+        dataInicio: new Date('2026-06-20T14:00:00-03:00'),
+      },
+      {
+        timeA: 'Alemanha',
+        timeB: 'Costa do Marfim',
+        dataInicio: new Date('2026-06-20T17:00:00-03:00'),
+      },
+      {
+        timeA: 'Equador',
+        timeB: 'Curaçao',
+        dataInicio: new Date('2026-06-20T21:00:00-03:00'),
+      },
+      {
+        timeA: 'Tunísia',
+        timeB: 'Japão',
+        dataInicio: new Date('2026-06-20T23:00:00-03:00'),
+      },
+      {
+        timeA: 'Espanha',
+        timeB: 'Arábia Saudita',
+        dataInicio: new Date('2026-06-21T13:00:00-03:00'),
+      },
+      {
+        timeA: 'Bélgica',
+        timeB: 'Irã',
+        dataInicio: new Date('2026-06-21T16:00:00-03:00'),
+      },
+      {
+        timeA: 'Uruguai',
+        timeB: 'Cabo Verde',
+        dataInicio: new Date('2026-06-21T19:00:00-03:00'),
+      },
+      {
+        timeA: 'Nova Zelândia',
+        timeB: 'Egito',
+        dataInicio: new Date('2026-06-21T22:00:00-03:00'),
+      },
+      {
+        timeA: 'Argentina',
+        timeB: 'Áustria',
+        dataInicio: new Date('2026-06-22T14:00:00-03:00'),
+      },
+      {
+        timeA: 'França',
+        timeB: 'Iraque',
+        dataInicio: new Date('2026-06-22T18:00:00-03:00'),
+      },
+      {
+        timeA: 'Noruega',
+        timeB: 'Senegal',
+        dataInicio: new Date('2026-06-22T21:00:00-03:00'),
+      },
+      {
+        timeA: 'Jordânia',
+        timeB: 'Argélia',
+        dataInicio: new Date('2026-06-23T00:00:00-03:00'),
+      },
+      {
+        timeA: 'Portugal',
+        timeB: 'Uzbequistão',
+        dataInicio: new Date('2026-06-23T14:00:00-03:00'),
+      },
+      {
+        timeA: 'Inglaterra',
+        timeB: 'Gana',
+        dataInicio: new Date('2026-06-23T17:00:00-03:00'),
+      },
+      {
+        timeA: 'Panamá',
+        timeB: 'Croácia',
+        dataInicio: new Date('2026-06-23T20:00:00-03:00'),
+      },
+      {
+        timeA: 'Colômbia',
+        timeB: 'RD Congo',
+        dataInicio: new Date('2026-06-23T23:00:00-03:00'),
+      },
+    ];
+
+    for (const match of rodada2Partidas) {
+      const timeAId = timesMap.get(match.timeA) ?? '';
+      const timeBId = timesMap.get(match.timeB) ?? '';
+      await db.insert(partidas).values({
+        rodadaId: rodada2Id,
+        timeAId,
+        timeBId,
+        dataInicio: match.dataInicio,
+        status: 'AGENDADO',
+      });
+    }
+    console.log('Todas as partidas da Rodada 2 criadas.');
+
+    // 5c. Criar Partidas da Rodada 3
+    const rodada3Partidas = [
+      {
+        timeA: 'Suíça',
+        timeB: 'Canadá',
+        dataInicio: new Date('2026-06-24T16:00:00-03:00'),
+      },
+      {
+        timeA: 'Bósnia',
+        timeB: 'Catar',
+        dataInicio: new Date('2026-06-24T16:00:00-03:00'),
+      },
+      {
+        timeA: 'Escócia',
+        timeB: 'Brasil',
+        dataInicio: new Date('2026-06-24T19:00:00-03:00'),
+      },
+      {
+        timeA: 'Marrocos',
+        timeB: 'Haiti',
+        dataInicio: new Date('2026-06-24T19:00:00-03:00'),
+      },
+      {
+        timeA: 'República Tcheca',
+        timeB: 'México',
+        dataInicio: new Date('2026-06-24T22:00:00-03:00'),
+      },
+      {
+        timeA: 'África do Sul',
+        timeB: 'Coreia do Sul',
+        dataInicio: new Date('2026-06-24T22:00:00-03:00'),
+      },
+      {
+        timeA: 'Equador',
+        timeB: 'Alemanha',
+        dataInicio: new Date('2026-06-25T17:00:00-03:00'),
+      },
+      {
+        timeA: 'Curaçao',
+        timeB: 'Costa do Marfim',
+        dataInicio: new Date('2026-06-25T17:00:00-03:00'),
+      },
+      {
+        timeA: 'Japão',
+        timeB: 'Suécia',
+        dataInicio: new Date('2026-06-25T20:00:00-03:00'),
+      },
+      {
+        timeA: 'Tunísia',
+        timeB: 'Holanda',
+        dataInicio: new Date('2026-06-25T20:00:00-03:00'),
+      },
+      {
+        timeA: 'Turquia',
+        timeB: 'Estados Unidos',
+        dataInicio: new Date('2026-06-25T23:00:00-03:00'),
+      },
+      {
+        timeA: 'Paraguai',
+        timeB: 'Austrália',
+        dataInicio: new Date('2026-06-25T23:00:00-03:00'),
+      },
+      {
+        timeA: 'Noruega',
+        timeB: 'França',
+        dataInicio: new Date('2026-06-26T16:00:00-03:00'),
+      },
+      {
+        timeA: 'Senegal',
+        timeB: 'Iraque',
+        dataInicio: new Date('2026-06-26T16:00:00-03:00'),
+      },
+      {
+        timeA: 'Cabo Verde',
+        timeB: 'Arábia Saudita',
+        dataInicio: new Date('2026-06-26T21:00:00-03:00'),
+      },
+      {
+        timeA: 'Uruguai',
+        timeB: 'Espanha',
+        dataInicio: new Date('2026-06-26T21:00:00-03:00'),
+      },
+      {
+        timeA: 'Egito',
+        timeB: 'Irã',
+        dataInicio: new Date('2026-06-27T00:00:00-03:00'),
+      },
+      {
+        timeA: 'Nova Zelândia',
+        timeB: 'Bélgica',
+        dataInicio: new Date('2026-06-27T00:00:00-03:00'),
+      },
+      {
+        timeA: 'Panamá',
+        timeB: 'Inglaterra',
+        dataInicio: new Date('2026-06-27T18:00:00-03:00'),
+      },
+      {
+        timeA: 'Croácia',
+        timeB: 'Gana',
+        dataInicio: new Date('2026-06-27T18:00:00-03:00'),
+      },
+      {
+        timeA: 'Colômbia',
+        timeB: 'Portugal',
+        dataInicio: new Date('2026-06-27T20:30:00-03:00'),
+      },
+      {
+        timeA: 'RD Congo',
+        timeB: 'Uzbequistão',
+        dataInicio: new Date('2026-06-27T20:30:00-03:00'),
+      },
+      {
+        timeA: 'Argélia',
+        timeB: 'Áustria',
+        dataInicio: new Date('2026-06-27T23:00:00-03:00'),
+      },
+      {
+        timeA: 'Jordânia',
+        timeB: 'Argentina',
+        dataInicio: new Date('2026-06-27T23:00:00-03:00'),
+      },
+    ];
+
+    for (const match of rodada3Partidas) {
+      const timeAId = timesMap.get(match.timeA) ?? '';
+      const timeBId = timesMap.get(match.timeB) ?? '';
+      await db.insert(partidas).values({
+        rodadaId: rodada3Id,
+        timeAId,
+        timeBId,
+        dataInicio: match.dataInicio,
+        status: 'AGENDADO',
+      });
+    }
+    console.log('Todas as partidas da Rodada 3 criadas.');
 
     // 6. Criar Palpites de Teste
     // Competidor e Admin palpitaram no jogo de abertura "México vs África do Sul" (futuro)

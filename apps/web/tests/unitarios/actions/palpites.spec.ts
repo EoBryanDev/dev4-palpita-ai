@@ -145,7 +145,6 @@ describe('salvarPalpite', () => {
               {
                 dataInicio: dataPassado,
                 status: 'AGENDADO',
-                rodadaId: 'rodada-123',
               },
             ]),
           ),
@@ -153,22 +152,18 @@ describe('salvarPalpite', () => {
       })),
     }));
 
-    // mock da busca da primeira partida da rodada (iniciada no passado)
+    // mock da busca da primeira partida do torneio (iniciada no passado)
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
-        where: vi.fn(() => ({
-          orderBy: vi.fn(() => ({
-            limit: vi.fn(() => Promise.resolve([{ dataInicio: dataPassado }])),
-          })),
+        orderBy: vi.fn(() => ({
+          limit: vi.fn(() => Promise.resolve([{ dataInicio: dataPassado }])),
         })),
       })),
     }));
 
     const result = await salvarPalpite('partida-123', 2, 1);
     expect(result.success).toBe(false);
-    expect(result.message).toContain(
-      'O prazo para palpitar nesta rodada expirou',
-    );
+    expect(result.message).toContain('O prazo para palpitar expirou');
   });
 
   it('deve atualizar o palpite com sucesso se já existir um palpite anterior', async () => {
@@ -197,7 +192,6 @@ describe('salvarPalpite', () => {
               {
                 dataInicio: dataFuturo,
                 status: 'AGENDADO',
-                rodadaId: 'rodada-123',
               },
             ]),
           ),
@@ -205,13 +199,11 @@ describe('salvarPalpite', () => {
       })),
     }));
 
-    // mock da busca da primeira partida da rodada (futura)
+    // mock da busca da primeira partida do torneio (futura)
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
-        where: vi.fn(() => ({
-          orderBy: vi.fn(() => ({
-            limit: vi.fn(() => Promise.resolve([{ dataInicio: dataFuturo }])),
-          })),
+        orderBy: vi.fn(() => ({
+          limit: vi.fn(() => Promise.resolve([{ dataInicio: dataFuturo }])),
         })),
       })),
     }));
@@ -264,7 +256,6 @@ describe('salvarPalpite', () => {
               {
                 dataInicio: dataFuturo,
                 status: 'AGENDADO',
-                rodadaId: 'rodada-123',
               },
             ]),
           ),
@@ -272,13 +263,11 @@ describe('salvarPalpite', () => {
       })),
     }));
 
-    // mock da busca da primeira partida da rodada (futura)
+    // mock da busca da primeira partida do torneio (futura)
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
-        where: vi.fn(() => ({
-          orderBy: vi.fn(() => ({
-            limit: vi.fn(() => Promise.resolve([{ dataInicio: dataFuturo }])),
-          })),
+        orderBy: vi.fn(() => ({
+          limit: vi.fn(() => Promise.resolve([{ dataInicio: dataFuturo }])),
         })),
       })),
     }));

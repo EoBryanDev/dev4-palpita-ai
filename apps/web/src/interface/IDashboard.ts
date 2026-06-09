@@ -11,6 +11,14 @@ export interface IPartidaDashboard {
   palpiteGolsA?: number | null;
   palpiteGolsB?: number | null;
   jaPalpitou: boolean;
+  rodadaNome?: string;
+}
+
+export interface IRodadaDashboard {
+  id: string;
+  numero: number;
+  nome: string;
+  partidas: IPartidaDashboard[];
 }
 
 export interface IHistoricoDashboard {
@@ -34,8 +42,8 @@ export interface IDashboardPalpitesProps {
   userStatus: string;
   pontos: number;
   posicao: number;
-  nomeRodada: string;
-  partidas: IPartidaDashboard[];
+  rodadas: IRodadaDashboard[];
   historico: IHistoricoDashboard[];
-  isRodadaBloqueada?: boolean;
+  prazoLimite?: string;
+  isTudoBloqueado: boolean;
 }
