@@ -99,6 +99,14 @@ export class Palpite {
       partidaGolsTimeB,
     );
 
+    const acertouPlacarExato =
+      this._golsTimeA === partidaGolsTimeA &&
+      this._golsTimeB === partidaGolsTimeB;
+
+    if (acertouPlacarExato) {
+      return 2;
+    }
+
     return vencedorPalpite === vencedorPartida ? 1 : 0;
   }
 
