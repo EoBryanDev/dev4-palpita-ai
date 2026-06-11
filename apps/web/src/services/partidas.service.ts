@@ -1,5 +1,5 @@
 import { db, partidas, rodadas, times } from '@palpita/db';
-import { asc, eq } from 'drizzle-orm';
+import { and, asc, eq, ne } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 
 export interface IPartidaCompleta {
@@ -18,6 +18,7 @@ export interface IPartidaCompleta {
 
 export async function obterPartidas(
   rodadaId?: string,
+  excluirFinalizadas = false,
 ): Promise<IPartidaCompleta[]> {
   const timeA = alias(times, 'time_a');
   const timeB = alias(times, 'time_b');
@@ -39,13 +40,24 @@ export async function obterPartidas(
     .from(partidas)
     .innerJoin(rodadas, eq(partidas.rodadaId, rodadas.id))
     .innerJoin(timeA, eq(partidas.timeAId, timeA.id))
-    .innerJoin(timeB, eq(partidas.timeBId, timeB.id));
+    .innerJoin(timeB, eq(partidas.timeBId, timeB.id))
+    .$dynamic();
+
+  const conditions = [];
 
   if (rodadaId) {
-    // Drizzle handles dynamic where clauses perfectly
-    const filteredQuery = query.where(eq(partidas.rodadaId, rodadaId));
-    return filteredQuery.orderBy(asc(partidas.dataInicio));
+    conditions.push(eq(partidas.rodadaId, rodadaId));
   }
 
-  return query.orderBy(asc(partidas.dataInicio));
+  if (excluirFinalizadas) {
+    conditions.push(ne(partidas.status, 'FINALIZADO'));
+    conditions.push(ne(partidas.status, 'FINALIZADA'));
+  }
+
+  let finalQuery = query;
+  if (conditions.length > 0) {
+    finalQuery = query.where(and(...conditions));
+  }
+
+  return finalQuery.orderBy(asc(partidas.dataInicio));
 }
