@@ -11,14 +11,10 @@ O sistema DEVE carregar a página de ranking (`/ranking`) em menos de 2 segundos
 - **THEN** o sistema exibe a lista atualizada de usuários ordenados por pontuação decrescente, contendo a posição, foto/nome, palpites corretos e pontuação acumulada.
 
 ### Requirement: Segurança de Visualização de Palpites Individuais (RN03)
-O sistema DEVE impedir a visualização pública dos palpites individuais detalhados de um usuário por partida até que o horário real de início da respectiva partida seja atingido.
+O sistema DEVE permitir a visualização pública dos palpites individuais detalhados de todos os usuários a qualquer momento, dado que as edições de palpites estão trancadas para o torneio inteiro e a Copa já começou.
 
-#### Scenario: Consulta a palpite individual antes do início
-- **WHEN** o usuário tenta visualizar o palpite de outro competidor para uma partida cuja data/hora de início é no futuro
-- **THEN** o sistema oculta o palpite individual ou retorna um indicador de "Palpite Fechado/Oculto".
-
-#### Scenario: Consulta a palpite individual após o início
-- **WHEN** a partida já iniciou (horário atual igual ou posterior ao início da partida)
+#### Scenario: Consulta a palpite individual
+- **WHEN** o usuário tenta visualizar o palpite de outro competidor para qualquer partida
 - **THEN** o sistema permite a visualização pública e transparente do palpite individual daquele usuário para a respectiva partida.
 
 ### Requirement: Analytics Agregado de Palpites

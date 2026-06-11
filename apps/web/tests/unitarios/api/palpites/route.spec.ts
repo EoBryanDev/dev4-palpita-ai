@@ -91,9 +91,28 @@ describe('GET /api/palpites', () => {
       pctEmpates: 33, // 1/3 = 33.3% -> 33%
     });
 
-    // Como o jogo não começou, palpites individuais devem estar bloqueados
-    expect(matchStats.palpitesIndividuaisLiberados).toBe(false);
-    expect(matchStats.palpitesIndividuais).toEqual([]);
+    // Como os palpites são liberados por padrão com a Copa iniciada, palpites individuais devem estar disponíveis
+    expect(matchStats.palpitesIndividuaisLiberados).toBe(true);
+    expect(matchStats.palpitesIndividuais).toEqual([
+      {
+        id: 'p1',
+        usuarioNome: 'Alice',
+        golsTimeA: 2,
+        golsTimeB: 1,
+      },
+      {
+        id: 'p2',
+        usuarioNome: 'Bob',
+        golsTimeA: 3,
+        golsTimeB: 0,
+      },
+      {
+        id: 'p3',
+        usuarioNome: 'Charlie',
+        golsTimeA: 1,
+        golsTimeB: 1,
+      },
+    ]);
   });
 
   it('deve liberar palpites individuais se a partida ja tiver iniciado', async () => {
