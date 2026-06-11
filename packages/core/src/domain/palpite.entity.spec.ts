@@ -113,7 +113,7 @@ describe('Palpite Entity', () => {
       expect(pontos).toBe(0);
     });
 
-    it('deve atribuir 1 ponto se o placar exato for identico (Vitoria do Time A)', () => {
+    it('deve atribuir 2 pontos se o placar exato for identico (Vitoria do Time A)', () => {
       const palpite = new Palpite({
         id: 'palpite-1',
         usuarioId: 'usuario-1',
@@ -125,7 +125,7 @@ describe('Palpite Entity', () => {
       });
 
       const pontos = palpite.calcularPontos(2, 1);
-      expect(pontos).toBe(1);
+      expect(pontos).toBe(2);
     });
 
     it('deve atribuir 1 ponto se errar placar mas acertar vencedor (Vitoria do Time A com placar diferente)', () => {
@@ -158,7 +158,7 @@ describe('Palpite Entity', () => {
       expect(pontos).toBe(0);
     });
 
-    it('deve atribuir 1 ponto se acertar o empate com placar exato', () => {
+    it('deve atribuir 2 pontos se acertar o empate com placar exato', () => {
       const palpite = new Palpite({
         id: 'palpite-1',
         usuarioId: 'usuario-1',
@@ -170,7 +170,7 @@ describe('Palpite Entity', () => {
       });
 
       const pontos = palpite.calcularPontos(1, 1);
-      expect(pontos).toBe(1);
+      expect(pontos).toBe(2);
     });
 
     it('deve atribuir 1 ponto se acertar o empate com placar diferente', () => {
