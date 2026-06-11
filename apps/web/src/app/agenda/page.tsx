@@ -181,7 +181,9 @@ export default async function AgendaPage({
           {partidasDoDia.map((partida) => {
             const timeStr = formatToBRLTime(partida.dataInicio);
 
-            const hasFinished = partida.status === 'ENCERRADA';
+            const hasFinished =
+              partida.status === 'FINALIZADO' ||
+              partida.status === 'FINALIZADA';
             const isLive = partida.status === 'EM_ANDAMENTO';
 
             return (
@@ -218,18 +220,39 @@ export default async function AgendaPage({
                 <div className="flex items-center justify-between gap-2 py-2">
                   {/* Time A */}
                   <div className="flex flex-1 flex-col items-center gap-2 text-center max-w-[40%]">
-                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden border border-zinc-200 dark:border-zinc-700 select-none">
-                      {partida.timeAEmoji ? (
-                        <FlagImage
-                          emoji={partida.timeAEmoji}
-                          alt={partida.timeA}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-xs font-bold text-zinc-500">
-                          {partida.timeA.slice(0, 3).toUpperCase()}
-                        </span>
-                      )}
+                    <div className="relative">
+                      <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden border border-zinc-200 dark:border-zinc-700 select-none">
+                        {partida.timeAEmoji ? (
+                          <FlagImage
+                            emoji={partida.timeAEmoji}
+                            alt={partida.timeA}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-xs font-bold text-zinc-500">
+                            {partida.timeA.slice(0, 3).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      {hasFinished &&
+                        partida.golsTimeA !== null &&
+                        partida.golsTimeB !== null && (
+                          <span
+                            className={`absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-zinc-900 ${
+                              partida.golsTimeA > partida.golsTimeB
+                                ? 'bg-emerald-500'
+                                : partida.golsTimeA < partida.golsTimeB
+                                  ? 'bg-red-500'
+                                  : 'bg-zinc-400'
+                            }`}
+                          >
+                            {partida.golsTimeA > partida.golsTimeB
+                              ? 'V'
+                              : partida.golsTimeA < partida.golsTimeB
+                                ? 'D'
+                                : 'E'}
+                          </span>
+                        )}
                     </div>
                     <span className="text-sm font-bold truncate w-full">
                       {partida.timeA}
@@ -255,18 +278,39 @@ export default async function AgendaPage({
 
                   {/* Time B */}
                   <div className="flex flex-1 flex-col items-center gap-2 text-center max-w-[40%]">
-                    <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden border border-zinc-200 dark:border-zinc-700 select-none">
-                      {partida.timeBEmoji ? (
-                        <FlagImage
-                          emoji={partida.timeBEmoji}
-                          alt={partida.timeB}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-xs font-bold text-zinc-500">
-                          {partida.timeB.slice(0, 3).toUpperCase()}
-                        </span>
-                      )}
+                    <div className="relative">
+                      <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden border border-zinc-200 dark:border-zinc-700 select-none">
+                        {partida.timeBEmoji ? (
+                          <FlagImage
+                            emoji={partida.timeBEmoji}
+                            alt={partida.timeB}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-xs font-bold text-zinc-500">
+                            {partida.timeB.slice(0, 3).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      {hasFinished &&
+                        partida.golsTimeA !== null &&
+                        partida.golsTimeB !== null && (
+                          <span
+                            className={`absolute -bottom-1 -left-1 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-zinc-900 ${
+                              partida.golsTimeB > partida.golsTimeA
+                                ? 'bg-emerald-500'
+                                : partida.golsTimeB < partida.golsTimeA
+                                  ? 'bg-red-500'
+                                  : 'bg-zinc-400'
+                            }`}
+                          >
+                            {partida.golsTimeB > partida.golsTimeA
+                              ? 'V'
+                              : partida.golsTimeB < partida.golsTimeA
+                                ? 'D'
+                                : 'E'}
+                          </span>
+                        )}
                     </div>
                     <span className="text-sm font-bold truncate w-full">
                       {partida.timeB}

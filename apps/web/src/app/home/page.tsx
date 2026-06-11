@@ -57,7 +57,11 @@ export default async function HomePage({
   try {
     const allPartidas = await obterPartidas();
     totalConfrontos = allPartidas.length;
-    partidasList = allPartidas.slice(0, 6).map((p) => ({
+
+    // Buscar as próximas partidas filtrando diretamente no banco de dados
+    const proximasPartidas = await obterPartidas(undefined, true);
+
+    partidasList = proximasPartidas.slice(0, 6).map((p) => ({
       id: p.id,
       timeA: p.timeA,
       timeB: p.timeB,
