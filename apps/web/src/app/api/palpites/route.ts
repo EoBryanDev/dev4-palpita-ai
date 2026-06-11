@@ -46,8 +46,9 @@ export async function GET(): Promise<NextResponse> {
       const pctEmpates =
         totalGuesses > 0 ? Math.round((empates / totalGuesses) * 100) : 0;
 
-      // Controle rigoroso da Regra
-      const isStarted = now >= new Date(match.dataInicio);
+      // Os palpites individuais estão sempre liberados porque as apostas já foram fechadas
+      // para todo o torneio e a Copa já começou.
+      const palpitesLiberados = true;
 
       return {
         id: match.id,
@@ -69,15 +70,13 @@ export async function GET(): Promise<NextResponse> {
           pctVitoriasB,
           pctEmpates,
         },
-        palpitesIndividuaisLiberados: isStarted,
-        palpitesIndividuais: isStarted
-          ? guesses.map((g) => ({
-              id: g.id,
-              usuarioNome: g.usuarioNome,
-              golsTimeA: g.golsTimeA,
-              golsTimeB: g.golsTimeB,
-            }))
-          : [],
+        palpitesIndividuaisLiberados: palpitesLiberados,
+        palpitesIndividuais: guesses.map((g) => ({
+          id: g.id,
+          usuarioNome: g.usuarioNome,
+          golsTimeA: g.golsTimeA,
+          golsTimeB: g.golsTimeB,
+        })),
       };
     });
 
