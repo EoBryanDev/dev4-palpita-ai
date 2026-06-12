@@ -123,11 +123,14 @@ export default async function AgendaPage({
     new Set(allPartidas.map((p) => obterDataSaoPauloISO(p.dataInicio))),
   ).sort();
 
-  // Define dia ativo default
+  // Define dia ativo default (sysdate)
+  const hojeSaoPaulo = obterDataSaoPauloISO(new Date());
   const activeDia =
     selectedDia && diasDisponiveis.includes(selectedDia)
       ? selectedDia
-      : diasDisponiveis[0] || '';
+      : diasDisponiveis.includes(hojeSaoPaulo)
+        ? hojeSaoPaulo
+        : diasDisponiveis[0] || '';
 
   // Filtra as partidas pelo dia ativo
   const partidasDoDia = allPartidas.filter(
