@@ -5,7 +5,11 @@ import type {
   IPartidaDashboard,
   IRodadaDashboard,
 } from '@/interface/IDashboard';
-import { obterPalpitesUsuario } from '@/services/palpites.service';
+import {
+  obterPalpitesSalvosFuturosPaginados,
+  obterPalpitesUsuario,
+  obterTotalPalpitesSalvosFuturos,
+} from '@/services/palpites.service';
 import { obterPartidas } from '@/services/partidas.service';
 import { calcularRankingGeral } from '@/services/ranking.service';
 import { obterRodadas } from '@/services/rodadas.service';
@@ -143,6 +147,14 @@ export default async function MeuEspacoPage() {
     }
   }
 
+  // 9. Buscar palpites salvos futuros iniciais paginados (limit 5, offset 0)
+  const totalPalpitesSalvos = await obterTotalPalpitesSalvosFuturos(session.id);
+  const palpitesSalvosIniciais = await obterPalpitesSalvosFuturosPaginados(
+    session.id,
+    5,
+    0,
+  );
+
   return (
     <DashboardPalpites
       nomeUsuario={user.nome}
@@ -155,6 +167,8 @@ export default async function MeuEspacoPage() {
       historico={historico}
       prazoLimite={prazoLimite}
       isTudoBloqueado={isTudoBloqueado}
+      palpitesSalvosIniciais={palpitesSalvosIniciais}
+      totalPalpitesSalvos={totalPalpitesSalvos}
     />
   );
 }

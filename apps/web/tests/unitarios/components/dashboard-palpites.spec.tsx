@@ -1,5 +1,8 @@
 import { logoutUsuario } from '@/app/actions/auth';
-import { salvarPalpite } from '@/app/actions/palpites';
+import {
+  obterPalpitesSalvosPaginadosAction,
+  salvarPalpite,
+} from '@/app/actions/palpites';
 import { DashboardPalpites } from '@/components/dashboard-palpites';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -7,6 +10,7 @@ import type { Mock } from 'vitest';
 
 vi.mock('@/app/actions/palpites', () => ({
   salvarPalpite: vi.fn(),
+  obterPalpitesSalvosPaginadosAction: vi.fn(),
 }));
 
 vi.mock('@/app/actions/auth', () => ({
@@ -87,6 +91,20 @@ const defaultProps = {
       dataInicio: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // Passado
     },
   ],
+  palpitesSalvosIniciais: [
+    {
+      id: 'partida-2',
+      timeA: 'Alemanha',
+      timeB: 'Espanha',
+      dataInicio: new Date(Date.now() + 1000 * 60 * 60 * 48).toISOString(), // Futuro daqui a 2 dias
+      status: 'AGENDADO',
+      palpiteGolsA: 2,
+      palpiteGolsB: 2,
+      jaPalpitou: true,
+      rodadaNome: 'Fase de Grupos - Rodada 1',
+    },
+  ],
+  totalPalpitesSalvos: 1,
 };
 
 describe('DashboardPalpites Component', () => {
@@ -166,5 +184,46 @@ describe('DashboardPalpites Component', () => {
       description: 'Palpite registrado com sucesso!',
     });
     expect(mockRefresh).toHaveBeenCalled();
+  });
+
+  it('deve exibir o botão "Veja Mais" se houver mais palpites salvos no banco e carregar mais ao clicar', async () => {
+    const propsComMaisPalpites = {
+      ...defaultProps,
+      totalPalpitesSalvos: 6,
+    };
+
+    (obterPalpitesSalvosPaginadosAction as Mock).mockResolvedValueOnce({
+      success: true,
+      palpites: [
+        {
+          id: 'partida-4',
+          timeA: 'Bélgica',
+          timeB: 'Japão',
+          dataInicio: new Date(Date.now() + 1000 * 60 * 60 * 72).toISOString(),
+          status: 'AGENDADO',
+          palpiteGolsA: 1,
+          palpiteGolsB: 0,
+          jaPalpitou: true,
+          rodadaNome: 'Fase de Grupos - Rodada 1',
+        },
+      ],
+      total: 6,
+    });
+
+    render(<DashboardPalpites {...propsComMaisPalpites} />);
+
+    const btnVejaMais = screen.getByRole('button', { name: /Veja Mais/i });
+    expect(btnVejaMais).toBeDefined();
+
+    fireEvent.click(btnVejaMais);
+
+    await waitFor(() => {
+      expect(obterPalpitesSalvosPaginadosAction).toHaveBeenCalledWith(5, 5);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Bélgica')).toBeDefined();
+      expect(screen.getByText('Japão')).toBeDefined();
+    });
   });
 });

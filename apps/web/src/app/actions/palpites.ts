@@ -1,5 +1,10 @@
 'use server';
 
+import type { IPartidaDashboard } from '@/interface/IDashboard';
+import {
+  obterPalpitesSalvosFuturosPaginados,
+  obterTotalPalpitesSalvosFuturos,
+} from '@/services/palpites.service';
 import { db, palpites, partidas, usuarios } from '@palpita/db';
 import { and, eq } from 'drizzle-orm';
 import { obterSessao } from './auth';
@@ -129,6 +134,51 @@ export async function salvarPalpite(
     return {
       success: false,
       message: 'Erro interno ao salvar palpite. Tente novamente mais tarde.',
+    };
+  }
+}
+
+export interface IObterPalpitesSalvosPaginadosResult {
+  success: boolean;
+  palpites: IPartidaDashboard[];
+  total: number;
+  message?: string;
+}
+
+export async function obterPalpitesSalvosPaginadosAction(
+  limit: number,
+  offset: number,
+): Promise<IObterPalpitesSalvosPaginadosResult> {
+  const session = await obterSessao();
+  if (!session || !session.id) {
+    return {
+      success: false,
+      palpites: [],
+      total: 0,
+      message: 'Usuário não autenticado.',
+    };
+  }
+
+  try {
+    const total = await obterTotalPalpitesSalvosFuturos(session.id);
+    const resultPalpites = await obterPalpitesSalvosFuturosPaginados(
+      session.id,
+      limit,
+      offset,
+    );
+
+    return {
+      success: true,
+      palpites: resultPalpites,
+      total,
+    };
+  } catch (error) {
+    console.error('Erro ao obter palpites salvos paginados:', error);
+    return {
+      success: false,
+      palpites: [],
+      total: 0,
+      message: 'Erro interno ao carregar palpites.',
     };
   }
 }
