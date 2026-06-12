@@ -243,7 +243,7 @@ export default function ChavesClient({ grupos }: IChavesClientProps) {
                       <span>{match.timeA}</span>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-850 pt-2">
+                  <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 pt-2">
                     <div className="flex items-center gap-2 font-medium text-zinc-400">
                       <FlagImage
                         emoji={match.emojiB}
@@ -278,7 +278,7 @@ export default function ChavesClient({ grupos }: IChavesClientProps) {
                       <span>{match.timeA}</span>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-850 pt-2">
+                  <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 pt-2">
                     <div className="flex items-center gap-2 font-medium text-zinc-400">
                       <span>{match.emojiB}</span>
                       <span>{match.timeB}</span>
@@ -313,7 +313,7 @@ export default function ChavesClient({ grupos }: IChavesClientProps) {
                       <span>{match.timeA}</span>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-850 pt-2">
+                  <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 pt-2">
                     <div className="flex items-center gap-2 font-medium text-zinc-400">
                       <FlagImage
                         emoji={match.emojiB}

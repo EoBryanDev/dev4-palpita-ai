@@ -91,7 +91,7 @@ export function AdminConfiguracoesClient({
         </div>
 
         {/* Display do Prêmio Total */}
-        <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-150 dark:border-zinc-800/50 flex flex-col justify-center">
+        <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/50 flex flex-col justify-center">
           <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
             Total Estimado de Prêmios
           </span>

@@ -277,7 +277,7 @@ export function DashboardPalpites({
                                       e.target.value,
                                     )
                                   }
-                                  className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50"
+                                  className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
                                 />
                                 <span className="text-zinc-400 font-bold">
                                   :
@@ -297,7 +297,7 @@ export function DashboardPalpites({
                                       e.target.value,
                                     )
                                   }
-                                  className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50"
+                                  className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
                                 />
                               </div>
 
@@ -418,7 +418,7 @@ export function DashboardPalpites({
                                       e.target.value,
                                     )
                                   }
-                                  className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50"
+                                  className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
                                 />
                                 <span className="text-zinc-400 font-bold">
                                   :
@@ -435,7 +435,7 @@ export function DashboardPalpites({
                                       e.target.value,
                                     )
                                   }
-                                  className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50"
+                                  className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
                                 />
                               </div>
 

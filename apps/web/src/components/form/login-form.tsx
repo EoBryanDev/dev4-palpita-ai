@@ -100,19 +100,19 @@ export function LoginForm() {
         </div>
 
         <div className="flex items-center justify-between text-xs pt-1">
-          <label className="flex items-center gap-2 cursor-pointer text-zinc-650 dark:text-zinc-400">
+          <label className="flex items-center gap-2 cursor-pointer text-zinc-600 dark:text-zinc-400">
             <input
               type="checkbox"
               checked={lembrarMe}
               onChange={(e) => setLembrarMe(e.target.checked)}
               disabled={loading}
-              className="rounded border-zinc-350 text-emerald-600 focus:ring-emerald-500/20"
+              className="rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500/20"
             />
             <span>Lembrar de mim</span>
           </label>
           <Link
             href="/home#solicitar-convite"
-            className="text-emerald-650 dark:text-emerald-400 hover:underline font-medium"
+            className="text-emerald-600 dark:text-emerald-400 hover:underline font-medium"
           >
             Esqueceu a senha?
           </Link>
@@ -141,11 +141,11 @@ export function LoginForm() {
         </Button>
       </form>
 
-      <div className="mt-6 text-center text-xs text-zinc-500 dark:text-zinc-400 border-t border-zinc-150 dark:border-zinc-800 pt-4">
+      <div className="mt-6 text-center text-xs text-zinc-500 dark:text-zinc-400 border-t border-zinc-200 dark:border-zinc-800 pt-4">
         Não tem acesso?{' '}
         <Link
           href="/home#solicitar-convite"
-          className="text-emerald-650 dark:text-emerald-400 hover:underline font-semibold"
+          className="text-emerald-600 dark:text-emerald-400 hover:underline font-semibold"
         >
           Solicite um convite
         </Link>

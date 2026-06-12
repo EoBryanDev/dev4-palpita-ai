@@ -259,9 +259,18 @@ export function AdminPartidasClient({
                   onChange={(e) => setPartidaRodadaId(e.target.value)}
                   disabled={isPending}
                 >
-                  <option value="">Selecione a rodada...</option>
+                  <option
+                    value=""
+                    className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50"
+                  >
+                    Selecione a rodada...
+                  </option>
                   {rodadas.map((r) => (
-                    <option key={r.id} value={r.id}>
+                    <option
+                      key={r.id}
+                      value={r.id}
+                      className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50"
+                    >
                       Rodada {r.numero} - {r.nome}
                     </option>
                   ))}
@@ -276,9 +285,18 @@ export function AdminPartidasClient({
                   onChange={(e) => setPartidaTimeA(e.target.value)}
                   disabled={isPending}
                 >
-                  <option value="">Selecione o Time A...</option>
+                  <option
+                    value=""
+                    className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50"
+                  >
+                    Selecione o Time A...
+                  </option>
                   {times.map((t) => (
-                    <option key={t.id} value={t.id}>
+                    <option
+                      key={t.id}
+                      value={t.id}
+                      className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50"
+                    >
                       {t.emoji} {t.nome}
                     </option>
                   ))}
@@ -296,9 +314,18 @@ export function AdminPartidasClient({
                   onChange={(e) => setPartidaTimeB(e.target.value)}
                   disabled={isPending}
                 >
-                  <option value="">Selecione o Time B...</option>
+                  <option
+                    value=""
+                    className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50"
+                  >
+                    Selecione o Time B...
+                  </option>
                   {times.map((t) => (
-                    <option key={t.id} value={t.id}>
+                    <option
+                      key={t.id}
+                      value={t.id}
+                      className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50"
+                    >
                       {t.emoji} {t.nome}
                     </option>
                   ))}
@@ -454,7 +481,7 @@ export function AdminPartidasClient({
                                           )
                                         }
                                         disabled={isPending || isJogoNoFuturo}
-                                        className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
                                       />
                                       <span className="text-zinc-400 text-xs">
                                         x
@@ -472,7 +499,7 @@ export function AdminPartidasClient({
                                           )
                                         }
                                         disabled={isPending || isJogoNoFuturo}
-                                        className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
                                       />
                                     </div>
                                   )}
@@ -507,7 +534,7 @@ export function AdminPartidasClient({
                                     onClick={() =>
                                       handleLancarResultado(partida.id)
                                     }
-                                    className="bg-zinc-900 hover:bg-zinc-850 text-white font-semibold text-xs px-3 h-8 rounded-xl flex items-center gap-1 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="bg-zinc-900 hover:bg-zinc-800 text-white font-semibold text-xs px-3 h-8 rounded-xl flex items-center gap-1 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
                                     <CheckCircle className="h-3.5 w-3.5" />
                                     Finalizar Jogo
