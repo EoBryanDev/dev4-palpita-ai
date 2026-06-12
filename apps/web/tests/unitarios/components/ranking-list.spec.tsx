@@ -51,14 +51,23 @@ describe('RankingList', () => {
         email: 'alice@test.com',
         pontos: 15,
         posicao: 1,
+        posicaoGrupo: 1,
       },
-      { id: '2', nome: 'Bob', email: 'bob@test.com', pontos: 12, posicao: 2 },
+      {
+        id: '2',
+        nome: 'Bob',
+        email: 'bob@test.com',
+        pontos: 12,
+        posicao: 2,
+        posicaoGrupo: 2,
+      },
       {
         id: '3',
         nome: 'Charlie',
         email: 'charlie@test.com',
         pontos: 10,
         posicao: 3,
+        posicaoGrupo: 3,
       },
       {
         id: '4',
@@ -66,6 +75,7 @@ describe('RankingList', () => {
         email: 'david@test.com',
         pontos: 8,
         posicao: 4,
+        posicaoGrupo: 4,
       },
     ];
 
@@ -95,8 +105,16 @@ describe('RankingList', () => {
         email: 'alice@test.com',
         pontos: 15,
         posicao: 1,
+        posicaoGrupo: 1,
       },
-      { id: '2', nome: 'Bob', email: 'bob@test.com', pontos: 12, posicao: 2 },
+      {
+        id: '2',
+        nome: 'Bob',
+        email: 'bob@test.com',
+        pontos: 12,
+        posicao: 2,
+        posicaoGrupo: 2,
+      },
     ];
 
     (useQuery as Mock).mockReturnValue({

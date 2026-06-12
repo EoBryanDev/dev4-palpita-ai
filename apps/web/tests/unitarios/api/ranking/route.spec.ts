@@ -86,6 +86,7 @@ describe('GET /api/ranking', () => {
       email: 'alice@test.com',
       pontos: 4,
       posicao: 1,
+      posicaoGrupo: 1,
     });
 
     // Bob em segundo
@@ -95,6 +96,7 @@ describe('GET /api/ranking', () => {
       email: 'bob@test.com',
       pontos: 2,
       posicao: 2,
+      posicaoGrupo: 2,
     });
 
     // Charlie em terceiro
@@ -104,6 +106,7 @@ describe('GET /api/ranking', () => {
       email: 'charlie@test.com',
       pontos: 1,
       posicao: 3,
+      posicaoGrupo: 3,
     });
   });
 
@@ -144,12 +147,15 @@ describe('GET /api/ranking', () => {
     const response = await GET();
     const json = await response.json();
 
-    // Alice e Bob empatados em 1º, Charlie em 3º
+    // Alice e Bob empatados em 1º no grupo, mas com posições sequenciais únicas (Alice 1, Bob 2), Charlie em 3º
     expect(json[0].posicao).toBe(1);
+    expect(json[0].posicaoGrupo).toBe(1);
     expect(json[0].nome).toBe('Alice');
-    expect(json[1].posicao).toBe(1);
+    expect(json[1].posicao).toBe(2);
+    expect(json[1].posicaoGrupo).toBe(1);
     expect(json[1].nome).toBe('Bob'); // ordenado alfabeticamente
     expect(json[2].posicao).toBe(3);
+    expect(json[2].posicaoGrupo).toBe(3);
   });
 
   it('deve retornar status 500 se ocorrer um erro no banco', async () => {
