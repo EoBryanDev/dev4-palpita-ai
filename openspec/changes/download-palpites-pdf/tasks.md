@@ -1,12 +1,12 @@
 ## 1. Setup & Dependencies
 
 - [x] 1.1 Add `jspdf` and `jspdf-autotable` dependencies to `apps/web/package.json`
-- [/] 1.2 Run package installation to sync node_modules
+- [x] 1.2 Run package installation to sync node_modules
 
 ## 2. Service & Actions
 
-- [ ] 2.1 Implement `obterTodosPalpitesUsuario` in `palpites.service.ts` to fetch all user guesses without limit filters
-- [ ] 2.2 Create `obterTodosPalpitesAction` in `actions/palpites.ts` to safely retrieve all guesses for the logged-in session
+- [x] 2.1 Implement `obterTodosPalpitesUsuario` in `palpites.service.ts` to fetch all user guesses without limit filters
+- [/] 2.2 Create `obterTodosPalpitesAction` in `actions/palpites.ts` to safely retrieve all guesses for the logged-in session
 
 ## 3. PDF Generator Utility
 

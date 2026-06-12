@@ -160,3 +160,49 @@ export async function obterPalpitesSalvosFuturosPaginados(
     rodadaNome: item.rodadaNome,
   }));
 }
+
+export async function obterTodosPalpitesUsuario(
+  usuarioId: string,
+): Promise<IPartidaDashboard[]> {
+  const timeA = alias(times, 'time_a');
+  const timeB = alias(times, 'time_b');
+
+  const queryResult = await db
+    .select({
+      id: partidas.id,
+      timeA: timeA.nome,
+      timeB: timeB.nome,
+      timeAEmoji: timeA.emoji,
+      timeBEmoji: timeB.emoji,
+      dataInicio: partidas.dataInicio,
+      status: partidas.status,
+      golsTimeA: partidas.golsTimeA,
+      golsTimeB: partidas.golsTimeB,
+      palpiteGolsA: palpites.golsTimeA,
+      palpiteGolsB: palpites.golsTimeB,
+      rodadaNome: rodadas.nome,
+    })
+    .from(palpites)
+    .innerJoin(partidas, eq(palpites.partidaId, partidas.id))
+    .innerJoin(rodadas, eq(partidas.rodadaId, rodadas.id))
+    .innerJoin(timeA, eq(partidas.timeAId, timeA.id))
+    .innerJoin(timeB, eq(partidas.timeBId, timeB.id))
+    .where(eq(palpites.usuarioId, usuarioId))
+    .orderBy(asc(partidas.dataInicio));
+
+  return queryResult.map((item) => ({
+    id: item.id,
+    timeA: item.timeA,
+    timeB: item.timeB,
+    timeAEmoji: item.timeAEmoji ?? undefined,
+    timeBEmoji: item.timeBEmoji ?? undefined,
+    dataInicio: item.dataInicio.toISOString(),
+    status: item.status,
+    golsTimeA: item.golsTimeA,
+    golsTimeB: item.golsTimeB,
+    palpiteGolsA: item.palpiteGolsA,
+    palpiteGolsB: item.palpiteGolsB,
+    jaPalpitou: true,
+    rodadaNome: item.rodadaNome,
+  }));
+}

@@ -3,6 +3,7 @@
 import type { IPartidaDashboard } from '@/interface/IDashboard';
 import {
   obterPalpitesSalvosFuturosPaginados,
+  obterTodosPalpitesUsuario,
   obterTotalPalpitesSalvosFuturos,
 } from '@/services/palpites.service';
 import { db, palpites, partidas, usuarios } from '@palpita/db';
@@ -179,6 +180,38 @@ export async function obterPalpitesSalvosPaginadosAction(
       palpites: [],
       total: 0,
       message: 'Erro interno ao carregar palpites.',
+    };
+  }
+}
+
+export interface IObterTodosPalpitesResult {
+  success: boolean;
+  palpites: IPartidaDashboard[];
+  message?: string;
+}
+
+export async function obterTodosPalpitesAction(): Promise<IObterTodosPalpitesResult> {
+  const session = await obterSessao();
+  if (!session || !session.id) {
+    return {
+      success: false,
+      palpites: [],
+      message: 'Usuário não autenticado.',
+    };
+  }
+
+  try {
+    const resultPalpites = await obterTodosPalpitesUsuario(session.id);
+    return {
+      success: true,
+      palpites: resultPalpites,
+    };
+  } catch (error) {
+    console.error('Erro ao obter todos os palpites do usuário:', error);
+    return {
+      success: false,
+      palpites: [],
+      message: 'Erro interno ao carregar todos os palpites.',
     };
   }
 }
