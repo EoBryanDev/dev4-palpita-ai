@@ -3,11 +3,11 @@
 import {
   type IComentarioFormatado,
   type IEventoTimeline,
-  type IPontuadorRodada,
+  type IPontuadorPartida,
   adicionarComentario,
   obterComentariosPartida,
   obterEventosTimeline,
-  obterPontuadoresRodada,
+  obterPontuadoresPartida,
 } from '@/app/actions/eventos';
 import { Button } from '@/components/ui/button';
 import { FlagImage } from '@/components/ui/flag-image';
@@ -44,18 +44,23 @@ export function EventosClient() {
   const [novoComentarioText, setNovoComentarioText] = useState('');
   const [enviandoComentario, setEnviandoComentario] = useState(false);
 
-  // Estados dos Pontuadores da Rodada por RodadaID
-  const [pontuadoresMap, setPontuadoresMap] = useState<
-    Record<string, IPontuadorRodada[]>
-  >({});
-  const [loadingPontuadores, setLoadingPontuadores] = useState<
-    Record<string, boolean>
-  >({});
-  // Estados do Modal de Pontuadores
-  const [selectedRodadaScorers, setSelectedRodadaScorers] = useState<{
+  // Estados do Modal de Pontuadores da Partida
+  const [selectedMatchScorers, setSelectedMatchScorers] = useState<{
     id: string;
-    nome: string;
+    timeA: string;
+    timeB: string;
+    golsA: number | null;
+    golsB: number | null;
+    rodadaNome: string;
   } | null>(null);
+  const [pontuadoresPartida, setPontuadoresPartida] = useState<
+    IPontuadorPartida[]
+  >([]);
+  const [loadingPontuadoresPartida, setLoadingPontuadoresPartida] =
+    useState(false);
+  const [mensagemPontuadoresPartida, setMensagemPontuadoresPartida] = useState<
+    string | null
+  >(null);
 
   // Carregar timeline inicial
   const carregarTimeline = useCallback(async () => {
@@ -80,26 +85,44 @@ export function EventosClient() {
     carregarTimeline();
   }, [carregarTimeline]);
 
-  // Carregar pontuadores de uma rodada
-  const carregarPontuadores = async (rodadaId: string) => {
-    if (pontuadoresMap[rodadaId] || loadingPontuadores[rodadaId]) return;
+  // Carregar pontuadores de um jogo/partida
+  const carregarPontuadoresPartida = async (partida: IEventoTimeline) => {
+    setSelectedMatchScorers({
+      id: partida.id,
+      timeA: partida.timeA,
+      timeB: partida.timeB,
+      golsA: partida.golsTimeA,
+      golsB: partida.golsTimeB,
+      rodadaNome: partida.rodadaNome,
+    });
+    setLoadingPontuadoresPartida(true);
+    setPontuadoresPartida([]);
+    setMensagemPontuadoresPartida(null);
 
-    setLoadingPontuadores((prev) => ({ ...prev, [rodadaId]: true }));
     try {
-      const res = await obterPontuadoresRodada(rodadaId);
+      const res = await obterPontuadoresPartida(partida.id);
       if (res.success) {
-        setPontuadoresMap((prev) => ({ ...prev, [rodadaId]: res.pontuadores }));
+        setPontuadoresPartida(res.pontuadores);
+        if (res.message) {
+          setMensagemPontuadoresPartida(res.message);
+        }
+      } else {
+        toast({
+          title: 'Erro',
+          description: res.message || 'Erro ao carregar pontuadores.',
+          variant: 'destructive',
+        });
       }
     } catch (err) {
       console.error(err);
+      toast({
+        title: 'Erro',
+        description: 'Erro ao buscar pontuadores.',
+        variant: 'destructive',
+      });
     } finally {
-      setLoadingPontuadores((prev) => ({ ...prev, [rodadaId]: false }));
+      setLoadingPontuadoresPartida(false);
     }
-  };
-
-  const abrirModalPontuadores = (rodadaId: string, rodadaNome: string) => {
-    setSelectedRodadaScorers({ id: rodadaId, nome: rodadaNome });
-    carregarPontuadores(rodadaId);
   };
 
   // Carregar comentários de um jogo
@@ -266,9 +289,6 @@ export function EventosClient() {
         <div className="relative border-l border-zinc-200 dark:border-zinc-800 ml-4 md:ml-6 space-y-12">
           {eventos.map((evento) => {
             const statusInfo = getStatusLabel(evento.status, evento.dataInicio);
-            const showScorers = !!pontuadoresMap[evento.rodadaId];
-            const scorers = pontuadoresMap[evento.rodadaId] || [];
-            const isLoadingScorers = !!loadingPontuadores[evento.rodadaId];
 
             return (
               <div key={evento.id} className="relative pl-8 md:pl-10">
@@ -340,16 +360,11 @@ export function EventosClient() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() =>
-                          abrirModalPontuadores(
-                            evento.rodadaId,
-                            evento.rodadaNome,
-                          )
-                        }
+                        onClick={() => carregarPontuadoresPartida(evento)}
                         className="text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 p-0 hover:bg-transparent flex items-center gap-1.5"
                       >
                         <Trophy className="h-4 w-4 text-amber-500" />
-                        Ver pontuadores da rodada
+                        Ver palpites e pontuadores
                       </Button>
                     </div>
 
@@ -476,8 +491,8 @@ export function EventosClient() {
         </div>
       )}
 
-      {/* Modal de Pontuadores */}
-      {selectedRodadaScorers && (
+      {/* Modal de Pontuadores do Jogo */}
+      {selectedMatchScorers && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
           <div className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl border border-zinc-200 dark:border-zinc-850 flex flex-col max-h-[80vh] overflow-hidden animate-in zoom-in-95 duration-200">
             {/* Header Modal */}
@@ -485,16 +500,25 @@ export function EventosClient() {
               <div>
                 <h4 className="font-black text-sm tracking-tight flex items-center gap-1.5">
                   <Trophy className="h-4.5 w-4.5 text-amber-500" />
-                  Pontuadores da Rodada
+                  Pontuadores do Jogo
                 </h4>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 select-none">
-                  Classificação da {selectedRodadaScorers.nome}
+                  {selectedMatchScorers.timeA}{' '}
+                  {selectedMatchScorers.golsA !== null
+                    ? selectedMatchScorers.golsA
+                    : ''}{' '}
+                  x{' '}
+                  {selectedMatchScorers.golsB !== null
+                    ? selectedMatchScorers.golsB
+                    : ''}{' '}
+                  {selectedMatchScorers.timeB} (
+                  {selectedMatchScorers.rodadaNome})
                 </p>
               </div>
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setSelectedRodadaScorers(null)}
+                onClick={() => setSelectedMatchScorers(null)}
                 className="rounded-full h-8 w-8 hover:bg-zinc-100 dark:hover:bg-zinc-800"
               >
                 <X className="h-4.5 w-4.5" />
@@ -503,35 +527,55 @@ export function EventosClient() {
 
             {/* Listagem de Pontuadores */}
             <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3 min-h-[250px]">
-              {loadingPontuadores[selectedRodadaScorers.id] ? (
+              {loadingPontuadoresPartida ? (
                 <div className="flex flex-col items-center justify-center py-20 space-y-2">
                   <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
                   <p className="text-xs text-zinc-400">
                     Carregando pontuações...
                   </p>
                 </div>
-              ) : (pontuadoresMap[selectedRodadaScorers.id] || []).length ===
-                0 ? (
+              ) : mensagemPontuadoresPartida ? (
                 <div className="text-center py-16 text-xs text-zinc-400 italic">
-                  Nenhum ponto registrado nesta rodada ainda.
+                  {mensagemPontuadoresPartida}
+                </div>
+              ) : pontuadoresPartida.length === 0 ? (
+                <div className="text-center py-16 text-xs text-zinc-450 dark:text-zinc-500 italic">
+                  Nenhum palpite computado ou pontuado para este jogo.
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {(pontuadoresMap[selectedRodadaScorers.id] || []).map(
-                    (pt, idx) => (
+                  {pontuadoresPartida.map((pt, idx) => {
+                    let badgeColor =
+                      'bg-zinc-100 text-zinc-650 dark:bg-zinc-800 dark:text-zinc-400';
+                    if (pt.pontos === 2) {
+                      badgeColor =
+                        'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400';
+                    } else if (pt.pontos === 1) {
+                      badgeColor =
+                        'bg-blue-500/10 text-blue-600 dark:text-blue-400';
+                    }
+
+                    return (
                       <div
-                        key={`${pt.usuarioNome}-${pt.pontos}`}
+                        key={`${pt.usuarioNome}-${pt.pontos}-${idx}`}
                         className="flex items-center justify-between bg-zinc-50 dark:bg-zinc-950/30 p-3 rounded-2xl border border-zinc-150 dark:border-zinc-850/50 text-xs"
                       >
-                        <span className="font-semibold text-zinc-700 dark:text-zinc-300">
-                          {idx + 1}º. {pt.usuarioNome}
-                        </span>
-                        <span className="font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded-lg">
-                          +{pt.pontos} PTS
+                        <div className="flex flex-col">
+                          <span className="font-bold text-zinc-800 dark:text-zinc-200">
+                            {idx + 1}º. {pt.usuarioNome}
+                          </span>
+                          <span className="text-[10px] text-zinc-500 dark:text-zinc-450 mt-0.5">
+                            Palpite: {pt.palpiteA} x {pt.palpiteB}
+                          </span>
+                        </div>
+                        <span
+                          className={`font-black text-[10px] px-2 py-0.5 rounded-lg shrink-0 ${badgeColor}`}
+                        >
+                          {pt.pontos > 0 ? `+${pt.pontos} PTS` : '0 PTS'}
                         </span>
                       </div>
-                    ),
-                  )}
+                    );
+                  })}
                 </div>
               )}
             </div>
