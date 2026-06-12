@@ -43,6 +43,13 @@ export interface IPontuadorRodada {
   pontos: number;
 }
 
+export interface IPontuadorPartida {
+  usuarioNome: string;
+  palpiteA: number;
+  palpiteB: number;
+  pontos: number;
+}
+
 export interface IComentarioFormatado {
   id: string;
   usuarioNome: string;
@@ -395,6 +402,133 @@ export async function obterComentariosPartida(partidaId: string): Promise<{
       success: false,
       comentarios: [],
       message: 'Erro interno ao obter comentários.',
+    };
+  }
+}
+
+// 5. Obter pontuadores de uma partida/jogo específico
+export async function obterPontuadoresPartida(partidaId: string): Promise<{
+  success: boolean;
+  pontuadores: IPontuadorPartida[];
+  timeA?: string;
+  timeB?: string;
+  golsA?: number | null;
+  golsB?: number | null;
+  message?: string;
+}> {
+  const session = await obterSessao();
+  if (!session || !session.id) {
+    return {
+      success: false,
+      pontuadores: [],
+      message: 'Usuário não autenticado.',
+    };
+  }
+
+  try {
+    const timeA = alias(times, 'time_a');
+    const timeB = alias(times, 'time_b');
+
+    const matchResult = await db
+      .select({
+        id: partidas.id,
+        golsTimeA: partidas.golsTimeA,
+        golsTimeB: partidas.golsTimeB,
+        timeANome: timeA.nome,
+        timeBNome: timeB.nome,
+        status: partidas.status,
+      })
+      .from(partidas)
+      .innerJoin(timeA, eq(partidas.timeAId, timeA.id))
+      .innerJoin(timeB, eq(partidas.timeBId, timeB.id))
+      .where(eq(partidas.id, partidaId))
+      .limit(1);
+
+    if (matchResult.length === 0) {
+      return {
+        success: false,
+        pontuadores: [],
+        message: 'Partida não encontrada.',
+      };
+    }
+
+    const match = matchResult[0];
+
+    // Se o jogo ainda não foi finalizado/não tem resultado, não há pontuação calculada
+    if (
+      match.golsTimeA === null ||
+      match.golsTimeB === null ||
+      (match.status !== 'FINALIZADO' && match.status !== 'FINALIZADA')
+    ) {
+      return {
+        success: true,
+        pontuadores: [],
+        timeA: match.timeANome,
+        timeB: match.timeBNome,
+        golsA: match.golsTimeA,
+        golsB: match.golsTimeB,
+        message:
+          'A pontuação será exibida quando o jogo for finalizado pelo administrador.',
+      };
+    }
+
+    // Buscar todos os palpites para esta partida, trazendo o nome do usuário
+    const listPalpites = await db
+      .select({
+        usuarioNome: usuarios.nome,
+        palpiteA: palpites.golsTimeA,
+        palpiteB: palpites.golsTimeB,
+      })
+      .from(palpites)
+      .innerJoin(usuarios, eq(palpites.usuarioId, usuarios.id))
+      .where(eq(palpites.partidaId, partidaId));
+
+    const golsRealA = match.golsTimeA;
+    const golsRealB = match.golsTimeB;
+    const vencedorReal = obterVencedor(golsRealA, golsRealB);
+
+    const pontuadores: IPontuadorPartida[] = listPalpites.map((p) => {
+      const vencedorPalpite = obterVencedor(p.palpiteA, p.palpiteB);
+      const acertouPlacarExato =
+        p.palpiteA === golsRealA && p.palpiteB === golsRealB;
+
+      let pontos = 0;
+      if (acertouPlacarExato) {
+        pontos = 2;
+      } else if (vencedorPalpite === vencedorReal) {
+        pontos = 1;
+      }
+
+      return {
+        usuarioNome: p.usuarioNome,
+        palpiteA: p.palpiteA,
+        palpiteB: p.palpiteB,
+        pontos,
+      };
+    });
+
+    // Ordenar por pontos desc, e em caso de empate, por nome do competidor
+    pontuadores.sort((a, b) => {
+      if (b.pontos !== a.pontos) {
+        return b.pontos - a.pontos;
+      }
+      return a.usuarioNome.localeCompare(b.usuarioNome);
+    });
+
+    return {
+      success: true,
+      pontuadores,
+      timeA: match.timeANome,
+      timeB: match.timeBNome,
+      golsA: match.golsTimeA,
+      golsB: match.golsTimeB,
+    };
+  } catch (error) {
+    console.error('Erro ao obter pontuadores da partida:', error);
+    return {
+      success: false,
+      pontuadores: [],
+      message: 'Erro interno ao calcular pontuadores.',
     };
   }
 }
