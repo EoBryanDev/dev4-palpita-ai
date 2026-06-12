@@ -172,6 +172,19 @@ export function EventosClient() {
         if (fresh.success) {
           setComentariosList(fresh.comentarios);
         }
+        // Atualizar o contador de comentários localmente na timeline
+        setEventos((prevEventos) =>
+          prevEventos.map((evt) =>
+            evt.id === selectedMatch.id
+              ? {
+                  ...evt,
+                  comentariosCount: fresh.success
+                    ? fresh.comentarios.length
+                    : evt.comentariosCount + 1,
+                }
+              : evt,
+          ),
+        );
         toast({
           title: 'Sucesso',
           description: 'Comentário enviado com sucesso!',
