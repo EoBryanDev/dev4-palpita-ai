@@ -1,7 +1,7 @@
 ## 1. Setup & Dependencies
 
-- [ ] 1.1 Add `jspdf` and `jspdf-autotable` dependencies to `apps/web/package.json`
-- [ ] 1.2 Run package installation to sync node_modules
+- [x] 1.1 Add `jspdf` and `jspdf-autotable` dependencies to `apps/web/package.json`
+- [/] 1.2 Run package installation to sync node_modules
 
 ## 2. Service & Actions
 
