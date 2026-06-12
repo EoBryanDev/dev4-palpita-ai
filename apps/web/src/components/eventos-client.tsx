@@ -51,6 +51,11 @@ export function EventosClient() {
   const [loadingPontuadores, setLoadingPontuadores] = useState<
     Record<string, boolean>
   >({});
+  // Estados do Modal de Pontuadores
+  const [selectedRodadaScorers, setSelectedRodadaScorers] = useState<{
+    id: string;
+    nome: string;
+  } | null>(null);
 
   // Carregar timeline inicial
   const carregarTimeline = useCallback(async () => {
@@ -90,6 +95,11 @@ export function EventosClient() {
     } finally {
       setLoadingPontuadores((prev) => ({ ...prev, [rodadaId]: false }));
     }
+  };
+
+  const abrirModalPontuadores = (rodadaId: string, rodadaNome: string) => {
+    setSelectedRodadaScorers({ id: rodadaId, nome: rodadaNome });
+    carregarPontuadores(rodadaId);
   };
 
   // Carregar comentários de um jogo
@@ -330,13 +340,16 @@ export function EventosClient() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => carregarPontuadores(evento.rodadaId)}
+                        onClick={() =>
+                          abrirModalPontuadores(
+                            evento.rodadaId,
+                            evento.rodadaNome,
+                          )
+                        }
                         className="text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 p-0 hover:bg-transparent flex items-center gap-1.5"
                       >
                         <Trophy className="h-4 w-4 text-amber-500" />
-                        {showScorers
-                          ? 'Ocultar pontuadores da rodada'
-                          : 'Ver pontuadores da rodada'}
+                        Ver pontuadores da rodada
                       </Button>
                     </div>
 
@@ -348,45 +361,15 @@ export function EventosClient() {
                     >
                       <MessageCircle className="h-4.5 w-4.5 text-blue-500" />
                       Comentários
+                      {evento.comentariosCount > 0 && (
+                        <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-blue-500 text-white dark:bg-blue-600 text-[10px] font-bold">
+                          {evento.comentariosCount > 9
+                            ? '9+'
+                            : evento.comentariosCount}
+                        </span>
+                      )}
                     </Button>
                   </div>
-
-                  {/* Seção Expandida: Maiores Pontuadores */}
-                  {showScorers && (
-                    <div className="mt-4 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/10 space-y-2.5 animate-in fade-in duration-250">
-                      <h5 className="text-[11px] font-black uppercase tracking-wider text-zinc-450 dark:text-zinc-500 flex items-center gap-1">
-                        <Users className="h-3.5 w-3.5 text-zinc-400" />
-                        Classificação da {evento.rodadaNome}
-                      </h5>
-
-                      {isLoadingScorers ? (
-                        <div className="flex items-center gap-1 text-xs text-zinc-500 py-1">
-                          <Loader2 className="h-3 w-3 animate-spin" />{' '}
-                          Carregando pontuações...
-                        </div>
-                      ) : scorers.length === 0 ? (
-                        <div className="text-xs text-zinc-400 italic py-1">
-                          Nenhum ponto registrado nesta rodada ainda.
-                        </div>
-                      ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                          {scorers.map((pt, idx) => (
-                            <div
-                              key={`${pt.usuarioNome}-${pt.pontos}`}
-                              className="flex items-center justify-between bg-white dark:bg-zinc-950/40 p-2 rounded-xl border border-zinc-150 dark:border-zinc-800/80"
-                            >
-                              <span className="font-semibold text-zinc-700 dark:text-zinc-300">
-                                {idx + 1}º. {pt.usuarioNome}
-                              </span>
-                              <span className="font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded-lg">
-                                +{pt.pontos} PTS
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
                 </div>
               </div>
             );
@@ -461,21 +444,26 @@ export function EventosClient() {
               onSubmit={handleEnviarComentario}
               className="border-t border-zinc-200 dark:border-zinc-800 p-4 bg-zinc-50 dark:bg-zinc-950/20 flex gap-2 items-center"
             >
-              <input
-                type="text"
-                maxLength={500}
-                required
-                disabled={enviandoComentario}
-                value={novoComentarioText}
-                onChange={(e) => setNovoComentarioText(e.target.value)}
-                placeholder="Envie seu comentário sobre o jogo..."
-                className="flex-1 h-10 px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white text-xs outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:bg-zinc-900 dark:text-zinc-50 disabled:opacity-50"
-              />
+              <div className="relative flex-1 flex items-center">
+                <input
+                  type="text"
+                  maxLength={280}
+                  required
+                  disabled={enviandoComentario}
+                  value={novoComentarioText}
+                  onChange={(e) => setNovoComentarioText(e.target.value)}
+                  placeholder="Envie seu comentário sobre o jogo..."
+                  className="w-full h-10 pl-4 pr-12 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white text-xs outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:bg-zinc-900 dark:text-zinc-50 disabled:opacity-50"
+                />
+                <span className="absolute right-3 text-[10px] text-zinc-400 font-medium select-none">
+                  {280 - novoComentarioText.length}
+                </span>
+              </div>
               <Button
                 type="submit"
                 size="icon"
                 disabled={!novoComentarioText.trim() || enviandoComentario}
-                className="bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:text-zinc-950 dark:hover:bg-emerald-400 rounded-xl h-10 w-10 flex items-center justify-center"
+                className="bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:text-zinc-950 dark:hover:bg-emerald-400 rounded-xl h-10 w-10 flex items-center justify-center shrink-0"
               >
                 {enviandoComentario ? (
                   <Loader2 className="h-4.5 w-4.5 animate-spin" />
@@ -484,6 +472,69 @@ export function EventosClient() {
                 )}
               </Button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Pontuadores */}
+      {selectedRodadaScorers && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl border border-zinc-200 dark:border-zinc-850 flex flex-col max-h-[80vh] overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Header Modal */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
+              <div>
+                <h4 className="font-black text-sm tracking-tight flex items-center gap-1.5">
+                  <Trophy className="h-4.5 w-4.5 text-amber-500" />
+                  Pontuadores da Rodada
+                </h4>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 select-none">
+                  Classificação da {selectedRodadaScorers.nome}
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSelectedRodadaScorers(null)}
+                className="rounded-full h-8 w-8 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              >
+                <X className="h-4.5 w-4.5" />
+              </Button>
+            </div>
+
+            {/* Listagem de Pontuadores */}
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3 min-h-[250px]">
+              {loadingPontuadores[selectedRodadaScorers.id] ? (
+                <div className="flex flex-col items-center justify-center py-20 space-y-2">
+                  <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
+                  <p className="text-xs text-zinc-400">
+                    Carregando pontuações...
+                  </p>
+                </div>
+              ) : (pontuadoresMap[selectedRodadaScorers.id] || []).length ===
+                0 ? (
+                <div className="text-center py-16 text-xs text-zinc-400 italic">
+                  Nenhum ponto registrado nesta rodada ainda.
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {(pontuadoresMap[selectedRodadaScorers.id] || []).map(
+                    (pt, idx) => (
+                      <div
+                        key={`${pt.usuarioNome}-${pt.pontos}`}
+                        className="flex items-center justify-between bg-zinc-50 dark:bg-zinc-950/30 p-3 rounded-2xl border border-zinc-150 dark:border-zinc-850/50 text-xs"
+                      >
+                        <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+                          {idx + 1}º. {pt.usuarioNome}
+                        </span>
+                        <span className="font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded-lg">
+                          +{pt.pontos} PTS
+                        </span>
+                      </div>
+                    ),
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

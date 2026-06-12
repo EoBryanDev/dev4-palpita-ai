@@ -139,7 +139,7 @@ export async function obterPalpitesSalvosFuturosPaginados(
       ),
     )
     .orderBy(
-      sql`CASE WHEN ${partidas.dataInicio} >= ${agora} THEN 0 ELSE 1 END`,
+      sql`CASE WHEN ${partidas.dataInicio} >= ${agora.toISOString()} THEN 0 ELSE 1 END`,
       asc(partidas.dataInicio),
     )
     .limit(limit)

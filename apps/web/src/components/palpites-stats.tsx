@@ -274,7 +274,7 @@ export function PalpitesStats() {
                     <div className="mt-4 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/20 text-xs space-y-3 transition-all animate-in fade-in slide-in-from-top-1 duration-200">
                       {match.palpitesIndividuaisLiberados ? (
                         match.palpitesIndividuais.length > 0 ? (
-                          <div className="overflow-hidden">
+                          <div className="max-h-60 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-zinc-250 dark:scrollbar-thumb-zinc-800">
                             <table className="w-full text-left">
                               <thead>
                                 <tr className="text-[10px] uppercase font-bold text-zinc-400 border-b border-zinc-200 dark:border-zinc-800">

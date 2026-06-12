@@ -9,7 +9,17 @@ import {
   times,
   usuarios,
 } from '@palpita/db';
-import { type Column, and, asc, desc, eq, lte, ne, or } from 'drizzle-orm';
+import {
+  type Column,
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  lte,
+  ne,
+  or,
+} from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { obterSessao } from './auth';
 
@@ -25,6 +35,7 @@ export interface IEventoTimeline {
   status: string;
   rodadaId: string;
   rodadaNome: string;
+  comentariosCount: number;
 }
 
 export interface IPontuadorRodada {
@@ -76,17 +87,32 @@ export async function obterEventosTimeline(): Promise<{
         status: partidas.status,
         rodadaId: partidas.rodadaId,
         rodadaNome: rodadas.nome,
+        comentariosCount: count(comentarios.id),
       })
       .from(partidas)
       .innerJoin(rodadas, eq(partidas.rodadaId, rodadas.id))
       .innerJoin(timeA, eq(partidas.timeAId, timeA.id))
       .innerJoin(timeB, eq(partidas.timeBId, timeB.id))
+      .leftJoin(comentarios, eq(partidas.id, comentarios.partidaId))
       .where(
         or(
           lte(partidas.dataInicio, agora),
           eq(partidas.status, 'FINALIZADO'),
           eq(partidas.status, 'FINALIZADA'),
         ),
+      )
+      .groupBy(
+        partidas.id,
+        timeA.nome,
+        timeB.nome,
+        timeA.emoji,
+        timeB.emoji,
+        partidas.golsTimeA,
+        partidas.golsTimeB,
+        partidas.dataInicio,
+        partidas.status,
+        partidas.rodadaId,
+        rodadas.nome,
       )
       .orderBy(desc(partidas.dataInicio));
 
@@ -102,6 +128,7 @@ export async function obterEventosTimeline(): Promise<{
       status: item.status,
       rodadaId: item.rodadaId,
       rodadaNome: item.rodadaNome,
+      comentariosCount: Number(item.comentariosCount),
     }));
 
     return { success: true, eventos };
@@ -281,14 +308,33 @@ export async function adicionarComentario(
     };
   }
 
-  if (texto.length > 500) {
+  if (texto.length > 280) {
     return {
       success: false,
-      message: 'O comentário deve ter no máximo 500 caracteres.',
+      message:
+        'O comentário deve ter no máximo 280 caracteres (tamanho de um tweet).',
     };
   }
 
   try {
+    const existingCommentsCount = await db
+      .select({ count: count() })
+      .from(comentarios)
+      .where(
+        and(
+          eq(comentarios.partidaId, partidaId),
+          eq(comentarios.usuarioId, session.id),
+        ),
+      );
+
+    const totalCount = existingCommentsCount[0]?.count ?? 0;
+    if (totalCount >= 10) {
+      return {
+        success: false,
+        message: 'Você já atingiu o limite de 10 comentários para este jogo.',
+      };
+    }
+
     await db.insert(comentarios).values({
       partidaId,
       usuarioId: session.id,
