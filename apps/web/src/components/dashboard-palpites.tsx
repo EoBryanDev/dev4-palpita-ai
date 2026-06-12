@@ -286,10 +286,20 @@ export function DashboardPalpites({
           {/* Coluna 1 & 2: Palpites (Pendentes e Salvos) */}
           <div className="lg:col-span-2 space-y-16">
             {rodadas.map((rodada) => {
-              const partidasFuturas = rodada.partidas.filter((p) => {
-                const dataInicio = new Date(p.dataInicio);
-                return dataInicio > new Date() && p.status !== 'FINALIZADO';
-              });
+              const partidasFuturas = rodada.partidas
+                .filter((p) => {
+                  return p.status !== 'FINALIZADO' && p.status !== 'FINALIZADA';
+                })
+                .sort((a, b) => {
+                  const aFuturo = new Date(a.dataInicio) >= new Date();
+                  const bFuturo = new Date(b.dataInicio) >= new Date();
+                  if (aFuturo && !bFuturo) return -1;
+                  if (!aFuturo && bFuturo) return 1;
+                  return (
+                    new Date(a.dataInicio).getTime() -
+                    new Date(b.dataInicio).getTime()
+                  );
+                });
 
               const palpitesPendentes = partidasFuturas.filter(
                 (p) => !p.jaPalpitou,

@@ -1,6 +1,6 @@
 import type { IPartidaDashboard } from '@/interface/IDashboard';
 import { db, palpites, partidas, rodadas, times, usuarios } from '@palpita/db';
-import { and, asc, count, eq, gt, inArray, ne, or } from 'drizzle-orm';
+import { and, asc, count, eq, gt, inArray, ne, or, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 
 export interface IPalpiteServiceData {
@@ -94,7 +94,6 @@ export async function obterTotalPalpitesSalvosFuturos(
     .where(
       and(
         eq(palpites.usuarioId, usuarioId),
-        gt(partidas.dataInicio, agora),
         ne(partidas.status, 'FINALIZADO'),
         ne(partidas.status, 'FINALIZADA'),
       ),
@@ -135,12 +134,14 @@ export async function obterPalpitesSalvosFuturosPaginados(
     .where(
       and(
         eq(palpites.usuarioId, usuarioId),
-        gt(partidas.dataInicio, agora),
         ne(partidas.status, 'FINALIZADO'),
         ne(partidas.status, 'FINALIZADA'),
       ),
     )
-    .orderBy(asc(partidas.dataInicio))
+    .orderBy(
+      sql`CASE WHEN ${partidas.dataInicio} >= ${agora.toISOString()} THEN 0 ELSE 1 END`,
+      asc(partidas.dataInicio),
+    )
     .limit(limit)
     .offset(offset);
 

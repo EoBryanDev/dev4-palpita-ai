@@ -26,6 +26,9 @@ export const metadata: Metadata = {
   title: 'Palpita AI - Plataforma de Palpites',
   description:
     'Dê seus palpites nos jogos da Copa do Mundo e dispute prêmios com seus amigos.',
+  icons: {
+    icon: '/logo_dev4-removebg-preview.png',
+  },
 };
 
 import { obterPartidas } from '@/services/partidas.service';

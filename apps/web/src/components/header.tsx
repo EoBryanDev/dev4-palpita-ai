@@ -43,6 +43,7 @@ export function Header({
       links.push({ href: '/admin/partidas', label: 'Partidas' });
     } else {
       links.push({ href: '/palpites', label: 'Palpites' });
+      links.push({ href: '/eventos', label: 'Eventos' });
       links.push({ href: '/meu-espaco', label: 'Meu Espaço' });
     }
   } else {
@@ -63,9 +64,11 @@ export function Header({
       <div className="mx-auto flex max-w-7xl h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/home" className="flex items-center gap-2 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white transition-all group-hover:scale-105 dark:bg-emerald-500">
-            <Trophy className="h-5 w-5" />
-          </div>
+          <img
+            src="/logo_dev4-removebg-preview.png"
+            alt="Logo Palpita AI"
+            className="h-9 w-auto object-contain transition-all group-hover:scale-105"
+          />
           <span className="text-xl font-black tracking-wider bg-linear-to-r from-emerald-600 via-emerald-500 to-amber-500 bg-clip-text text-transparent dark:from-emerald-400 dark:via-emerald-300 dark:to-amber-400">
             PALPITA AI
           </span>
