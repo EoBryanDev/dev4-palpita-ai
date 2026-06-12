@@ -43,6 +43,7 @@ export function Header({
       links.push({ href: '/admin/partidas', label: 'Partidas' });
     } else {
       links.push({ href: '/palpites', label: 'Palpites' });
+      links.push({ href: '/eventos', label: 'Eventos' });
       links.push({ href: '/meu-espaco', label: 'Meu Espaço' });
     }
   } else {

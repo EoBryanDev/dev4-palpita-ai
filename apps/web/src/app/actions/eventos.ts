@@ -1,0 +1,354 @@
+'use server';
+
+import {
+  comentarios,
+  db,
+  palpites,
+  partidas,
+  rodadas,
+  times,
+  usuarios,
+} from '@palpita/db';
+import { type Column, and, asc, desc, eq, lte, ne, or } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
+import { obterSessao } from './auth';
+
+export interface IEventoTimeline {
+  id: string;
+  timeA: string;
+  timeB: string;
+  timeAEmoji: string | null;
+  timeBEmoji: string | null;
+  golsTimeA: number | null;
+  golsTimeB: number | null;
+  dataInicio: string;
+  status: string;
+  rodadaId: string;
+  rodadaNome: string;
+}
+
+export interface IPontuadorRodada {
+  usuarioNome: string;
+  pontos: number;
+}
+
+export interface IComentarioFormatado {
+  id: string;
+  usuarioNome: string;
+  usuarioId: string;
+  conteudo: string;
+  dataCriacao: string;
+}
+
+// Helper para calcular vencedor
+const obterVencedor = (golsA: number, golsB: number): 'A' | 'B' | 'EMPATE' => {
+  if (golsA > golsB) return 'A';
+  if (golsB > golsA) return 'B';
+  return 'EMPATE';
+};
+
+// 1. Obter a timeline de eventos (jogos já iniciados ou finalizados)
+export async function obterEventosTimeline(): Promise<{
+  success: boolean;
+  eventos: IEventoTimeline[];
+  message?: string;
+}> {
+  const session = await obterSessao();
+  if (!session || !session.id) {
+    return { success: false, eventos: [], message: 'Usuário não autenticado.' };
+  }
+
+  try {
+    const timeA = alias(times, 'time_a');
+    const timeB = alias(times, 'time_b');
+    const agora = new Date();
+
+    const queryResult = await db
+      .select({
+        id: partidas.id,
+        timeA: timeA.nome,
+        timeB: timeB.nome,
+        timeAEmoji: timeA.emoji,
+        timeBEmoji: timeB.emoji,
+        golsTimeA: partidas.golsTimeA,
+        golsTimeB: partidas.golsTimeB,
+        dataInicio: partidas.dataInicio,
+        status: partidas.status,
+        rodadaId: partidas.rodadaId,
+        rodadaNome: rodadas.nome,
+      })
+      .from(partidas)
+      .innerJoin(rodadas, eq(partidas.rodadaId, rodadas.id))
+      .innerJoin(timeA, eq(partidas.timeAId, timeA.id))
+      .innerJoin(timeB, eq(partidas.timeBId, timeB.id))
+      .where(
+        or(
+          lte(partidas.dataInicio, agora),
+          eq(partidas.status, 'FINALIZADO'),
+          eq(partidas.status, 'FINALIZADA'),
+        ),
+      )
+      .orderBy(desc(partidas.dataInicio));
+
+    const eventos: IEventoTimeline[] = queryResult.map((item) => ({
+      id: item.id,
+      timeA: item.timeA,
+      timeB: item.timeB,
+      timeAEmoji: item.timeAEmoji,
+      timeBEmoji: item.timeBEmoji,
+      golsTimeA: item.golsTimeA,
+      golsTimeB: item.golsTimeB,
+      dataInicio: item.dataInicio.toISOString(),
+      status: item.status,
+      rodadaId: item.rodadaId,
+      rodadaNome: item.rodadaNome,
+    }));
+
+    return { success: true, eventos };
+  } catch (error) {
+    console.error('Erro ao obter eventos da timeline:', error);
+    return {
+      success: false,
+      eventos: [],
+      message: 'Erro interno ao buscar timeline.',
+    };
+  }
+}
+
+// 2. Obter pontuadores de uma determinada rodada
+export async function obterPontuadoresRodada(rodadaId: string): Promise<{
+  success: boolean;
+  pontuadores: IPontuadorRodada[];
+  message?: string;
+}> {
+  const session = await obterSessao();
+  if (!session || !session.id) {
+    return {
+      success: false,
+      pontuadores: [],
+      message: 'Usuário não autenticado.',
+    };
+  }
+
+  try {
+    // Buscar todos os competidores ativos/liberados (que não sejam ADMIN)
+    const competidores = await db
+      .select({
+        id: usuarios.id,
+        nome: usuarios.nome,
+      })
+      .from(usuarios)
+      .where(
+        and(
+          or(eq(usuarios.status, 'ATIVO'), eq(usuarios.status, 'LIBERADO')),
+          ne(usuarios.cargo, 'ADMIN'),
+        ),
+      );
+
+    // Buscar partidas finalizadas dessa rodada
+    const partidasFinalizadas = await db
+      .select({
+        id: partidas.id,
+        golsTimeA: partidas.golsTimeA,
+        golsTimeB: partidas.golsTimeB,
+      })
+      .from(partidas)
+      .where(
+        and(
+          eq(partidas.rodadaId, rodadaId),
+          or(
+            eq(partidas.status, 'FINALIZADO'),
+            eq(partidas.status, 'FINALIZADA'),
+          ),
+        ),
+      );
+
+    if (partidasFinalizadas.length === 0) {
+      return { success: true, pontuadores: [] };
+    }
+
+    const partidasMap = new Map<
+      string,
+      { golsTimeA: number; golsTimeB: number }
+    >();
+    const partidaIds: string[] = [];
+    for (const p of partidasFinalizadas) {
+      if (p.golsTimeA !== null && p.golsTimeB !== null) {
+        partidasMap.set(p.id, {
+          golsTimeA: p.golsTimeA,
+          golsTimeB: p.golsTimeB,
+        });
+        partidaIds.push(p.id);
+      }
+    }
+
+    // Buscar palpites nessas partidas
+    const palpitesRodada = await db
+      .select({
+        usuarioId: palpites.usuarioId,
+        partidaId: palpites.partidaId,
+        golsTimeA: palpites.golsTimeA,
+        golsTimeB: palpites.golsTimeB,
+      })
+      .from(palpites)
+      .where(inArrayOrTrue(palpites.partidaId, partidaIds));
+
+    // Agrupar palpites por usuário
+    const palpitesPorUsuario = new Map<string, typeof palpitesRodada>();
+    for (const palpite of palpitesRodada) {
+      const list = palpitesPorUsuario.get(palpite.usuarioId) || [];
+      list.push(palpite);
+      palpitesPorUsuario.set(palpite.usuarioId, list);
+    }
+
+    // Calcular os pontos obtidos nessa rodada para cada usuário
+    const pontuadores: IPontuadorRodada[] = [];
+
+    for (const comp of competidores) {
+      const userGuesses = palpitesPorUsuario.get(comp.id) || [];
+      let pontosRodada = 0;
+
+      for (const guess of userGuesses) {
+        const match = partidasMap.get(guess.partidaId);
+        if (match) {
+          const vencedorPalpite = obterVencedor(
+            guess.golsTimeA,
+            guess.golsTimeB,
+          );
+          const vencedorPartida = obterVencedor(
+            match.golsTimeA,
+            match.golsTimeB,
+          );
+
+          const acertouPlacarExato =
+            guess.golsTimeA === match.golsTimeA &&
+            guess.golsTimeB === match.golsTimeB;
+
+          if (acertouPlacarExato) {
+            pontosRodada += 2;
+          } else if (vencedorPalpite === vencedorPartida) {
+            pontosRodada += 1;
+          }
+        }
+      }
+
+      if (pontosRodada > 0) {
+        pontuadores.push({
+          usuarioNome: comp.nome,
+          pontos: pontosRodada,
+        });
+      }
+    }
+
+    // Ordenar pontuadores por pontos desc
+    pontuadores.sort((a, b) => b.pontos - a.pontos);
+
+    return { success: true, pontuadores };
+  } catch (error) {
+    console.error('Erro ao obter pontuadores da rodada:', error);
+    return {
+      success: false,
+      pontuadores: [],
+      message: 'Erro interno ao calcular pontuadores.',
+    };
+  }
+}
+
+// Auxiliar para lidar com inArray vazio
+function inArrayOrTrue(column: Column, values: string[]) {
+  if (values.length === 0) {
+    return eq(column, '00000000-0000-0000-0000-000000000000'); // ID nulo para retornar nada
+  }
+  const { inArray } = require('drizzle-orm');
+  return inArray(column, values);
+}
+
+// 3. Adicionar um comentário no confronto
+export async function adicionarComentario(
+  partidaId: string,
+  conteudo: string,
+): Promise<{ success: boolean; message: string }> {
+  const session = await obterSessao();
+  if (!session || !session.id) {
+    return { success: false, message: 'Usuário não autenticado.' };
+  }
+
+  const texto = conteudo?.trim();
+  if (!texto) {
+    return {
+      success: false,
+      message: 'O conteúdo do comentário não pode estar vazio.',
+    };
+  }
+
+  if (texto.length > 500) {
+    return {
+      success: false,
+      message: 'O comentário deve ter no máximo 500 caracteres.',
+    };
+  }
+
+  try {
+    await db.insert(comentarios).values({
+      partidaId,
+      usuarioId: session.id,
+      conteudo: texto,
+    });
+
+    return { success: true, message: 'Comentário enviado com sucesso!' };
+  } catch (error) {
+    console.error('Erro ao adicionar comentário:', error);
+    return {
+      success: false,
+      message: 'Erro ao enviar comentário. Tente novamente.',
+    };
+  }
+}
+
+// 4. Obter os comentários de uma partida
+export async function obterComentariosPartida(partidaId: string): Promise<{
+  success: boolean;
+  comentarios: IComentarioFormatado[];
+  message?: string;
+}> {
+  const session = await obterSessao();
+  if (!session || !session.id) {
+    return {
+      success: false,
+      comentarios: [],
+      message: 'Usuário não autenticado.',
+    };
+  }
+
+  try {
+    const list = await db
+      .select({
+        id: comentarios.id,
+        conteudo: comentarios.conteudo,
+        dataCriacao: comentarios.dataCriacao,
+        usuarioNome: usuarios.nome,
+        usuarioId: usuarios.id,
+      })
+      .from(comentarios)
+      .innerJoin(usuarios, eq(comentarios.usuarioId, usuarios.id))
+      .where(eq(comentarios.partidaId, partidaId))
+      .orderBy(asc(comentarios.dataCriacao));
+
+    const result: IComentarioFormatado[] = list.map((item) => ({
+      id: item.id,
+      usuarioNome: item.usuarioNome,
+      usuarioId: item.usuarioId,
+      conteudo: item.conteudo,
+      dataCriacao: item.dataCriacao.toISOString(),
+    }));
+
+    return { success: true, comentarios: result };
+  } catch (error) {
+    console.error('Erro ao obter comentários da partida:', error);
+    return {
+      success: false,
+      comentarios: [],
+      message: 'Erro interno ao obter comentários.',
+    };
+  }
+}

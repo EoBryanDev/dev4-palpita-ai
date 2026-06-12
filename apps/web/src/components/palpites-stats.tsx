@@ -41,25 +41,38 @@ export function PalpitesStats() {
     setExpandedMatchId((prev) => (prev === matchId ? null : matchId));
   };
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'FINALIZADO':
-        return {
-          label: 'Encerrado',
-          styles:
-            'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300',
-        };
-      case 'EM_ANDAMENTO':
-        return {
-          label: 'Em Andamento',
-          styles: 'bg-red-500/10 text-red-500 animate-pulse',
-        };
-      default:
-        return {
-          label: 'Agendado',
-          styles: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-        };
+  const getStatusLabel = (status: string, dataInicioStr: string) => {
+    if (status === 'FINALIZADO' || status === 'FINALIZADA') {
+      return {
+        label: 'Encerrado',
+        styles: 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300',
+      };
     }
+
+    const dataInicio = new Date(dataInicioStr);
+    const agora = new Date();
+    const diffMs = agora.getTime() - dataInicio.getTime();
+    const diffMinutes = diffMs / (1000 * 60);
+
+    if (diffMinutes < 0) {
+      return {
+        label: 'Agendado',
+        styles: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+      };
+    }
+
+    if (diffMinutes >= 115) {
+      return {
+        label: 'Calculando Encerramento',
+        styles:
+          'bg-purple-500/10 text-purple-500 dark:text-purple-400 animate-pulse',
+      };
+    }
+
+    return {
+      label: 'Em Andamento',
+      styles: 'bg-blue-500/10 text-blue-500 dark:text-blue-400 animate-pulse',
+    };
   };
 
   const formatDate = (dateStr: string) => {
@@ -125,7 +138,7 @@ export function PalpitesStats() {
       {filteredMatches.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2">
           {filteredMatches.map((match) => {
-            const statusInfo = getStatusLabel(match.status);
+            const statusInfo = getStatusLabel(match.status, match.dataInicio);
             const isExpanded = expandedMatchId === match.id;
 
             return (

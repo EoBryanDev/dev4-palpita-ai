@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 
 import { PalpitesStats } from '@/components/palpites-stats';
@@ -139,5 +139,160 @@ describe('PalpitesStats', () => {
     expect(screen.queryByText(/Bloqueado por Segurança/i)).toBeNull();
     expect(screen.getByText('Gabriel')).toBeDefined();
     expect(screen.getByText('2 x 1')).toBeDefined();
+  });
+
+  describe('Status Labels', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-06-12T12:00:00Z'));
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('deve exibir status "Encerrado" quando o status da partida for FINALIZADO', () => {
+      const mockData = [
+        {
+          id: 'm-encerrado',
+          timeA: 'Brasil',
+          timeB: 'Argentina',
+          golsTimeA: 2,
+          golsTimeB: 0,
+          dataInicio: '2026-06-12T10:00:00Z',
+          status: 'FINALIZADO',
+          rodadaNome: 'Oitavas',
+          estatisticas: {
+            total: 0,
+            vitoriasA: 0,
+            vitoriasB: 0,
+            empates: 0,
+            pctVitoriasA: 0,
+            pctVitoriasB: 0,
+            pctEmpates: 0,
+          },
+          palpitesIndividuaisLiberados: true,
+          palpitesIndividuais: [],
+        },
+      ];
+
+      (useQuery as Mock).mockReturnValue({
+        isLoading: false,
+        isError: false,
+        data: mockData,
+      });
+
+      render(<PalpitesStats />);
+
+      expect(screen.getByText('Encerrado')).toBeDefined();
+    });
+
+    it('deve exibir status "Agendado" se o jogo ainda não começou', () => {
+      const mockData = [
+        {
+          id: 'm-agendado',
+          timeA: 'Brasil',
+          timeB: 'Argentina',
+          golsTimeA: null,
+          golsTimeB: null,
+          dataInicio: '2026-06-12T13:00:00Z',
+          status: 'AGENDADO',
+          rodadaNome: 'Oitavas',
+          estatisticas: {
+            total: 0,
+            vitoriasA: 0,
+            vitoriasB: 0,
+            empates: 0,
+            pctVitoriasA: 0,
+            pctVitoriasB: 0,
+            pctEmpates: 0,
+          },
+          palpitesIndividuaisLiberados: false,
+          palpitesIndividuais: [],
+        },
+      ];
+
+      (useQuery as Mock).mockReturnValue({
+        isLoading: false,
+        isError: false,
+        data: mockData,
+      });
+
+      render(<PalpitesStats />);
+
+      expect(screen.getByText('Agendado')).toBeDefined();
+    });
+
+    it('deve exibir status "Em Andamento" se o jogo começou há menos de 115 minutos e não está finalizado', () => {
+      const mockData = [
+        {
+          id: 'm-andamento',
+          timeA: 'Brasil',
+          timeB: 'Argentina',
+          golsTimeA: null,
+          golsTimeB: null,
+          dataInicio: '2026-06-12T11:00:00Z',
+          status: 'INICIADO',
+          rodadaNome: 'Oitavas',
+          estatisticas: {
+            total: 0,
+            vitoriasA: 0,
+            vitoriasB: 0,
+            empates: 0,
+            pctVitoriasA: 0,
+            pctVitoriasB: 0,
+            pctEmpates: 0,
+          },
+          palpitesIndividuaisLiberados: true,
+          palpitesIndividuais: [],
+        },
+      ];
+
+      (useQuery as Mock).mockReturnValue({
+        isLoading: false,
+        isError: false,
+        data: mockData,
+      });
+
+      render(<PalpitesStats />);
+
+      expect(screen.getByText('Em Andamento')).toBeDefined();
+    });
+
+    it('deve exibir status "Calculando Encerramento" se o jogo começou há 115 minutos ou mais e não está finalizado', () => {
+      const mockData = [
+        {
+          id: 'm-calculando',
+          timeA: 'Brasil',
+          timeB: 'Argentina',
+          golsTimeA: null,
+          golsTimeB: null,
+          dataInicio: '2026-06-12T10:00:00Z',
+          status: 'INICIADO',
+          rodadaNome: 'Oitavas',
+          estatisticas: {
+            total: 0,
+            vitoriasA: 0,
+            vitoriasB: 0,
+            empates: 0,
+            pctVitoriasA: 0,
+            pctVitoriasB: 0,
+            pctEmpates: 0,
+          },
+          palpitesIndividuaisLiberados: true,
+          palpitesIndividuais: [],
+        },
+      ];
+
+      (useQuery as Mock).mockReturnValue({
+        isLoading: false,
+        isError: false,
+        data: mockData,
+      });
+
+      render(<PalpitesStats />);
+
+      expect(screen.getByText('Calculando Encerramento')).toBeDefined();
+    });
   });
 });

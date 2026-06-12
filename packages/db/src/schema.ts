@@ -105,3 +105,16 @@ export const configuracoes = pgTable('configuracoes', {
   dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
   dataAtualizacao: timestamp('data_atualizacao').defaultNow().notNull(),
 });
+
+// 7. Tabela de Comentários
+export const comentarios = pgTable('comentarios', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  partidaId: uuid('partida_id')
+    .notNull()
+    .references(() => partidas.id, { onDelete: 'cascade' }),
+  usuarioId: uuid('usuario_id')
+    .notNull()
+    .references(() => usuarios.id, { onDelete: 'cascade' }),
+  conteudo: varchar('conteudo', { length: 500 }).notNull(),
+  dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
+});
