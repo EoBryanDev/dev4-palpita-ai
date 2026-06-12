@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   CheckCircle2,
   Clock,
+  Download,
   Loader2,
   Save,
   ShieldCheck,
@@ -22,10 +23,16 @@ import {
 import { useEffect, useState } from 'react';
 import type React from 'react';
 
-import { obterPalpitesSalvosPaginadosAction } from '@/app/actions/palpites';
+import {
+  obterPalpitesSalvosPaginadosAction,
+  obterTodosPalpitesAction,
+} from '@/app/actions/palpites';
+import { gerarPalpitesPDF } from '@/helpers/pdf-generator';
 import { useCountdown } from '@/hooks/use-countdown';
 
 export function DashboardPalpites({
+  nomeUsuario,
+  emailUsuario,
   userStatus,
   pontos,
   posicao,
@@ -75,6 +82,31 @@ export function DashboardPalpites({
     }
   };
 
+  const [downloadingPDF, setDownloadingPDF] = useState(false);
+
+  const handleDownloadPDF = async () => {
+    if (downloadingPDF) return;
+    setDownloadingPDF(true);
+    try {
+      const response = await obterTodosPalpitesAction();
+      if (response.success && response.palpites) {
+        await gerarPalpitesPDF(
+          nomeUsuario,
+          emailUsuario,
+          pontos,
+          posicao,
+          response.palpites,
+        );
+      } else {
+        console.error('Erro ao obter palpites para PDF:', response.message);
+      }
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+    } finally {
+      setDownloadingPDF(false);
+    }
+  };
+
   const isUsuarioLiberado = userStatus === 'LIBERADO';
   const isInputHabilitado = isUsuarioLiberado && !isTudoBloqueado;
   const { timeLeft, mounted, isUrgent } = useCountdown(prazoLimite);
@@ -88,6 +120,37 @@ export function DashboardPalpites({
   return (
     <div className="min-h-screen bg-zinc-50 transition-colors dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 pb-16">
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl font-black tracking-tight bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-zinc-50 dark:to-zinc-400 bg-clip-text text-transparent">
+              Meu Espaço
+            </h1>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+              Gerencie seus palpites, veja seu desempenho e acompanhe seu
+              histórico.
+            </p>
+          </div>
+          <div>
+            <Button
+              onClick={handleDownloadPDF}
+              disabled={downloadingPDF}
+              className="bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-sm px-5 py-2.5 rounded-2xl transition-all shadow-sm border border-zinc-800 dark:border-zinc-200 flex items-center gap-2"
+            >
+              {downloadingPDF ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Gerando PDF...
+                </>
+              ) : (
+                <>
+                  <Download className="h-4 w-4" />
+                  Exportar PDF
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+
         {/* Aviso de Conta Pendente de Liberação */}
         {!isUsuarioLiberado && (
           <div className="mb-8 p-4 rounded-2xl border border-amber-200 bg-amber-50/50 dark:border-amber-900/30 dark:bg-amber-950/20 text-amber-800 dark:text-amber-400 flex items-start gap-3 animate-pulse">

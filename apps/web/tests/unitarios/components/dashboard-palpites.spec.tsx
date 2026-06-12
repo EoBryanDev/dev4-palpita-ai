@@ -1,9 +1,11 @@
 import { logoutUsuario } from '@/app/actions/auth';
 import {
   obterPalpitesSalvosPaginadosAction,
+  obterTodosPalpitesAction,
   salvarPalpite,
 } from '@/app/actions/palpites';
 import { DashboardPalpites } from '@/components/dashboard-palpites';
+import { gerarPalpitesPDF } from '@/helpers/pdf-generator';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
@@ -11,6 +13,11 @@ import type { Mock } from 'vitest';
 vi.mock('@/app/actions/palpites', () => ({
   salvarPalpite: vi.fn(),
   obterPalpitesSalvosPaginadosAction: vi.fn(),
+  obterTodosPalpitesAction: vi.fn(),
+}));
+
+vi.mock('@/helpers/pdf-generator', () => ({
+  gerarPalpitesPDF: vi.fn(),
 }));
 
 vi.mock('@/app/actions/auth', () => ({
@@ -224,6 +231,48 @@ describe('DashboardPalpites Component', () => {
     await waitFor(() => {
       expect(screen.getByText('Bélgica')).toBeDefined();
       expect(screen.getByText('Japão')).toBeDefined();
+    });
+  });
+
+  it('deve chamar obterTodosPalpitesAction e gerarPalpitesPDF ao clicar em Exportar PDF', async () => {
+    const mockPalpites = [
+      {
+        id: 'partida-2',
+        timeA: 'Alemanha',
+        timeB: 'Espanha',
+        dataInicio: new Date(Date.now() + 1000 * 60 * 60 * 48).toISOString(),
+        status: 'AGENDADO',
+        palpiteGolsA: 2,
+        palpiteGolsB: 2,
+        jaPalpitou: true,
+        rodadaNome: 'Fase de Grupos - Rodada 1',
+      },
+    ];
+
+    (obterTodosPalpitesAction as Mock).mockResolvedValueOnce({
+      success: true,
+      palpites: mockPalpites,
+    });
+
+    render(<DashboardPalpites {...defaultProps} />);
+
+    const btnExportar = screen.getByRole('button', { name: /Exportar PDF/i });
+    expect(btnExportar).toBeDefined();
+
+    fireEvent.click(btnExportar);
+
+    await waitFor(() => {
+      expect(obterTodosPalpitesAction).toHaveBeenCalled();
+    });
+
+    await waitFor(() => {
+      expect(gerarPalpitesPDF).toHaveBeenCalledWith(
+        defaultProps.nomeUsuario,
+        defaultProps.emailUsuario,
+        defaultProps.pontos,
+        defaultProps.posicao,
+        mockPalpites,
+      );
     });
   });
 });
