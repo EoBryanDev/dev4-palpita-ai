@@ -7,6 +7,7 @@ export interface IRankedUser {
   email: string;
   pontos: number;
   posicao: number;
+  posicaoGrupo: number;
 }
 
 const obterVencedor = (golsA: number, golsB: number): 'A' | 'B' | 'EMPATE' => {
@@ -106,16 +107,17 @@ export async function calcularRankingGeral(): Promise<IRankedUser[]> {
   });
 
   // 6. Atribuir posições considerando empates
-  let rank = 1;
+  let rankGrupo = 1;
   let lastPoints = -1;
   const rankedUsers = rankingData.map((user, index) => {
     if (user.pontos !== lastPoints) {
-      rank = index + 1;
+      rankGrupo = index + 1;
       lastPoints = user.pontos;
     }
     return {
       ...user,
-      posicao: rank,
+      posicao: index + 1,
+      posicaoGrupo: rankGrupo,
     };
   });
 

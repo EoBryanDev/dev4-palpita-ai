@@ -4,4 +4,5 @@ export interface IRankUser {
   email: string;
   pontos: number;
   posicao: number;
+  posicaoGrupo: number;
 }
