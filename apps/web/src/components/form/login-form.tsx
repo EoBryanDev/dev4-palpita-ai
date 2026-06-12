@@ -53,9 +53,11 @@ export function LoginForm() {
       <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-emerald-500 via-teal-500 to-emerald-600" />
 
       <div className="mb-6 text-center">
-        <div className="mx-auto rounded-full bg-emerald-50 dark:bg-emerald-950/30 p-3 text-emerald-600 dark:text-emerald-400 w-fit mb-3">
-          <LogIn className="h-6 w-6" />
-        </div>
+        <img
+          src="/logo_dev4-removebg-preview.png"
+          alt="Logo Palpita AI"
+          className="mx-auto h-16 w-auto object-contain mb-3"
+        />
         <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
           Entrar no Palpita AI
         </h2>
