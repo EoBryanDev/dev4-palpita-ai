@@ -81,7 +81,7 @@ export default async function AdminDashboardPage() {
         <h1 className="text-3xl font-black tracking-tight bg-linear-to-r from-emerald-600 to-amber-500 bg-clip-text text-transparent dark:from-emerald-400 dark:to-amber-400">
           Painel de Controle do Administrador
         </h1>
-        <p className="text-sm text-zinc-550 dark:text-zinc-400 mt-2">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2">
           Monitore o engajamento de palpites, libere apostadores e acompanhe a
           rodada atual.
         </p>
@@ -154,7 +154,7 @@ export default async function AdminDashboardPage() {
                       esperados
                     </span>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-zinc-150 dark:bg-zinc-800 overflow-hidden">
+                  <div className="h-2 w-full rounded-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
                     <div
                       className="h-full bg-emerald-500 transition-all duration-500"
                       style={{

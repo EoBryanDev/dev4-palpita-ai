@@ -206,7 +206,7 @@ export default function TimesClient({ initialTimes }: ITimesClientProps) {
                   alt={selecao.nome}
                   className="h-10 w-10 shrink-0"
                 />
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 dark:bg-zinc-850 dark:text-zinc-400">
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
                   {selecao.grupo}
                 </span>
               </div>

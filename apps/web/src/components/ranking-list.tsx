@@ -98,7 +98,7 @@ export function RankingList() {
                 <span className="text-xs uppercase font-bold text-zinc-400 tracking-wider mt-2">
                   2º Lugar
                 </span>
-                <h3 className="text-lg font-bold text-zinc-850 dark:text-zinc-150 mt-1 truncate max-w-full">
+                <h3 className="text-lg font-bold text-zinc-800 dark:text-zinc-200 mt-1 truncate max-w-full">
                   {podiumUsers[1].nome}
                 </h3>
                 <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
@@ -140,7 +140,7 @@ export function RankingList() {
                 <span className="text-xs uppercase font-bold text-zinc-400 tracking-wider mt-2">
                   3º Lugar
                 </span>
-                <h3 className="text-lg font-bold text-zinc-850 dark:text-zinc-150 mt-1 truncate max-w-full">
+                <h3 className="text-lg font-bold text-zinc-800 dark:text-zinc-200 mt-1 truncate max-w-full">
                   {podiumUsers[2].nome}
                 </h3>
                 <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
@@ -161,7 +161,7 @@ export function RankingList() {
           placeholder="Buscar participante pelo nome..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 rounded-xl border border-zinc-200 bg-white text-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-855 dark:bg-zinc-900 dark:text-zinc-50"
+          className="w-full pl-10 pr-4 py-2 rounded-xl border border-zinc-200 bg-white text-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50"
         />
       </div>
 
@@ -185,20 +185,20 @@ export function RankingList() {
               </thead>
               <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
                 {tableUsers.map((user) => {
-                  const isTop3 = user.posicao <= 3;
+                  const isTop3 = user.posicaoGrupo <= 3;
                   const rankColors =
-                    user.posicao === 1
+                    user.posicaoGrupo === 1
                       ? 'text-amber-500 dark:text-amber-400'
-                      : user.posicao === 2
+                      : user.posicaoGrupo === 2
                         ? 'text-zinc-400 dark:text-zinc-300'
-                        : user.posicao === 3
+                        : user.posicaoGrupo === 3
                           ? 'text-orange-550 dark:text-orange-400'
                           : 'text-zinc-500';
 
                   return (
                     <tr
                       key={user.id}
-                      className="hover:bg-zinc-50/50 dark:hover:bg-zinc-850/20 transition-all"
+                      className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/20 transition-all"
                     >
                       <td className="px-6 py-4 text-center font-bold">
                         <span

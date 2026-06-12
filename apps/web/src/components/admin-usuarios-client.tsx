@@ -307,14 +307,14 @@ export function AdminUsuariosClient({
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-zinc-150 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-[11px] font-bold text-zinc-550 dark:text-zinc-400 uppercase tracking-wider">
+                  <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                     <th className="py-4 px-6">Nome</th>
                     <th className="py-4 px-6">Cargo</th>
                     <th className="py-4 px-6">Status (Apostas)</th>
                     <th className="py-4 px-6 text-right">Ações</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-150 dark:divide-zinc-850">
+                <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
                   {usuariosCadastrados.map((usuario) => {
                     const statusConfig = {
                       ATIVO: {
@@ -424,7 +424,7 @@ export function AdminUsuariosClient({
                                 onClick={() =>
                                   handleAlterarStatus(usuario.id, 'ATIVO')
                                 }
-                                className="h-8 rounded-lg text-xs font-bold border-zinc-350 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                                className="h-8 rounded-lg text-xs font-bold border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
                               >
                                 Reativar
                               </Button>

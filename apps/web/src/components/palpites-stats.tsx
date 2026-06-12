@@ -118,7 +118,7 @@ export function PalpitesStats() {
           placeholder="Filtrar jogos pelo nome de uma seleção..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 rounded-xl border border-zinc-200 bg-white text-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-855 dark:bg-zinc-900 dark:text-zinc-50"
+          className="w-full pl-10 pr-4 py-2 rounded-xl border border-zinc-200 bg-white text-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50"
         />
       </div>
 
@@ -136,7 +136,7 @@ export function PalpitesStats() {
                 {/* Header do Jogo */}
                 <div>
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-zinc-100 text-zinc-650 dark:bg-zinc-850 dark:text-zinc-400">
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
                       {match.rodadaNome}
                     </span>
                     <span
@@ -147,11 +147,11 @@ export function PalpitesStats() {
                   </div>
 
                   {/* Times e Placar */}
-                  <div className="flex items-center justify-between py-2 border-b border-zinc-100 dark:border-zinc-850 pb-4 mb-4">
-                    <div className="w-[42%] text-right font-extrabold text-zinc-850 dark:text-zinc-150 truncate">
+                  <div className="flex items-center justify-between py-2 border-b border-zinc-100 dark:border-zinc-800 pb-4 mb-4">
+                    <div className="w-[42%] text-right font-extrabold text-zinc-800 dark:text-zinc-200 truncate">
                       {match.timeA}
                     </div>
-                    <div className="flex items-center justify-center gap-2 bg-zinc-50 dark:bg-zinc-850 px-3 py-1.5 rounded-xl border border-zinc-200/50 dark:border-zinc-800 text-lg font-black text-zinc-900 dark:text-zinc-50">
+                    <div className="flex items-center justify-center gap-2 bg-zinc-50 dark:bg-zinc-800 px-3 py-1.5 rounded-xl border border-zinc-200/50 dark:border-zinc-800 text-lg font-black text-zinc-900 dark:text-zinc-50">
                       <span>
                         {match.golsTimeA !== null ? match.golsTimeA : '-'}
                       </span>
@@ -162,7 +162,7 @@ export function PalpitesStats() {
                         {match.golsTimeB !== null ? match.golsTimeB : '-'}
                       </span>
                     </div>
-                    <div className="w-[42%] text-left font-extrabold text-zinc-850 dark:text-zinc-150 truncate">
+                    <div className="w-[42%] text-left font-extrabold text-zinc-800 dark:text-zinc-200 truncate">
                       {match.timeB}
                     </div>
                   </div>
@@ -242,7 +242,7 @@ export function PalpitesStats() {
                   <button
                     type="button"
                     onClick={() => toggleExpand(match.id)}
-                    className="mt-2 w-full flex items-center justify-center gap-1.5 px-4 py-2 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 hover:bg-zinc-100 dark:hover:bg-zinc-850/30 text-xs font-semibold rounded-xl text-zinc-650 dark:text-zinc-350 transition-all cursor-pointer"
+                    className="mt-2 w-full flex items-center justify-center gap-1.5 px-4 py-2 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 hover:bg-zinc-100 dark:hover:bg-zinc-800/30 text-xs font-semibold rounded-xl text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer"
                   >
                     {isExpanded ? (
                       <>
@@ -271,7 +271,7 @@ export function PalpitesStats() {
                                   </th>
                                 </tr>
                               </thead>
-                              <tbody className="divide-y divide-zinc-100 dark:divide-zinc-850">
+                              <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                                 {match.palpitesIndividuais.map((palpite) => (
                                   <tr
                                     key={palpite.id}
@@ -295,8 +295,8 @@ export function PalpitesStats() {
                         )
                       ) : (
                         <div className="flex flex-col items-center justify-center text-center p-3 space-y-2">
-                          <Lock className="h-6 w-6 text-zinc-400 dark:text-zinc-650" />
-                          <p className="font-semibold text-zinc-750 dark:text-zinc-350">
+                          <Lock className="h-6 w-6 text-zinc-400 dark:text-zinc-500" />
+                          <p className="font-semibold text-zinc-700 dark:text-zinc-300">
                             Bloqueado por Segurança
                           </p>
                           <p className="text-zinc-400 text-[10px] leading-relaxed max-w-[280px]">

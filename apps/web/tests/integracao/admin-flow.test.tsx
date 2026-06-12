@@ -108,6 +108,7 @@ describe('Admin Dashboard Integration Flow', () => {
         innerJoin: () => chain,
         where: () => chain,
         orderBy: () => chain,
+        $dynamic: () => chain,
       };
       return chain;
     };
