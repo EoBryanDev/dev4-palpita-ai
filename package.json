@@ -12,7 +12,8 @@
     "dev": "turbo dev",
     "lint": "biome check .",
     "format": "biome format --write .",
-    "test": "turbo test"
+    "test": "turbo test",
+    "coverage": "turbo coverage"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",

@@ -11,6 +11,9 @@
     "test": {
       "dependsOn": ["^test"]
     },
+    "coverage": {
+      "dependsOn": ["^coverage"]
+    },
     "dev": {
       "cache": false,
       "persistent": true

@@ -25,3 +25,6 @@ out/
 # Arquivos do Sistema Operacional
 .DS_Store
 Thumbs.db
+
+# Cobertura de Testes
+coverage/
