@@ -33,6 +33,4 @@ export {
   obterSegredoParaValidacao,
 } from './services/sessao-service';
 
-export {
-  validarEnvSeguranca,
-} from './services/env-validator';
+export { validarEnvSeguranca } from './services/env-validator';

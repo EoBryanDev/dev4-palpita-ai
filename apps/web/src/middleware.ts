@@ -1,17 +1,10 @@
+import { verificarToken } from '@palpita/core';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-interface ISessionUser {
-  id: string;
-  nome: string;
-  email: string;
-  cargo: string;
-}
-
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 1. Verificar se a rota precisa de proteção
   const isMeuEspaco = pathname.startsWith('/meu-espaco');
   const isAdmin = pathname.startsWith('/admin');
 
@@ -19,32 +12,30 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 2. Tentar obter o cookie da sessão
   const sessionCookie = request.cookies.get('palpita_session')?.value;
 
   if (!sessionCookie) {
     const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(loginUrl);
   }
 
   try {
-    // Decodificar a sessão a partir do cookie base64
-    const sessionStr = decodeURIComponent(atob(sessionCookie));
-    const session: ISessionUser = JSON.parse(sessionStr);
+    const sessao = await verificarToken(sessionCookie);
 
-    if (!session || !session.id) {
+    if (!sessao || !sessao.sub) {
       const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
     }
 
-    // 3. Se for rota administrativa, verificar se o cargo é ADMIN
-    if (isAdmin && session.cargo !== 'ADMIN') {
+    if (isAdmin && sessao.cargo !== 'ADMIN') {
       const meuEspacoUrl = new URL('/meu-espaco', request.url);
       return NextResponse.redirect(meuEspacoUrl);
     }
-  } catch (error) {
-    // Em caso de cookie corrompido, limpa o cookie e redireciona
+  } catch {
     const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('redirect', pathname);
     const response = NextResponse.redirect(loginUrl);
     response.cookies.delete('palpita_session');
     return response;

@@ -1,13 +1,20 @@
 import { z } from 'zod';
 
 const ZJwtExpiresIn = z.string().regex(/^\d+[smhd]$/, {
-  message: 'JWT_EXPIRES_IN must be a number followed by s (seconds), m (minutes), h (hours), or d (days). Example: 7d',
+  message:
+    'JWT_EXPIRES_IN must be a number followed by s (seconds), m (minutes), h (hours), or d (days). Example: 7d',
 });
 
 const ZEnvSeguranca = z.object({
-  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters long'),
+  JWT_SECRET: z
+    .string()
+    .min(32, 'JWT_SECRET must be at least 32 characters long'),
   JWT_EXPIRES_IN: ZJwtExpiresIn.optional().default('7d'),
-  BCRYPT_SALT_ROUNDS: z.coerce.number().int().min(10, 'BCRYPT_SALT_ROUNDS must be at least 10').optional(),
+  BCRYPT_SALT_ROUNDS: z.coerce
+    .number()
+    .int()
+    .min(10, 'BCRYPT_SALT_ROUNDS must be at least 10')
+    .optional(),
 });
 
 type TEnvSeguranca = z.infer<typeof ZEnvSeguranca>;

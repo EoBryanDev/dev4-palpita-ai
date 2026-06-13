@@ -1,5 +1,6 @@
 'use server';
 
+import { Usuario, criarToken, verificarToken } from '@palpita/core';
 import { db, usuarios } from '@palpita/db';
 import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
@@ -69,29 +70,36 @@ export async function loginUsuario(
       return { success: false, message: 'Credenciais inválidas.' };
     }
 
-    const sessionData: ISessionUser = {
+    const usuarioEntity = new Usuario({
       id: usuario.id,
       nome: usuario.nome,
       email: usuario.email,
       cargo: usuario.cargo,
-    };
+      status: usuario.status,
+      dataCriacao: usuario.dataCriacao,
+      ultimoLoginAt: usuario.ultimoLoginAt,
+      senha: usuario.senha,
+    });
+
+    const token = await criarToken(usuarioEntity);
 
     const cookieStore = await cookies();
-    cookieStore.set(
-      'palpita_session',
-      btoa(encodeURIComponent(JSON.stringify(sessionData))),
-      {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 60 * 60 * 24 * 7, // 1 semana
-        path: '/',
-      },
-    );
+    cookieStore.set('palpita_session', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/',
+    });
 
     return {
       success: true,
       message: 'Autenticação realizada com sucesso!',
-      user: sessionData,
+      user: {
+        id: usuario.id,
+        nome: usuario.nome,
+        email: usuario.email,
+        cargo: usuario.cargo,
+      },
     };
   } catch (error) {
     console.error('Erro ao realizar login:', error);
@@ -127,8 +135,15 @@ export async function obterSessao(): Promise<ISessionUser | null> {
       return null;
     }
 
-    const sessionStr = decodeURIComponent(atob(sessionCookie));
-    return JSON.parse(sessionStr);
+    const sessao = await verificarToken(sessionCookie);
+    if (!sessao) return null;
+
+    return {
+      id: sessao.sub,
+      nome: sessao.nome,
+      email: sessao.email,
+      cargo: sessao.cargo,
+    };
   } catch (error) {
     return null;
   }

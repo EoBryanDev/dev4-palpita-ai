@@ -1,5 +1,6 @@
 'use server';
 
+import { Palpite } from '@palpita/core';
 import {
   comentarios,
   db,
@@ -21,7 +22,6 @@ import {
   or,
 } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
-import { Palpite } from '@palpita/core';
 import { obterSessao } from './auth';
 
 export interface IEventoTimeline {

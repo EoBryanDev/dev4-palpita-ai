@@ -59,7 +59,7 @@
 
 ## Task 5: Middleware de sessão Next.js
 
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** HIGH
 - **Description:** Implementar middleware Next.js para proteger rotas autenticadas.
 

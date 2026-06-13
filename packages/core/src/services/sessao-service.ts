@@ -1,59 +1,75 @@
-import jwt from 'jsonwebtoken';
-import { Sessao, type ISessaoPayload } from '../domain/sessao';
-
+import { SignJWT, jwtVerify } from 'jose';
+import { type ISessaoPayload, Sessao } from '../domain/sessao';
 import type { Usuario } from '../domain/usuario.entity';
-const JWT_ALGORITHM = 'HS256';
 
-function obterSegredo(): string {
+const JWT_ALGORITHM = 'HS256';
+const encoder = new TextEncoder();
+
+function obterChave(): Uint8Array {
   const secret = process.env.JWT_SECRET;
   if (!secret || secret.length < 32) {
     throw new Error('JWT_SECRET must be at least 32 characters long');
   }
-  return secret;
+  return encoder.encode(secret);
 }
 
-function obterExpiracao(): number {
+function obterExpiracaoMs(): number {
   const raw = process.env.JWT_EXPIRES_IN || '7d';
   const match = raw.match(/^(\d+)([smhd])$/);
   if (!match) {
     return 7 * 24 * 60 * 60 * 1000;
   }
-  const value = parseInt(match[1], 10);
+  const value = Number.parseInt(match[1], 10);
   const unit = match[2];
   switch (unit) {
-    case 's': return value * 1000;
-    case 'm': return value * 60 * 1000;
-    case 'h': return value * 60 * 60 * 1000;
-    case 'd': return value * 24 * 60 * 60 * 1000;
-    default: return 7 * 24 * 60 * 60 * 1000;
+    case 's':
+      return value * 1000;
+    case 'm':
+      return value * 60 * 1000;
+    case 'h':
+      return value * 60 * 60 * 1000;
+    case 'd':
+      return value * 24 * 60 * 60 * 1000;
+    default:
+      return 7 * 24 * 60 * 60 * 1000;
   }
 }
 
-export function criarToken(usuario: Usuario): string {
-  const segredo = obterSegredo();
-  const agora = Date.now();
-  const exp = agora + obterExpiracao();
+export async function criarToken(usuario: Usuario): Promise<string> {
+  const segredo = obterChave();
+  const agora = Math.floor(Date.now() / 1000);
+  const expSegundos = Math.floor(obterExpiracaoMs() / 1000);
 
-  const payload: ISessaoPayload & { [key: string]: unknown } = {
+  const token = await new SignJWT({
     sub: usuario.id,
     cargo: usuario.cargo,
-    iat: agora,
-    exp,
-  };
+    nome: usuario.nome,
+    email: usuario.email,
+  })
+    .setProtectedHeader({ alg: JWT_ALGORITHM })
+    .setIssuedAt(agora)
+    .setExpirationTime(agora + expSegundos)
+    .sign(segredo);
 
-  return jwt.sign(payload, segredo, { algorithm: JWT_ALGORITHM });
+  return token;
 }
 
-export function verificarToken(token: string): Sessao | null {
+export async function verificarToken(token: string): Promise<Sessao | null> {
   try {
-    const segredo = obterSegredo();
-    const payload = jwt.verify(token, segredo, { algorithms: [JWT_ALGORITHM] }) as ISessaoPayload;
-    return new Sessao(payload);
+    const segredo = obterChave();
+    const { payload } = await jwtVerify(token, segredo, {
+      algorithms: [JWT_ALGORITHM],
+    });
+    return new Sessao(payload as unknown as ISessaoPayload);
   } catch {
     return null;
   }
 }
 
 export function obterSegredoParaValidacao(): string {
-  return obterSegredo();
+  const secret = process.env.JWT_SECRET;
+  if (!secret || secret.length < 32) {
+    throw new Error('JWT_SECRET must be at least 32 characters long');
+  }
+  return secret;
 }
