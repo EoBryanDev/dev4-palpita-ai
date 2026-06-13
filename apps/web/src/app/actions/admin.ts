@@ -9,6 +9,13 @@ import {
   tokensConvite,
   usuarios,
 } from '@palpita/db';
+import {
+  Partida,
+  Usuario,
+  type TPartidaStatus,
+  type TUsuarioCargo,
+  type TUsuarioStatus,
+} from '@palpita/core';
 import { and, eq } from 'drizzle-orm';
 import { obterSessao } from './auth';
 
@@ -139,10 +146,21 @@ export async function rejeitarSolicitacao(
       };
     }
 
-    // Altera o status para DESATIVADO
+    const usuarioEntity = new Usuario({
+      id: user.id,
+      nome: user.nome,
+      email: user.email,
+      status: user.status as TUsuarioStatus,
+      cargo: user.cargo as TUsuarioCargo,
+      dataCriacao: user.dataCriacao,
+      senha: user.senha,
+    });
+
+    usuarioEntity.desativar();
+
     await db
       .update(usuarios)
-      .set({ status: 'DESATIVADO' })
+      .set({ status: usuarioEntity.status })
       .where(eq(usuarios.id, usuarioId));
 
     return {
@@ -192,9 +210,23 @@ export async function alterarStatusUsuario(
       };
     }
 
+    const usuarioEntity = new Usuario({
+      id: user.id,
+      nome: user.nome,
+      email: user.email,
+      status: user.status as TUsuarioStatus,
+      cargo: user.cargo as TUsuarioCargo,
+      dataCriacao: user.dataCriacao,
+      senha: user.senha,
+    });
+
+    if (novoStatus === 'ATIVO') usuarioEntity.ativar();
+    else if (novoStatus === 'LIBERADO') usuarioEntity.liberar();
+    else if (novoStatus === 'DESATIVADO') usuarioEntity.desativar();
+
     await db
       .update(usuarios)
-      .set({ status: novoStatus })
+      .set({ status: usuarioEntity.status })
       .where(eq(usuarios.id, usuarioId));
 
     const msgMap = {
@@ -365,20 +397,26 @@ export async function lancarResultadoOficial(
         return { success: false, message: 'Esta partida já foi finalizada.' };
       }
 
-      if (new Date() < new Date(match.dataInicio)) {
-        return {
-          success: false,
-          message:
-            'Não é possível lançar o resultado de uma partida que ainda não começou.',
-        };
-      }
+      const partidaEntity = new Partida({
+        id: match.id,
+        rodadaId: match.rodadaId,
+        timeAId: match.timeAId,
+        timeBId: match.timeBId,
+        golsTimeA: match.golsTimeA,
+        golsTimeB: match.golsTimeB,
+        dataInicio: new Date(match.dataInicio),
+        status: match.status as TPartidaStatus,
+        dataCriacao: match.dataCriacao,
+      });
+
+      partidaEntity.finalizar(golsTimeA, golsTimeB);
 
       // 2. Atualizar o status e o placar
       await tx
         .update(partidas)
         .set({
-          golsTimeA,
-          golsTimeB,
+          golsTimeA: partidaEntity.golsTimeA,
+          golsTimeB: partidaEntity.golsTimeB,
           status: 'FINALIZADO',
         })
         .where(eq(partidas.id, partidaId));

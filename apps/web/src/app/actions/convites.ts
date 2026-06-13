@@ -100,14 +100,12 @@ export async function cadastrarSenha(
         usado: tokenData.usado,
       });
 
-      if (tokenConvite.usado) {
-        return { success: false, message: 'Este token já foi utilizado.' };
-      }
-
-      if (tokenConvite.estaExpirado()) {
+      try {
+        tokenConvite.usar();
+      } catch (error) {
         return {
           success: false,
-          message: 'Este link de convite expirou (limite de 5 minutos).',
+          message: error instanceof Error ? error.message : 'Token inválido.',
         };
       }
 
