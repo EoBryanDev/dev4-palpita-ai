@@ -3,9 +3,9 @@
 import {
   Usuario,
   criarToken,
-  verificarToken,
   logAuditoria,
   verificarRateLimit,
+  verificarToken,
 } from '@palpita/core';
 import { db, usuarios } from '@palpita/db';
 import bcrypt from 'bcryptjs';

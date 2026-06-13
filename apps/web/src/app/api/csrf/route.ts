@@ -1,5 +1,5 @@
+import { CSRF_CONFIG, gerarTokenCsrf } from '@palpita/core';
 import { NextResponse } from 'next/server';
-import { gerarTokenCsrf, CSRF_CONFIG } from '@palpita/core';
 
 export async function GET(): Promise<NextResponse> {
   const token = gerarTokenCsrf();
