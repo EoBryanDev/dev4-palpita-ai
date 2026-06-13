@@ -9,8 +9,13 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^3.23.8"
+  },
   "devDependencies": {
     "@palpita/tsconfig": "workspace:*",
+    "@types/jsonwebtoken": "^9.0.6",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"
   }

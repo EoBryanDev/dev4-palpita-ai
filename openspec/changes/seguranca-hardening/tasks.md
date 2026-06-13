@@ -2,18 +2,18 @@
 
 ## Task 1: Instalar dependências de segurança
 
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** HIGH
-- **Description:** Adicionar e instalar pacotes necessários para segurança.
+- **Description:** Adicionar e instalar pacotes necessários para segurança (bcrypt já está instalado).
 
 ### Implementation
-- Adicionar `jsonwebtoken`, `bcrypt`, `zod` no `packages/core/package.json`
-- Adicionar `@types/jsonwebtoken`, `@types/bcrypt` como devDependencies
+- Adicionar `jsonwebtoken`, `zod` no `packages/core/package.json`
+- Adicionar `@types/jsonwebtoken` como devDependency
 - Instalar dependências com o gerenciador de pacotes do monorepo
 
 ## Task 2: Configurar variáveis de ambiente de segurança
 
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** HIGH
 - **Description:** Adicionar e documentar variáveis de ambiente para módulos de segurança.
 
@@ -29,22 +29,22 @@
 - Validar `JWT_SECRET` no startup (min 32 chars, obrigatório)
 - Validar `BCRYPT_SALT_ROUNDS` (mínimo 10)
 
-## Task 3: Migração do schema — senha_hash, status e ultimo_login_at
+## Task 3: Migração do schema — ultimo_login_at
 
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** HIGH
-- **Description:** Alterar schema do banco para suportar hash de senha, status do usuário e tracking de login.
+- **Description:** Adicionar campo de tracking de login (senha já está com bcrypt, status já existe).
 
 ### Implementation
-- Adicionar campo `senha_hash text not null` na tabela `usuario`
-- Remover campo `senha` (texto puro) da tabela `usuario`
-- Adicionar campo `status text not null default 'ATIVO'` na tabela `usuario`, com constraint check `status in ('ATIVO', 'INATIVO')`
 - Adicionar campo `ultimo_login_at timestamp` (nullable) na tabela `usuario`
-- Criar migration Drizzle
+- Migration manual `0003_add_ultimo_login_at.sql` (DrizzleKit bloqueado por mismatch schemal/snapshot)
+- `_journal.json` e `0003_snapshot.json` atualizados
+- Migration aplicada no banco via `pnpm db:migrate`
+- `IUsuarioProps` e classe `Usuario` em `packages/core/src/domain/usuario.entity.ts` atualizados com `ultimoLoginAt` e método `registrarLogin()`
 
 ## Task 4: Módulo de sessão com JWT
 
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** HIGH
 - **Description:** Implementar módulo de sessão usando JWT assinado com HS256.
 
@@ -119,21 +119,20 @@
   - `Strict-Transport-Security: max-age=31536000; includeSubDomains` (apenas produção)
 - Testar que headers estão presentes em respostas
 
-## Task 9: Login seguro com bcrypt e validação Zod
+## Task 9: Login seguro com validação Zod e JWT
 
 - **Status:** PENDING
 - **Priority:** HIGH
-- **Description:** Atualizar fluxo de login para usar bcrypt e validação de entrada com Zod.
+- **Description:** Atualizar fluxo de login com validação Zod (senha já usa bcrypt existente).
 
 ### Implementation
 - Atualizar schema Zod de login: `{ email: z.string().email(), senha: z.string().min(6) }`
 - No login handler:
   - Validar entrada com Zod, retornar 400 se inválida
   - Buscar usuário por email
-  - Comparar senha com bcrypt
+  - Comparar senha com bcrypt (já existente)
   - Se falhar: log `LOGIN_FAILURE`, retornar 401 "Email ou senha inválidos"
   - Se ok: atualizar `ultimo_login_at`, gerar JWT, setar cookie, log `LOGIN_SUCCESS`
-- Atualizar cadastro de usuário para usar `senha_hash` e bcrypt
 
 ## Task 10: Logs de auditoria de segurança
 
