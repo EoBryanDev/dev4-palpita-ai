@@ -27,7 +27,6 @@ vi.mock('@palpita/core', () => ({
   validarCsrf: vi.fn(() => true),
 }));
 
-
 describe('Middleware', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -87,7 +86,9 @@ describe('Middleware', () => {
     };
     const sessionCookie = btoa(encodeURIComponent(JSON.stringify(sessionData)));
     const { verificarToken } = await import('@palpita/core');
-    vi.mocked(verificarToken).mockResolvedValueOnce(sessionData as unknown as Sessao);
+    vi.mocked(verificarToken).mockResolvedValueOnce(
+      sessionData as unknown as Sessao,
+    );
     const req = createMockRequest('/meu-espaco/perfil', sessionCookie);
     const res = await proxy(req);
 
@@ -104,7 +105,9 @@ describe('Middleware', () => {
     };
     const sessionCookie = btoa(encodeURIComponent(JSON.stringify(sessionData)));
     const { verificarToken } = await import('@palpita/core');
-    vi.mocked(verificarToken).mockResolvedValueOnce(sessionData as unknown as Sessao);
+    vi.mocked(verificarToken).mockResolvedValueOnce(
+      sessionData as unknown as Sessao,
+    );
     const req = createMockRequest('/admin/usuarios', sessionCookie);
     const res = await proxy(req);
 
@@ -122,7 +125,9 @@ describe('Middleware', () => {
     };
     const sessionCookie = btoa(encodeURIComponent(JSON.stringify(sessionData)));
     const { verificarToken } = await import('@palpita/core');
-    vi.mocked(verificarToken).mockResolvedValueOnce(sessionData as unknown as Sessao);
+    vi.mocked(verificarToken).mockResolvedValueOnce(
+      sessionData as unknown as Sessao,
+    );
     const req = createMockRequest('/admin/usuarios', sessionCookie);
     const res = await proxy(req);
 
@@ -133,7 +138,9 @@ describe('Middleware', () => {
   it('deve apagar o cookie de sessão e redirecionar para /login se o cookie estiver corrompido', async () => {
     const req = createMockRequest('/meu-espaco', '!!!invalid-base64!!!');
     const { verificarToken } = await import('@palpita/core');
-    vi.mocked(verificarToken).mockRejectedValueOnce(new Error('Token inválido'));
+    vi.mocked(verificarToken).mockRejectedValueOnce(
+      new Error('Token inválido'),
+    );
     const res = await proxy(req);
 
     expect(res?.type).toBe('redirect');
