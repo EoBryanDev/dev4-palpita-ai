@@ -1,5 +1,6 @@
 'use server';
 
+import { validarOrigem } from '@/lib/csrf-server';
 import { TokenConvite } from '@palpita/core';
 import { db, tokensConvite, usuarios } from '@palpita/db';
 import bcrypt from 'bcryptjs';
@@ -14,6 +15,15 @@ export async function solicitarConvite(
   nome: string,
   email: string,
 ): Promise<ISolicitarConviteResult> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   if (!nome || nome.trim().length === 0) {
     return { success: false, message: 'O nome é obrigatório.' };
   }
@@ -70,6 +80,15 @@ export async function cadastrarSenha(
   tokenId: string,
   senha: string,
 ): Promise<{ success: boolean; message: string }> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   if (!tokenId) {
     return { success: false, message: 'Token inválido.' };
   }

@@ -1,5 +1,6 @@
 'use server';
 
+import { validarOrigem } from '@/lib/csrf-server';
 import {
   Usuario,
   criarToken,
@@ -47,6 +48,15 @@ export async function loginUsuario(
   email: string,
   senhaInformada: string,
 ): Promise<ILoginResult> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   const validated = loginSchema.safeParse({ email, senha: senhaInformada });
   if (!validated.success) {
     const firstError = validated.error.errors[0]?.message ?? 'Dados inválidos.';
@@ -142,6 +152,7 @@ export async function loginUsuario(
     cookieStore.set('palpita_session', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7,
       path: '/',
     });
@@ -169,6 +180,15 @@ export async function logoutUsuario(): Promise<{
   success: boolean;
   message: string;
 }> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   try {
     const cookieStore = await cookies();
     cookieStore.delete('palpita_session');

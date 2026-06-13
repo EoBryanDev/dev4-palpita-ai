@@ -1,5 +1,6 @@
 'use server';
 
+import { validarOrigem } from '@/lib/csrf-server';
 import {
   Partida,
   type TPartidaStatus,
@@ -42,6 +43,15 @@ export interface IAprovacaoResponse extends IAdminActionResponse {
 export async function aprovarSolicitacao(
   usuarioId: string,
 ): Promise<IAprovacaoResponse> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   const isAdmin = await verificarPermissaoAdmin();
   if (!isAdmin) {
     return {
@@ -116,6 +126,15 @@ export async function aprovarSolicitacao(
 export async function rejeitarSolicitacao(
   usuarioId: string,
 ): Promise<IAdminActionResponse> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   const isAdmin = await verificarPermissaoAdmin();
   if (!isAdmin) {
     return {
@@ -180,6 +199,15 @@ export async function alterarStatusUsuario(
   usuarioId: string,
   novoStatus: 'ATIVO' | 'LIBERADO' | 'DESATIVADO',
 ): Promise<IAdminActionResponse> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   const isAdmin = await verificarPermissaoAdmin();
   if (!isAdmin) {
     return {
@@ -252,6 +280,15 @@ export async function criarRodada(
   numero: number,
   nome: string,
 ): Promise<IAdminActionResponse> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   const isAdmin = await verificarPermissaoAdmin();
   if (!isAdmin) {
     return { success: false, message: 'Acesso negado.' };
@@ -291,6 +328,15 @@ export async function criarPartida(
   timeBId: string,
   dataInicioString: string,
 ): Promise<IAdminActionResponse> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   const isAdmin = await verificarPermissaoAdmin();
   if (!isAdmin) {
     return { success: false, message: 'Acesso negado.' };
@@ -366,6 +412,15 @@ export async function lancarResultadoOficial(
   golsTimeA: number,
   golsTimeB: number,
 ): Promise<IAdminActionResponse> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   const isAdmin = await verificarPermissaoAdmin();
   if (!isAdmin) {
     return { success: false, message: 'Acesso negado.' };
@@ -466,6 +521,15 @@ export async function obterValorPalpite(): Promise<number> {
 export async function salvarValorPalpite(
   valor: number,
 ): Promise<IAdminActionResponse> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   const isAdmin = await verificarPermissaoAdmin();
   if (!isAdmin) {
     return {
