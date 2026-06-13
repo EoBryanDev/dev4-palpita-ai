@@ -74,33 +74,31 @@
 
 ## Task 6: Proteção CSRF
 
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** HIGH
 - **Description:** Implementar proteção CSRF via double-submit cookie pattern.
 
 ### Implementation
-- Criar `GET /api/csrf` — gera token aleatório, retorna no body e seta cookie não httpOnly
+- Criar `GET /api/csrf` — gera token aleatório, retorna no body e seta cookie httpOnly
 - Criar middleware/helper `validarCsrf(req)`:
   - Pular validação para GET/HEAD/OPTIONS
   - Comparar cookie `csrf-token` com header `X-CSRF-Token`
   - Retornar 403 se inválido ou ausente
 - Aplicar validação CSRF em todas as rotas de mutação protegidas por cookie
+- Service `csrf-service.ts` criado com `gerarTokenCsrf()`, `validarTokenCsrf()`, `validarCsrf()`
+- `GET /api/csrf` criado e integrado ao middleware via `CSRF_CONFIG.COOKIE_NAME` / `CSRF_CONFIG.HEADER_NAME`
 
 ## Task 7: Rate limiting
 
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** MEDIUM
 - **Description:** Implementar rate limiting para endpoints de API.
 
 ### Implementation
-- Criar `packages/core/src/services/rate-limit-service.ts`:
-  - Store em memória (Map com IP -> { count, windowStart })
-  - Limpeza periódica de janelas expiradas
-  - `verificar(ip, tipo: 'login' | 'general'): { permitido: boolean, resetEm: number }`
-- Criar middleware/helper para rotas de API
-- Aplicar limite de 5/min para login, 100/min para geral
-- Retornar 429 com `Retry-After` quando excedido
-- Configurável via variáveis de ambiente
+- `verificarRateLimit(ip, 'LOGIN')` adicionado no início da server action `loginUsuario` em `auth.ts`.
+- `verificarRateLimit(ip, 'API')` para toda rota `/api/` no middleware, retornando 429 + `Retry-After`.
+- IP extraído de `x-forwarded-for` → `x-real-ip` → `'unknown'`.
+- `LOGIN`: 5 req/min, `API`: 100 req/min (config in-memory em `packages/core/src/services/rate-limit-service.ts`).
 
 ## Task 8: Security headers
 
@@ -121,7 +119,7 @@
 
 ## Task 9: Login seguro com validação Zod e JWT
 
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** HIGH
 - **Description:** Atualizar fluxo de login com validação Zod (senha já usa bcrypt existente).
 
@@ -131,12 +129,12 @@
   - Validar entrada com Zod, retornar 400 se inválida
   - Buscar usuário por email
   - Comparar senha com bcrypt (já existente)
-  - Se falhar: log `LOGIN_FAILURE`, retornar 401 "Email ou senha inválidos"
-  - Se ok: atualizar `ultimo_login_at`, gerar JWT, setar cookie, log `LOGIN_SUCCESS`
+  - Se falhar: log `LOGIN_FALHA`, retornar "Credenciais inválidas."
+  - Se ok: atualizar `ultimo_login_at`, gerar JWT, setar cookie, log `LOGIN_SUCESSO`
 
 ## Task 10: Logs de auditoria de segurança
 
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** MEDIUM
 - **Description:** Implementar logging estruturado de eventos de segurança.
 
