@@ -1,4 +1,9 @@
-import { verificarToken, validarCsrf, CSRF_CONFIG, verificarRateLimit } from '@palpita/core';
+import {
+  verificarToken,
+  validarCsrf,
+  CSRF_CONFIG,
+  verificarRateLimit,
+} from '@palpita/core';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -16,9 +21,10 @@ export async function middleware(request: NextRequest) {
   const { method } = request;
 
   if (pathname.startsWith('/api/')) {
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-      || request.headers.get('x-real-ip')
-      || 'unknown';
+    const ip =
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      request.headers.get('x-real-ip') ||
+      'unknown';
 
     const rateCheck = verificarRateLimit(ip, 'API');
     if (!rateCheck.permitido) {
@@ -35,8 +41,10 @@ export async function middleware(request: NextRequest) {
   }
 
   if (deveExigirCsrf(pathname, method)) {
-    const cookieToken = request.cookies.get(CSRF_CONFIG.COOKIE_NAME)?.value ?? undefined;
-    const headerToken = request.headers.get(CSRF_CONFIG.HEADER_NAME) ?? undefined;
+    const cookieToken =
+      request.cookies.get(CSRF_CONFIG.COOKIE_NAME)?.value ?? undefined;
+    const headerToken =
+      request.headers.get(CSRF_CONFIG.HEADER_NAME) ?? undefined;
 
     if (!validarCsrf(cookieToken, headerToken)) {
       return NextResponse.json(

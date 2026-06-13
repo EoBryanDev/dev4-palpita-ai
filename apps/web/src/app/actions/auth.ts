@@ -1,6 +1,12 @@
 'use server';
 
-import { Usuario, criarToken, verificarToken, logAuditoria, verificarRateLimit } from '@palpita/core';
+import {
+  Usuario,
+  criarToken,
+  verificarToken,
+  logAuditoria,
+  verificarRateLimit,
+} from '@palpita/core';
 import { db, usuarios } from '@palpita/db';
 import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
@@ -50,13 +56,17 @@ export async function loginUsuario(
   const { email: emailValido, senha: senhaValida } = validated.data;
 
   const headersList = await headers();
-  const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim()
-    || headersList.get('x-real-ip')
-    || 'unknown';
+  const ip =
+    headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    headersList.get('x-real-ip') ||
+    'unknown';
 
   const rateCheck = verificarRateLimit(ip, 'LOGIN');
   if (!rateCheck.permitido) {
-    logAuditoria('LOGIN_FALHA', { email: emailValido, motivo: 'rate_limit_excedido' });
+    logAuditoria('LOGIN_FALHA', {
+      email: emailValido,
+      motivo: 'rate_limit_excedido',
+    });
     return {
       success: false,
       message: `Muitas tentativas de login. Tente novamente em ${Math.ceil(rateCheck.resetEmMs / 1000)} segundos.`,
@@ -71,7 +81,10 @@ export async function loginUsuario(
       .limit(1);
 
     if (usuarioData.length === 0) {
-      logAuditoria('LOGIN_FALHA', { email: emailValido, motivo: 'usuario_nao_encontrado' });
+      logAuditoria('LOGIN_FALHA', {
+        email: emailValido,
+        motivo: 'usuario_nao_encontrado',
+      });
       return { success: false, message: 'Credenciais inválidas.' };
     }
 
@@ -95,11 +108,15 @@ export async function loginUsuario(
     const senhaValida = await bcrypt.compare(senhaInformada, usuario.senha);
 
     if (!senhaValida) {
-      logAuditoria('LOGIN_FALHA', { email: emailValido, motivo: 'senha_incorreta' });
+      logAuditoria('LOGIN_FALHA', {
+        email: emailValido,
+        motivo: 'senha_incorreta',
+      });
       return { success: false, message: 'Credenciais inválidas.' };
     }
 
-    await db.update(usuarios)
+    await db
+      .update(usuarios)
       .set({ ultimoLoginAt: new Date() })
       .where(eq(usuarios.id, usuario.id))
       .execute();
@@ -116,7 +133,10 @@ export async function loginUsuario(
     });
 
     const token = await criarToken(usuarioEntity);
-    logAuditoria('LOGIN_SUCESSO', { usuarioId: usuario.id, email: emailValido });
+    logAuditoria('LOGIN_SUCESSO', {
+      usuarioId: usuario.id,
+      email: emailValido,
+    });
 
     const cookieStore = await cookies();
     cookieStore.set('palpita_session', token, {

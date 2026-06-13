@@ -42,6 +42,7 @@ export function useLoginForm() {
         }, 1500);
       } else {
         setErrorMsg(res.message);
+        setSenha('');
       }
     } catch (err) {
       setErrorMsg('Ocorreu um erro ao realizar o login. Tente novamente.');

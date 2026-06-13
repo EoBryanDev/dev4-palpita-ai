@@ -69,7 +69,10 @@ export function verificarRateLimit(
   };
 }
 
-export function limparRateLimit(identificador: string, tipo: RateLimitTipo): void {
+export function limparRateLimit(
+  identificador: string,
+  tipo: RateLimitTipo,
+): void {
   const key = buildKey(identificador, tipo);
   store.delete(key);
 }

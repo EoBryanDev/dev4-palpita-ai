@@ -46,7 +46,11 @@ export function logAuditoria(
 function sanitizarDados(dados: AuditoriaDados): AuditoriaDados {
   const sanitized = { ...dados };
   if (sanitized.senha) delete sanitized.senha;
-  if (sanitized.token && typeof sanitized.token === 'string' && sanitized.token.length > 20) {
+  if (
+    sanitized.token &&
+    typeof sanitized.token === 'string' &&
+    sanitized.token.length > 20
+  ) {
     sanitized.token = sanitized.token.slice(0, 8) + '...';
   }
   return sanitized;
