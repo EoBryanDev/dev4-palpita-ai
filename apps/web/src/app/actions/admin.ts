@@ -409,7 +409,14 @@ export async function lancarResultadoOficial(
         dataCriacao: match.dataCriacao,
       });
 
-      partidaEntity.finalizar(golsTimeA, golsTimeB);
+      try {
+        partidaEntity.finalizar(golsTimeA, golsTimeB);
+      } catch (domainError) {
+        return {
+          success: false,
+          message: (domainError as Error).message,
+        };
+      }
 
       // 2. Atualizar o status e o placar
       await tx

@@ -463,7 +463,7 @@ describe('Ações Administrativas (admin.ts)', () => {
 
       const res = await lancarResultadoOficial('partida-id', 2, 1);
       expect(res.success).toBe(false);
-      expect(res.message).toContain('ainda não começou');
+      expect(res.message).toContain('antes do seu inicio');
       expect(txMock.update).not.toHaveBeenCalled();
     });
 
