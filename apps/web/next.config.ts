@@ -1,7 +1,4 @@
-import { validarEnvSeguranca } from '@palpita/core';
 import type { NextConfig } from 'next';
-
-validarEnvSeguranca();
 
 const cspHeader = `
   default-src 'self';

@@ -1,6 +1,7 @@
 import {
   CSRF_CONFIG,
   validarCsrf,
+  validarEnvSeguranca,
   verificarRateLimit,
   verificarToken,
 } from '@palpita/core';
@@ -17,6 +18,7 @@ function deveExigirCsrf(pathname: string, method: string): boolean {
 }
 
 export async function proxy(request: NextRequest) {
+  validarEnvSeguranca();
   const { pathname } = request.nextUrl;
   const { method } = request;
 

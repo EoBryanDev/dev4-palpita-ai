@@ -25,6 +25,7 @@ vi.mock('@palpita/core', () => ({
   verificarToken: vi.fn(),
   verificarRateLimit: vi.fn(() => ({ permitido: true, resetEmMs: 0 })),
   validarCsrf: vi.fn(() => true),
+  validarEnvSeguranca: vi.fn(),
 }));
 
 describe('Middleware', () => {
