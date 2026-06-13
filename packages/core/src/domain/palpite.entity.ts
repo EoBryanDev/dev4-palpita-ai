@@ -63,8 +63,9 @@ export class Palpite {
     golsTimeB: number,
     dataPartidaInicio: Date,
     dataReferencia: Date = new Date(),
+    deadlineGlobal?: Date,
   ): void {
-    this.validarPrazo(dataPartidaInicio, dataReferencia);
+    this.validarPrazo(dataPartidaInicio, dataReferencia, deadlineGlobal);
     if (golsTimeA < 0 || golsTimeB < 0) {
       throw new Error('Gols nao podem ser negativos');
     }
@@ -76,9 +77,13 @@ export class Palpite {
   public validarPrazo(
     dataPartidaInicio: Date,
     dataReferencia: Date = new Date(),
+    deadlineGlobal?: Date,
   ): void {
     if (dataReferencia >= dataPartidaInicio) {
       throw new Error('Prazo para palpitar nesta partida expirou');
+    }
+    if (deadlineGlobal && dataReferencia >= deadlineGlobal) {
+      throw new Error('Prazo global para palpitar expirou');
     }
   }
 

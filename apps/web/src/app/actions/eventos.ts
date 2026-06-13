@@ -21,6 +21,7 @@ import {
   or,
 } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
+import { Palpite } from '@palpita/core';
 import { obterSessao } from './auth';
 
 export interface IEventoTimeline {
@@ -57,13 +58,6 @@ export interface IComentarioFormatado {
   conteudo: string;
   dataCriacao: string;
 }
-
-// Helper para calcular vencedor
-const obterVencedor = (golsA: number, golsB: number): 'A' | 'B' | 'EMPATE' => {
-  if (golsA > golsB) return 'A';
-  if (golsB > golsA) return 'B';
-  return 'EMPATE';
-};
 
 // 1. Obter a timeline de eventos (jogos já iniciados ou finalizados)
 export async function obterEventosTimeline(): Promise<{
@@ -245,24 +239,19 @@ export async function obterPontuadoresRodada(rodadaId: string): Promise<{
       for (const guess of userGuesses) {
         const match = partidasMap.get(guess.partidaId);
         if (match) {
-          const vencedorPalpite = obterVencedor(
-            guess.golsTimeA,
-            guess.golsTimeB,
-          );
-          const vencedorPartida = obterVencedor(
+          const palpiteEntity = new Palpite({
+            id: 'placeholder',
+            usuarioId: comp.id,
+            partidaId: guess.partidaId,
+            golsTimeA: guess.golsTimeA,
+            golsTimeB: guess.golsTimeB,
+            dataCriacao: new Date(),
+            dataAtualizacao: new Date(),
+          });
+          pontosRodada += palpiteEntity.calcularPontos(
             match.golsTimeA,
             match.golsTimeB,
           );
-
-          const acertouPlacarExato =
-            guess.golsTimeA === match.golsTimeA &&
-            guess.golsTimeB === match.golsTimeB;
-
-          if (acertouPlacarExato) {
-            pontosRodada += 2;
-          } else if (vencedorPalpite === vencedorPartida) {
-            pontosRodada += 1;
-          }
         }
       }
 
@@ -485,19 +474,18 @@ export async function obterPontuadoresPartida(partidaId: string): Promise<{
 
     const golsRealA = match.golsTimeA;
     const golsRealB = match.golsTimeB;
-    const vencedorReal = obterVencedor(golsRealA, golsRealB);
 
     const pontuadores: IPontuadorPartida[] = listPalpites.map((p) => {
-      const vencedorPalpite = obterVencedor(p.palpiteA, p.palpiteB);
-      const acertouPlacarExato =
-        p.palpiteA === golsRealA && p.palpiteB === golsRealB;
-
-      let pontos = 0;
-      if (acertouPlacarExato) {
-        pontos = 2;
-      } else if (vencedorPalpite === vencedorReal) {
-        pontos = 1;
-      }
+      const palpiteEntity = new Palpite({
+        id: 'placeholder',
+        usuarioId: 'placeholder',
+        partidaId,
+        golsTimeA: p.palpiteA,
+        golsTimeB: p.palpiteB,
+        dataCriacao: new Date(),
+        dataAtualizacao: new Date(),
+      });
+      const pontos = palpiteEntity.calcularPontos(golsRealA, golsRealB);
 
       return {
         usuarioNome: p.usuarioNome,
