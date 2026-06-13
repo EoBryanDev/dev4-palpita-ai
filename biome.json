@@ -6,7 +6,8 @@
       "**/dist/**",
       "**/.next/**",
       "**/migrations/**",
-      "**/.turbo/**"
+      "**/.turbo/**",
+      "**/coverage/**"
     ]
   },
   "organizeImports": {

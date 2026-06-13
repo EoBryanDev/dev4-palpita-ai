@@ -48,16 +48,26 @@ export function FlagImage({
   const code = getCountryCode(emoji);
 
   if (!code || hasError) {
-    return <span className={className}>{emoji}</span>;
+    return (
+      <span
+        className={`inline-flex items-center justify-center shrink-0 align-middle ${className}`}
+      >
+        {emoji}
+      </span>
+    );
   }
 
   return (
-    <img
-      src={`https://flagcdn.com/w40/${code}.png`}
-      srcSet={`https://flagcdn.com/w80/${code}.png 2x`}
-      alt={alt || 'Bandeira'}
-      className={`${className} object-cover rounded-sm`}
-      onError={() => setHasError(true)}
-    />
+    <span
+      className={`inline-flex items-center justify-center shrink-0 overflow-hidden rounded-sm align-middle ${className}`}
+    >
+      <img
+        src={`https://flagcdn.com/w40/${code}.png`}
+        srcSet={`https://flagcdn.com/w80/${code}.png 2x`}
+        alt={alt || 'Bandeira'}
+        className="h-full w-full object-cover"
+        onError={() => setHasError(true)}
+      />
+    </span>
   );
 }
