@@ -147,13 +147,12 @@
 
 ## Task 11: Feedback de segurança no frontend
 
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** MEDIUM
 - **Description:** Adicionar feedback visual para eventos de segurança no frontend.
 
 ### Implementation
-- Criar hook/componente para detectar sessão expirada (401 em requisição autenticada)
-- Exibir toast/modal "Sua sessão expirou. Faça login novamente."
-- Integrar obtenção de token CSRF no fluxo de formulários
-- Limpar campo de senha em falha de login
-- Mensagens de erro em português
+- Criar `apps/web/src/hooks/use-auth-fetch.ts` — hook `useAuthFetch()` que intercepta 401 em fetchs autenticados, exibe toast "Sua sessão expirou. Faça login novamente." (destructive variant) e redireciona para `/home` após 2s
+- Criar `apps/web/src/lib/csrf.ts` — utility `fetchCsrfToken()` (chama `GET /api/csrf` e retorna token) e `getCsrfCookie()` (lê cookie `csrf_token` do document.cookie)
+- Modificar `apps/web/src/hooks/use-login-form.ts` — adicionar `setSenha('')` no bloco `else` quando login falha, limpando o campo senha após credenciais inválidas
+- Mensagens de erro em português já estavam implementadas nas tasks anteriores
