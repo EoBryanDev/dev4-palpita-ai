@@ -9,6 +9,7 @@ Este documento define as regras de operação, consulta de documentação e flux
 - **Dúvidas Gerais:** Consulte o diretório `docs/` para diretrizes gerais do projeto.
 - **Regras Específicas:** Consulte o diretório `docs/rules/` para regras detalhadas (como `linting.md`, `testing.md` e `versioning.md`).
 - **Arquitetura e Design:** Siga sempre as decisões de design e arquitetura estipuladas nos documentos de proposta ou requisitos (ex.: `docs/prds/PRD_001_Plataforma_Palpites_DEV4.md` e eventuais arquivos `design.md` ou `proposal.md`).
+- **Entidades de Domínio:** Toda lógica com comportamento próprio e complexidade suficiente para ser uma entidade de domínio **deve** ser criada em `packages/core/src/domain/`, e não inline nas actions ou componentes da aplicação. Exemplos: `Palpite`, `Partida`, `Usuario`, `TokenConvite`.
 
 ## 2. Fluxo de Trabalho de Tarefas
 
