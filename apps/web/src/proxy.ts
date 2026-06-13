@@ -1,8 +1,8 @@
 import {
-  verificarToken,
-  validarCsrf,
   CSRF_CONFIG,
+  validarCsrf,
   verificarRateLimit,
+  verificarToken,
 } from '@palpita/core';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
@@ -16,7 +16,7 @@ function deveExigirCsrf(pathname: string, method: string): boolean {
   return true;
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const { method } = request;
 
