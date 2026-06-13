@@ -68,7 +68,7 @@ describe('Middleware', () => {
   });
 
   it('deve redirecionar para /login se a sessão contiver dados inválidos', async () => {
-    const req = createMockRequest('/meu-espaco', btoa('invalido'));
+    const req = createMockRequest('/meu-espaco', 'invalid-jwt-token');
     const { verificarToken } = await import('@palpita/core');
     vi.mocked(verificarToken).mockResolvedValueOnce(null);
     const res = await proxy(req);
@@ -84,7 +84,7 @@ describe('Middleware', () => {
       email: 'user@test.com',
       cargo: 'COLABORADOR',
     };
-    const sessionCookie = btoa(encodeURIComponent(JSON.stringify(sessionData)));
+    const sessionCookie = 'mock-jwt-token-colaborador';
     const { verificarToken } = await import('@palpita/core');
     vi.mocked(verificarToken).mockResolvedValueOnce(
       sessionData as unknown as Sessao,
@@ -103,7 +103,7 @@ describe('Middleware', () => {
       email: 'user@test.com',
       cargo: 'COLABORADOR',
     };
-    const sessionCookie = btoa(encodeURIComponent(JSON.stringify(sessionData)));
+    const sessionCookie = 'mock-jwt-token-colaborador';
     const { verificarToken } = await import('@palpita/core');
     vi.mocked(verificarToken).mockResolvedValueOnce(
       sessionData as unknown as Sessao,
@@ -123,7 +123,7 @@ describe('Middleware', () => {
       email: 'admin@test.com',
       cargo: 'ADMIN',
     };
-    const sessionCookie = btoa(encodeURIComponent(JSON.stringify(sessionData)));
+    const sessionCookie = 'mock-jwt-token-admin';
     const { verificarToken } = await import('@palpita/core');
     vi.mocked(verificarToken).mockResolvedValueOnce(
       sessionData as unknown as Sessao,
@@ -136,7 +136,7 @@ describe('Middleware', () => {
   });
 
   it('deve apagar o cookie de sessão e redirecionar para /login se o cookie estiver corrompido', async () => {
-    const req = createMockRequest('/meu-espaco', '!!!invalid-base64!!!');
+    const req = createMockRequest('/meu-espaco', 'corrupted-jwt-token');
     const { verificarToken } = await import('@palpita/core');
     vi.mocked(verificarToken).mockRejectedValueOnce(
       new Error('Token inválido'),

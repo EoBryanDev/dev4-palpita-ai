@@ -226,7 +226,7 @@ describe('obterSessao', () => {
       email: 'teste@empresa.com',
       cargo: 'COLABORADOR',
     };
-    const encodedCookie = btoa(encodeURIComponent(JSON.stringify(sessionData)));
+    const encodedCookie = 'mock-jwt-token-colaborador';
     mockCookiesStore.get.mockReturnValueOnce({ value: encodedCookie });
     (verificarToken as Mock).mockResolvedValueOnce({
       sub: 'user-123',
@@ -247,7 +247,7 @@ describe('obterSessao', () => {
   it('deve retornar null se o cookie estiver corrompido ou inválido', async () => {
     const { verificarToken } = await import('@palpita/core');
     mockCookiesStore.get.mockReturnValueOnce({
-      value: 'cookie-invalido-nao-json',
+      value: 'corrupted-jwt-token',
     });
     (verificarToken as Mock).mockRejectedValueOnce(new Error('Invalid token'));
     const session = await obterSessao();
