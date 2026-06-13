@@ -1,5 +1,7 @@
 'use server';
 
+import { validarOrigem } from '@/lib/csrf-server';
+import { Palpite } from '@palpita/core';
 import {
   comentarios,
   db,
@@ -21,7 +23,6 @@ import {
   or,
 } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
-import { Palpite } from '@palpita/core';
 import { obterSessao } from './auth';
 
 export interface IEventoTimeline {
@@ -291,6 +292,15 @@ export async function adicionarComentario(
   partidaId: string,
   conteudo: string,
 ): Promise<{ success: boolean; message: string }> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   const session = await obterSessao();
   if (!session || !session.id) {
     return { success: false, message: 'Usuário não autenticado.' };

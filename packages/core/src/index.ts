@@ -21,3 +21,37 @@ export {
   TokenConvite,
   type ITokenConviteProps,
 } from './domain/token-convite.entity';
+
+export {
+  Sessao,
+  type ISessaoPayload,
+} from './domain/sessao';
+
+export {
+  criarToken,
+  verificarToken,
+  obterSegredoParaValidacao,
+} from './services/sessao-service';
+
+export { validarEnvSeguranca } from './services/env-validator';
+
+export {
+  gerarTokenCsrf,
+  validarTokenCsrf,
+  validarCsrf,
+  CSRF_CONFIG,
+} from './services/csrf-service';
+
+export {
+  verificarRateLimit,
+  limparRateLimit,
+  resetarRateLimitStore,
+  encerrarRateLimit,
+  type RateLimitTipo,
+} from './services/rate-limit-service';
+
+export {
+  logAuditoria,
+  type AuditoriaEvento,
+  type AuditoriaDados,
+} from './services/auditoria-service';

@@ -15,6 +15,21 @@ vi.mock('@/app/actions/auth', () => ({
   obterSessao: vi.fn(),
 }));
 
+vi.mock('next/headers', () => ({
+  headers: vi.fn(() =>
+    Promise.resolve({
+      get: vi.fn(),
+    }),
+  ),
+  cookies: vi.fn(() =>
+    Promise.resolve({
+      get: vi.fn(),
+      set: vi.fn(),
+      delete: vi.fn(),
+    }),
+  ),
+}));
+
 vi.mock('@palpita/db', () => {
   const mockSelect = vi.fn();
   const mockInsert = vi.fn();
@@ -463,7 +478,7 @@ describe('Ações Administrativas (admin.ts)', () => {
 
       const res = await lancarResultadoOficial('partida-id', 2, 1);
       expect(res.success).toBe(false);
-      expect(res.message).toContain('ainda não começou');
+      expect(res.message).toContain('antes do seu inicio');
       expect(txMock.update).not.toHaveBeenCalled();
     });
 

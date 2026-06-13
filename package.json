@@ -12,10 +12,14 @@
     "dev": "turbo dev",
     "lint": "biome check .",
     "format": "biome format --write .",
-    "test": "turbo test"
+    "test": "turbo test",
+    "coverage": "turbo coverage"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "semantic-release": "^25.0.5",
     "turbo": "^2.0.4",
     "typescript": "^5.4.5"
   }

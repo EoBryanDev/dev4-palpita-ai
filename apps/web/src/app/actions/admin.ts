@@ -1,5 +1,13 @@
 'use server';
 
+import { validarOrigem } from '@/lib/csrf-server';
+import {
+  Partida,
+  type TPartidaStatus,
+  type TUsuarioCargo,
+  type TUsuarioStatus,
+  Usuario,
+} from '@palpita/core';
 import {
   configuracoes,
   db,
@@ -9,13 +17,6 @@ import {
   tokensConvite,
   usuarios,
 } from '@palpita/db';
-import {
-  Partida,
-  Usuario,
-  type TPartidaStatus,
-  type TUsuarioCargo,
-  type TUsuarioStatus,
-} from '@palpita/core';
 import { and, eq } from 'drizzle-orm';
 import { obterSessao } from './auth';
 
@@ -42,6 +43,15 @@ export interface IAprovacaoResponse extends IAdminActionResponse {
 export async function aprovarSolicitacao(
   usuarioId: string,
 ): Promise<IAprovacaoResponse> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   const isAdmin = await verificarPermissaoAdmin();
   if (!isAdmin) {
     return {
@@ -116,6 +126,15 @@ export async function aprovarSolicitacao(
 export async function rejeitarSolicitacao(
   usuarioId: string,
 ): Promise<IAdminActionResponse> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   const isAdmin = await verificarPermissaoAdmin();
   if (!isAdmin) {
     return {
@@ -180,6 +199,15 @@ export async function alterarStatusUsuario(
   usuarioId: string,
   novoStatus: 'ATIVO' | 'LIBERADO' | 'DESATIVADO',
 ): Promise<IAdminActionResponse> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   const isAdmin = await verificarPermissaoAdmin();
   if (!isAdmin) {
     return {
@@ -252,6 +280,15 @@ export async function criarRodada(
   numero: number,
   nome: string,
 ): Promise<IAdminActionResponse> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   const isAdmin = await verificarPermissaoAdmin();
   if (!isAdmin) {
     return { success: false, message: 'Acesso negado.' };
@@ -291,6 +328,15 @@ export async function criarPartida(
   timeBId: string,
   dataInicioString: string,
 ): Promise<IAdminActionResponse> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   const isAdmin = await verificarPermissaoAdmin();
   if (!isAdmin) {
     return { success: false, message: 'Acesso negado.' };
@@ -366,6 +412,15 @@ export async function lancarResultadoOficial(
   golsTimeA: number,
   golsTimeB: number,
 ): Promise<IAdminActionResponse> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   const isAdmin = await verificarPermissaoAdmin();
   if (!isAdmin) {
     return { success: false, message: 'Acesso negado.' };
@@ -409,7 +464,14 @@ export async function lancarResultadoOficial(
         dataCriacao: match.dataCriacao,
       });
 
-      partidaEntity.finalizar(golsTimeA, golsTimeB);
+      try {
+        partidaEntity.finalizar(golsTimeA, golsTimeB);
+      } catch (domainError) {
+        return {
+          success: false,
+          message: (domainError as Error).message,
+        };
+      }
 
       // 2. Atualizar o status e o placar
       await tx
@@ -459,6 +521,15 @@ export async function obterValorPalpite(): Promise<number> {
 export async function salvarValorPalpite(
   valor: number,
 ): Promise<IAdminActionResponse> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   const isAdmin = await verificarPermissaoAdmin();
   if (!isAdmin) {
     return {

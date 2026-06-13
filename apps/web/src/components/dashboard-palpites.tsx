@@ -122,7 +122,7 @@ export function DashboardPalpites({
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-black tracking-tight bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-zinc-50 dark:to-zinc-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-black tracking-tight bg-linear-to-r from-zinc-900 to-zinc-600 dark:from-zinc-50 dark:to-zinc-400 bg-clip-text text-transparent">
               Meu Espaço
             </h1>
             <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">

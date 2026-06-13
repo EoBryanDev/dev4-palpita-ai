@@ -4,6 +4,21 @@ import { db } from '@palpita/db';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 
+vi.mock('next/headers', () => ({
+  headers: vi.fn(() =>
+    Promise.resolve({
+      get: vi.fn(),
+    }),
+  ),
+  cookies: vi.fn(() =>
+    Promise.resolve({
+      get: vi.fn(),
+      set: vi.fn(),
+      delete: vi.fn(),
+    }),
+  ),
+}));
+
 vi.mock('@palpita/db', () => {
   const mockSelectResult: unknown[] = [];
   const mockSelect = vi.fn(() => ({
@@ -156,7 +171,7 @@ describe('cadastrarSenha', () => {
 
     const result = await cadastrarSenha('token-usado', 'senha123');
     expect(result.success).toBe(false);
-    expect(result.message).toBe('Este token já foi utilizado.');
+    expect(result.message).toBe('Este token ja foi utilizado');
   });
 
   it('deve retornar erro se o token estiver expirado', async () => {

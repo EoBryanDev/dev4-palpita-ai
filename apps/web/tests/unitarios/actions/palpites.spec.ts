@@ -8,6 +8,21 @@ vi.mock('@/app/actions/auth', () => ({
   obterSessao: vi.fn(),
 }));
 
+vi.mock('next/headers', () => ({
+  headers: vi.fn(() =>
+    Promise.resolve({
+      get: vi.fn(),
+    }),
+  ),
+  cookies: vi.fn(() =>
+    Promise.resolve({
+      get: vi.fn(),
+      set: vi.fn(),
+      delete: vi.fn(),
+    }),
+  ),
+}));
+
 vi.mock('@palpita/db', () => {
   const mockSelect = vi.fn();
   const mockInsert = vi.fn();

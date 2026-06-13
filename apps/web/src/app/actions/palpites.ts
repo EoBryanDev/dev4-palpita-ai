@@ -1,6 +1,7 @@
 'use server';
 
 import type { IPartidaDashboard } from '@/interface/IDashboard';
+import { validarOrigem } from '@/lib/csrf-server';
 import {
   obterPalpitesSalvosFuturosPaginados,
   obterTodosPalpitesUsuario,
@@ -20,6 +21,15 @@ export async function salvarPalpite(
   golsTimeA: number,
   golsTimeB: number,
 ): Promise<ISalvarPalpiteResult> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
   // 1. Validar autenticação
   const session = await obterSessao();
   if (!session || !session.id) {

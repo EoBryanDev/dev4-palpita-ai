@@ -7,11 +7,17 @@
   "types": "./src/index.ts",
   "scripts": {
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "jose": "^5.9.6",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@palpita/tsconfig": "workspace:*",
+    "@vitest/coverage-v8": "^1.6.1",
     "typescript": "^5.4.5",
-    "vitest": "^1.6.0"
+    "vitest": "^1.6.1"
   }
 }
