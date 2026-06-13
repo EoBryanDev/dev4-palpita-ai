@@ -4,6 +4,21 @@ import { db } from '@palpita/db';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 
+vi.mock('next/headers', () => ({
+  headers: vi.fn(() =>
+    Promise.resolve({
+      get: vi.fn(),
+    }),
+  ),
+  cookies: vi.fn(() =>
+    Promise.resolve({
+      get: vi.fn(),
+      set: vi.fn(),
+      delete: vi.fn(),
+    }),
+  ),
+}));
+
 vi.mock('@palpita/db', () => {
   const mockSelectResult: unknown[] = [];
   const mockSelect = vi.fn(() => ({

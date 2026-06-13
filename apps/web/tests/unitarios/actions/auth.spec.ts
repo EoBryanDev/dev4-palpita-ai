@@ -15,6 +15,10 @@ vi.mock('next/headers', () => ({
   headers: vi.fn(() => Promise.resolve(new Map())),
 }));
 
+vi.mock('@/lib/csrf-server', () => ({
+  validarOrigem: vi.fn(() => Promise.resolve()),
+}));
+
 vi.mock('@palpita/core', () => ({
   Usuario: vi.fn(),
   criarToken: vi.fn(() => Promise.resolve('mock-jwt-token')),
