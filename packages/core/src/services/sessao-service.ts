@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
-import { Sessao, type ISessaoPayload } from '../domain/sessao.js';
-import type { Usuario } from '../domain/usuario.entity.js';
+import { Sessao, type ISessaoPayload } from '../domain/sessao';
 
+import type { Usuario } from '../domain/usuario.entity';
 const JWT_ALGORITHM = 'HS256';
 
 function obterSegredo(): string {

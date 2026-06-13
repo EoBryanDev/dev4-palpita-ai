@@ -1,4 +1,4 @@
-import type { TUsuarioCargo } from './usuario.entity.js';
+import type { TUsuarioCargo } from './usuario.entity';
 
 export interface ISessaoPayload {
   sub: string;

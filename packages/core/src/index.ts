@@ -25,10 +25,14 @@ export {
 export {
   Sessao,
   type ISessaoPayload,
-} from './domain/sessao.js';
+} from './domain/sessao';
 
 export {
   criarToken,
   verificarToken,
   obterSegredoParaValidacao,
-} from './services/sessao-service.js';
+} from './services/sessao-service';
+
+export {
+  validarEnvSeguranca,
+} from './services/env-validator';
