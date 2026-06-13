@@ -1,10 +1,11 @@
 'use server';
 
-import { Usuario, criarToken, verificarToken } from '@palpita/core';
+import { Usuario, criarToken, verificarToken, logAuditoria, verificarRateLimit } from '@palpita/core';
 import { db, usuarios } from '@palpita/db';
 import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
+import { z } from 'zod';
 
 export interface ILoginResult {
   success: boolean;
@@ -24,26 +25,53 @@ export interface ISessionUser {
   cargo: string;
 }
 
+const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, 'O e-mail é obrigatório.')
+    .email('Formato de e-mail inválido.')
+    .max(255, 'E-mail muito longo.'),
+  senha: z
+    .string()
+    .min(1, 'A senha é obrigatória.')
+    .max(128, 'Senha muito longa.'),
+});
+
 export async function loginUsuario(
   email: string,
   senhaInformada: string,
 ): Promise<ILoginResult> {
-  if (!email || email.trim().length === 0) {
-    return { success: false, message: 'O e-mail é obrigatório.' };
+  const validated = loginSchema.safeParse({ email, senha: senhaInformada });
+  if (!validated.success) {
+    const firstError = validated.error.errors[0]?.message ?? 'Dados inválidos.';
+    return { success: false, message: firstError };
   }
 
-  if (!senhaInformada || senhaInformada.length === 0) {
-    return { success: false, message: 'A senha é obrigatória.' };
+  const { email: emailValido, senha: senhaValida } = validated.data;
+
+  const headersList = await headers();
+  const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim()
+    || headersList.get('x-real-ip')
+    || 'unknown';
+
+  const rateCheck = verificarRateLimit(ip, 'LOGIN');
+  if (!rateCheck.permitido) {
+    logAuditoria('LOGIN_FALHA', { email: emailValido, motivo: 'rate_limit_excedido' });
+    return {
+      success: false,
+      message: `Muitas tentativas de login. Tente novamente em ${Math.ceil(rateCheck.resetEmMs / 1000)} segundos.`,
+    };
   }
 
   try {
     const usuarioData = await db
       .select()
       .from(usuarios)
-      .where(eq(usuarios.email, email.trim().toLowerCase()))
+      .where(eq(usuarios.email, emailValido.trim().toLowerCase()))
       .limit(1);
 
     if (usuarioData.length === 0) {
+      logAuditoria('LOGIN_FALHA', { email: emailValido, motivo: 'usuario_nao_encontrado' });
       return { success: false, message: 'Credenciais inválidas.' };
     }
 
@@ -67,8 +95,14 @@ export async function loginUsuario(
     const senhaValida = await bcrypt.compare(senhaInformada, usuario.senha);
 
     if (!senhaValida) {
+      logAuditoria('LOGIN_FALHA', { email: emailValido, motivo: 'senha_incorreta' });
       return { success: false, message: 'Credenciais inválidas.' };
     }
+
+    await db.update(usuarios)
+      .set({ ultimoLoginAt: new Date() })
+      .where(eq(usuarios.id, usuario.id))
+      .execute();
 
     const usuarioEntity = new Usuario({
       id: usuario.id,
@@ -82,6 +116,7 @@ export async function loginUsuario(
     });
 
     const token = await criarToken(usuarioEntity);
+    logAuditoria('LOGIN_SUCESSO', { usuarioId: usuario.id, email: emailValido });
 
     const cookieStore = await cookies();
     cookieStore.set('palpita_session', token, {
@@ -117,6 +152,7 @@ export async function logoutUsuario(): Promise<{
   try {
     const cookieStore = await cookies();
     cookieStore.delete('palpita_session');
+    logAuditoria('LOGOUT', {});
     return { success: true, message: 'Logout realizado com sucesso!' };
   } catch (error) {
     console.error('Erro ao realizar logout:', error);
