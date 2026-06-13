@@ -12,13 +12,27 @@ const mockCookiesStore = {
 
 vi.mock('next/headers', () => ({
   cookies: vi.fn(() => Promise.resolve(mockCookiesStore)),
+  headers: vi.fn(() => Promise.resolve(new Map())),
+}));
+
+vi.mock('@palpita/core', () => ({
+  Usuario: vi.fn(),
+  criarToken: vi.fn(() => Promise.resolve('mock-jwt-token')),
+  logAuditoria: vi.fn(),
+  verificarRateLimit: vi.fn(() => ({ permitido: true, resetEmMs: 0 })),
+  verificarToken: vi.fn(),
 }));
 
 vi.mock('@palpita/db', () => {
   const mockSelect = vi.fn();
+  const mockExecute = vi.fn().mockResolvedValue(undefined);
+  const mockWhere = vi.fn(() => ({ execute: mockExecute }));
+  const mockSet = vi.fn(() => ({ where: mockWhere }));
+  const mockUpdate = vi.fn(() => ({ set: mockSet }));
   return {
     db: {
       select: mockSelect,
+      update: mockUpdate,
     },
     usuarios: {
       email: 'email-col',
@@ -205,6 +219,7 @@ describe('obterSessao', () => {
   });
 
   it('deve decodificar o cookie e retornar os dados do usuário se estiver presente', async () => {
+    const { verificarToken } = await import('@palpita/core');
     const sessionData = {
       id: 'user-123',
       nome: 'Fulano',
@@ -213,15 +228,28 @@ describe('obterSessao', () => {
     };
     const encodedCookie = btoa(encodeURIComponent(JSON.stringify(sessionData)));
     mockCookiesStore.get.mockReturnValueOnce({ value: encodedCookie });
+    (verificarToken as Mock).mockResolvedValueOnce({
+      sub: 'user-123',
+      nome: 'Fulano',
+      email: 'teste@empresa.com',
+      cargo: 'COLABORADOR',
+    });
 
     const session = await obterSessao();
-    expect(session).toEqual(sessionData);
+    expect(session).toEqual({
+      id: 'user-123',
+      nome: 'Fulano',
+      email: 'teste@empresa.com',
+      cargo: 'COLABORADOR',
+    });
   });
 
   it('deve retornar null se o cookie estiver corrompido ou inválido', async () => {
+    const { verificarToken } = await import('@palpita/core');
     mockCookiesStore.get.mockReturnValueOnce({
       value: 'cookie-invalido-nao-json',
     });
+    (verificarToken as Mock).mockRejectedValueOnce(new Error('Invalid token'));
     const session = await obterSessao();
     expect(session).toBeNull();
   });

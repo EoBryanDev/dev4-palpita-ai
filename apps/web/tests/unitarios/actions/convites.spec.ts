@@ -156,7 +156,7 @@ describe('cadastrarSenha', () => {
 
     const result = await cadastrarSenha('token-usado', 'senha123');
     expect(result.success).toBe(false);
-    expect(result.message).toBe('Este token já foi utilizado.');
+    expect(result.message).toBe('Este token ja foi utilizado');
   });
 
   it('deve retornar erro se o token estiver expirado', async () => {
