@@ -102,7 +102,7 @@
 
 ## Task 8: Security headers
 
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** MEDIUM
 - **Description:** Configurar headers de segurança HTTP na aplicação Next.js.
 
