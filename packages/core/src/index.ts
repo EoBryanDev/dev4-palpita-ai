@@ -21,3 +21,14 @@ export {
   TokenConvite,
   type ITokenConviteProps,
 } from './domain/token-convite.entity';
+
+export {
+  Sessao,
+  type ISessaoPayload,
+} from './domain/sessao.js';
+
+export {
+  criarToken,
+  verificarToken,
+  obterSegredoParaValidacao,
+} from './services/sessao-service.js';
