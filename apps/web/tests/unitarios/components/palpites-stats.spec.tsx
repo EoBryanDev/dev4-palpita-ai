@@ -295,4 +295,183 @@ describe('PalpitesStats', () => {
       expect(screen.getByText('Calculando Encerramento')).toBeDefined();
     });
   });
+
+  describe('Ordenação e Paginação', () => {
+    it('deve ordenar jogos ativos primeiro (ordem cronológica) e finalizados por último (ordem cronológica)', () => {
+      const mockData = [
+        {
+          id: 'm-completed-2',
+          timeA: 'Time Comp 2',
+          timeB: 'Outro',
+          golsTimeA: 1,
+          golsTimeB: 1,
+          dataInicio: '2026-06-12T15:00:00Z',
+          status: 'FINALIZADO',
+          rodadaNome: 'Oitavas',
+          estatisticas: {
+            total: 0,
+            vitoriasA: 0,
+            vitoriasB: 0,
+            empates: 0,
+            pctVitoriasA: 0,
+            pctVitoriasB: 0,
+            pctEmpates: 0,
+          },
+          palpitesIndividuaisLiberados: true,
+          palpitesIndividuais: [],
+        },
+        {
+          id: 'm-active-1',
+          timeA: 'Time Active 1',
+          timeB: 'Outro',
+          golsTimeA: null,
+          golsTimeB: null,
+          dataInicio: '2026-06-12T14:00:00Z',
+          status: 'AGENDADO',
+          rodadaNome: 'Oitavas',
+          estatisticas: {
+            total: 0,
+            vitoriasA: 0,
+            vitoriasB: 0,
+            empates: 0,
+            pctVitoriasA: 0,
+            pctVitoriasB: 0,
+            pctEmpates: 0,
+          },
+          palpitesIndividuaisLiberados: false,
+          palpitesIndividuais: [],
+        },
+        {
+          id: 'm-completed-1',
+          timeA: 'Time Comp 1',
+          timeB: 'Outro',
+          golsTimeA: 2,
+          golsTimeB: 0,
+          dataInicio: '2026-06-12T16:00:00Z',
+          status: 'FINALIZADO',
+          rodadaNome: 'Oitavas',
+          estatisticas: {
+            total: 0,
+            vitoriasA: 0,
+            vitoriasB: 0,
+            empates: 0,
+            pctVitoriasA: 0,
+            pctVitoriasB: 0,
+            pctEmpates: 0,
+          },
+          palpitesIndividuaisLiberados: true,
+          palpitesIndividuais: [],
+        },
+        {
+          id: 'm-active-2',
+          timeA: 'Time Active 2',
+          timeB: 'Outro',
+          golsTimeA: null,
+          golsTimeB: null,
+          dataInicio: '2026-06-12T13:00:00Z',
+          status: 'AGENDADO',
+          rodadaNome: 'Oitavas',
+          estatisticas: {
+            total: 0,
+            vitoriasA: 0,
+            vitoriasB: 0,
+            empates: 0,
+            pctVitoriasA: 0,
+            pctVitoriasB: 0,
+            pctEmpates: 0,
+          },
+          palpitesIndividuaisLiberados: false,
+          palpitesIndividuais: [],
+        },
+      ];
+
+      (useQuery as Mock).mockReturnValue({
+        isLoading: false,
+        isError: false,
+        data: mockData,
+      });
+
+      render(<PalpitesStats />);
+
+      const elActive2 = screen.getByText('Time Active 2');
+      const elActive1 = screen.getByText('Time Active 1');
+      const elComp2 = screen.getByText('Time Comp 2');
+      const elComp1 = screen.getByText('Time Comp 1');
+
+      expect(elActive2.compareDocumentPosition(elActive1) & 4).toBe(4); // 4 = Node.DOCUMENT_POSITION_FOLLOWING
+      expect(elActive1.compareDocumentPosition(elComp2) & 4).toBe(4);
+      expect(elComp2.compareDocumentPosition(elComp1) & 4).toBe(4);
+    });
+
+    it('deve limitar a exibição a 10 jogos inicialmente, exibir "Visualizar mais" e resetar limite ao buscar', () => {
+      const mockData = Array.from({ length: 12 }, (_, i) => ({
+        id: `m-${i}`,
+        timeA: `Time ${i + 1}`,
+        timeB: 'Outro',
+        golsTimeA: null,
+        golsTimeB: null,
+        dataInicio: `2026-06-12T1${i}:00:00Z`,
+        status: 'AGENDADO',
+        rodadaNome: 'Oitavas',
+        estatisticas: {
+          total: 0,
+          vitoriasA: 0,
+          vitoriasB: 0,
+          empates: 0,
+          pctVitoriasA: 0,
+          pctVitoriasB: 0,
+          pctEmpates: 0,
+        },
+        palpitesIndividuaisLiberados: false,
+        palpitesIndividuais: [],
+      }));
+
+      (useQuery as Mock).mockReturnValue({
+        isLoading: false,
+        isError: false,
+        data: mockData,
+      });
+
+      render(<PalpitesStats />);
+
+      // Deve renderizar de Time 1 a Time 10
+      for (let i = 1; i <= 10; i++) {
+        expect(screen.getByText(`Time ${i}`)).toBeDefined();
+      }
+      // Não deve renderizar Time 11 e Time 12 inicialmente
+      expect(screen.queryByText('Time 11')).toBeNull();
+      expect(screen.queryByText('Time 12')).toBeNull();
+
+      // Botão "Visualizar mais" deve estar presente
+      const loadMoreBtn = screen.getByRole('button', {
+        name: /Visualizar mais/i,
+      });
+      expect(loadMoreBtn).toBeDefined();
+
+      // Clica para carregar mais
+      fireEvent.click(loadMoreBtn);
+
+      // Agora todos devem ser exibidos
+      for (let i = 1; i <= 12; i++) {
+        expect(screen.getByText(`Time ${i}`)).toBeDefined();
+      }
+      // Botão "Visualizar mais" deve desaparecer
+      expect(
+        screen.queryByRole('button', { name: /Visualizar mais/i }),
+      ).toBeNull();
+
+      // Altera o campo de busca para resetar a paginação
+      const searchInput = screen.getByPlaceholderText(
+        /Filtrar jogos pelo nome de uma seleção/i,
+      );
+      fireEvent.change(searchInput, { target: { value: 'Time' } });
+
+      // Deve ter voltado a exibir apenas 10 e reexibir o botão "Visualizar mais"
+      expect(screen.queryByText('Time 11')).toBeNull();
+      expect(screen.queryByText('Time 12')).toBeNull();
+      expect(
+        screen.getByRole('button', { name: /Visualizar mais/i }),
+      ).toBeDefined();
+    });
+  });
 });
