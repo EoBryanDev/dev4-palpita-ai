@@ -14,6 +14,7 @@ export function FlagImage({
   alt,
 }: FlagImageProps) {
   const [hasError, setHasError] = useState(false);
+  const [useFallbackCDN, setUseFallbackCDN] = useState(false);
 
   // Helper para converter emoji em código de país (ISO de duas letras)
   const getCountryCode = (flagEmoji: string) => {
@@ -57,16 +58,24 @@ export function FlagImage({
     );
   }
 
+  const primaryUrl = `https://cdn.jsdelivr.net/gh/lipis/flag-icons/flags/4x3/${code}.svg`;
+  const fallbackUrl = `https://flagcdn.com/w40/${code}.png`;
+
   return (
     <span
       className={`inline-flex items-center justify-center shrink-0 overflow-hidden rounded-sm align-middle ${className}`}
     >
       <img
-        src={`https://flagcdn.com/w40/${code}.png`}
-        srcSet={`https://flagcdn.com/w80/${code}.png 2x`}
+        src={useFallbackCDN ? fallbackUrl : primaryUrl}
         alt={alt || 'Bandeira'}
         className="h-full w-full object-cover"
-        onError={() => setHasError(true)}
+        onError={() => {
+          if (!useFallbackCDN) {
+            setUseFallbackCDN(true);
+          } else {
+            setHasError(true);
+          }
+        }}
       />
     </span>
   );
