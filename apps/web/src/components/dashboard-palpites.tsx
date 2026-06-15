@@ -42,6 +42,7 @@ export function DashboardPalpites({
   isTudoBloqueado,
   palpitesSalvosIniciais,
   totalPalpitesSalvos,
+  partidasEmAndamento,
 }: IDashboardPalpitesProps): React.ReactNode {
   const {
     valoresPalpites,
@@ -277,6 +278,97 @@ export function DashboardPalpites({
                 O prazo limite para palpitar expirou (bloqueado 30 minutos antes
                 do início do primeiro jogo da Copa do Mundo).
               </p>
+            </div>
+          </div>
+        )}
+
+        {/* Jogos em Andamento (Ao Vivo) */}
+        {partidasEmAndamento && partidasEmAndamento.length > 0 && (
+          <div className="mb-10">
+            <h2 className="text-xl font-black tracking-tight mb-4 flex items-center gap-2">
+              <span className="flex h-2.5 w-2.5 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+              </span>
+              Jogos em Andamento ({partidasEmAndamento.length})
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {partidasEmAndamento.map((partida) => (
+                <div
+                  key={partida.id}
+                  className="rounded-3xl border border-red-500/20 bg-red-500/5 p-6 shadow-md dark:border-red-500/10 dark:bg-red-950/10 backdrop-blur-sm flex flex-col justify-between gap-4"
+                >
+                  <div className="flex items-center justify-between text-xs text-red-650 dark:text-red-455">
+                    <span className="font-bold uppercase tracking-wider bg-red-100 dark:bg-red-950/40 px-2 py-0.5 rounded-full">
+                      Ao Vivo
+                    </span>
+                    <span className="text-[11px] font-bold text-zinc-550 dark:text-zinc-400">
+                      {formatarData(partida.dataInicio)}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4 py-2">
+                    <div className="flex flex-1 items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden border border-zinc-200 dark:border-zinc-700 select-none shrink-0">
+                        {partida.timeAEmoji ? (
+                          <FlagImage
+                            emoji={partida.timeAEmoji}
+                            alt={partida.timeA}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-xs font-bold text-zinc-500">
+                            {partida.timeA.slice(0, 3).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-sm font-bold truncate">{partida.timeA}</span>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span className="bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 rounded-xl font-black text-lg min-w-[36px] text-center border border-zinc-200 dark:border-zinc-800">
+                        {partida.golsTimeA ?? 0}
+                      </span>
+                      <span className="text-zinc-400 text-xs font-bold">VS</span>
+                      <span className="bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 rounded-xl font-black text-lg min-w-[36px] text-center border border-zinc-200 dark:border-zinc-800">
+                        {partida.golsTimeB ?? 0}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-1 items-center justify-end gap-3">
+                      <span className="text-sm font-bold truncate text-right">{partida.timeB}</span>
+                      <div className="h-10 w-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden border border-zinc-200 dark:border-zinc-700 select-none shrink-0">
+                        {partida.timeBEmoji ? (
+                          <FlagImage
+                            emoji={partida.timeBEmoji}
+                            alt={partida.timeB}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-xs font-bold text-zinc-500">
+                            {partida.timeB.slice(0, 3).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-zinc-200/50 dark:border-zinc-800/50 pt-3 flex items-center justify-between text-xs">
+                    <span className="font-semibold text-zinc-500 dark:text-zinc-400">
+                      Seu Palpite
+                    </span>
+                    {partida.jaPalpitou ? (
+                      <span className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-400 px-3 py-1 rounded-full font-bold">
+                        {partida.palpiteGolsA} x {partida.palpiteGolsB}
+                      </span>
+                    ) : (
+                      <span className="bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400 px-3 py-1 rounded-full font-bold">
+                        Sem palpite
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}

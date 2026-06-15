@@ -112,6 +112,7 @@ const defaultProps = {
     },
   ],
   totalPalpitesSalvos: 1,
+  partidasEmAndamento: [],
 };
 
 describe('DashboardPalpites Component', () => {
@@ -274,5 +275,35 @@ describe('DashboardPalpites Component', () => {
         mockPalpites,
       );
     });
+  });
+
+  it('deve renderizar a seção de jogos em andamento (Ao Vivo) se houver partidas ativas', () => {
+    const propsComPartidaAtiva = {
+      ...defaultProps,
+      partidasEmAndamento: [
+        {
+          id: 'partida-live',
+          timeA: 'Uruguai',
+          timeB: 'Itália',
+          timeAEmoji: '🇺🇾',
+          timeBEmoji: '🇮🇹',
+          dataInicio: new Date().toISOString(),
+          status: 'EM_ANDAMENTO',
+          golsTimeA: 1,
+          golsTimeB: 0,
+          palpiteGolsA: 3,
+          palpiteGolsB: 1,
+          jaPalpitou: true,
+        },
+      ],
+    };
+
+    render(<DashboardPalpites {...propsComPartidaAtiva} />);
+
+    expect(screen.getByText('Jogos em Andamento (1)')).toBeDefined();
+    expect(screen.getByText('Uruguai')).toBeDefined();
+    expect(screen.getByText('Itália')).toBeDefined();
+    expect(screen.getByText('Ao Vivo')).toBeDefined();
+    expect(screen.getByText('3 x 1')).toBeDefined();
   });
 });
