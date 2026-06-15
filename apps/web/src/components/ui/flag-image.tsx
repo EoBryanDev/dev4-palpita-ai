@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface FlagImageProps {
   emoji: string;
@@ -11,10 +11,15 @@ interface FlagImageProps {
 export function FlagImage({
   emoji,
   className = 'h-5 w-5',
-  alt,
+  alt = '',
 }: FlagImageProps) {
+  const [mounted, setMounted] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [useFallbackCDN, setUseFallbackCDN] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Helper para converter emoji em código de país (ISO de duas letras)
   const getCountryCode = (flagEmoji: string) => {
@@ -48,10 +53,12 @@ export function FlagImage({
 
   const code = getCountryCode(emoji);
 
-  if (!code || hasError) {
+  // Se não estiver montado no client, ou não tiver código, ou deu erro de carregamento:
+  // Renderiza o emoji nativo como fallback seguro.
+  if (!mounted || !code || hasError) {
     return (
       <span
-        className={`inline-flex items-center justify-center shrink-0 align-middle ${className}`}
+        className={`inline-flex items-center justify-center shrink-0 align-middle select-none ${className}`}
       >
         {emoji}
       </span>
@@ -67,7 +74,7 @@ export function FlagImage({
     >
       <img
         src={useFallbackCDN ? fallbackUrl : primaryUrl}
-        alt={alt || 'Bandeira'}
+        alt={alt}
         className="h-full w-full object-cover"
         onError={() => {
           if (!useFallbackCDN) {
