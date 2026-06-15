@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.1.0...v1.1.1) (2026-06-15)
+
+
+### Bug Fixes
+
+* **ui:** defer flag image rendering to client to fix SSR hydration and prevent broken alt text ([b71065d](https://github.com/EoBryanDev/dev4-palpita-ai/commit/b71065d7ea6576760b29b6686978b24cf040e101))
+
 # [1.1.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.0.0...v1.1.0) (2026-06-15)
 
 
