@@ -5,4 +5,6 @@ export interface IRankUser {
   pontos: number;
   posicao: number;
   posicaoGrupo: number;
+  jogosPontuados: number;
+  palpitesCerteiros: number;
 }

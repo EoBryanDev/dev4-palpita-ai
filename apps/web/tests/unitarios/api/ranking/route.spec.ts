@@ -87,6 +87,8 @@ describe('GET /api/ranking', () => {
       pontos: 4,
       posicao: 1,
       posicaoGrupo: 1,
+      jogosPontuados: 2,
+      palpitesCerteiros: 2,
     });
 
     // Bob em segundo
@@ -97,6 +99,8 @@ describe('GET /api/ranking', () => {
       pontos: 2,
       posicao: 2,
       posicaoGrupo: 2,
+      jogosPontuados: 1,
+      palpitesCerteiros: 1,
     });
 
     // Charlie em terceiro
@@ -107,6 +111,8 @@ describe('GET /api/ranking', () => {
       pontos: 1,
       posicao: 3,
       posicaoGrupo: 3,
+      jogosPontuados: 1,
+      palpitesCerteiros: 0,
     });
   });
 

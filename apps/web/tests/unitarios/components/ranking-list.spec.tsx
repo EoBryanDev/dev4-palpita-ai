@@ -52,6 +52,8 @@ describe('RankingList', () => {
         pontos: 15,
         posicao: 1,
         posicaoGrupo: 1,
+        jogosPontuados: 10,
+        palpitesCerteiros: 5,
       },
       {
         id: '2',
@@ -60,6 +62,8 @@ describe('RankingList', () => {
         pontos: 12,
         posicao: 2,
         posicaoGrupo: 2,
+        jogosPontuados: 8,
+        palpitesCerteiros: 4,
       },
       {
         id: '3',
@@ -68,6 +72,8 @@ describe('RankingList', () => {
         pontos: 10,
         posicao: 3,
         posicaoGrupo: 3,
+        jogosPontuados: 6,
+        palpitesCerteiros: 3,
       },
       {
         id: '4',
@@ -76,6 +82,8 @@ describe('RankingList', () => {
         pontos: 8,
         posicao: 4,
         posicaoGrupo: 4,
+        jogosPontuados: 4,
+        palpitesCerteiros: 2,
       },
     ];
 
@@ -106,6 +114,8 @@ describe('RankingList', () => {
         pontos: 15,
         posicao: 1,
         posicaoGrupo: 1,
+        jogosPontuados: 10,
+        palpitesCerteiros: 5,
       },
       {
         id: '2',
@@ -114,6 +124,8 @@ describe('RankingList', () => {
         pontos: 12,
         posicao: 2,
         posicaoGrupo: 2,
+        jogosPontuados: 8,
+        palpitesCerteiros: 4,
       },
     ];
 
