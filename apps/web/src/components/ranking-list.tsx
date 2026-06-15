@@ -178,6 +178,12 @@ export function RankingList() {
                   <th scope="col" className="px-6 py-4">
                     Participante
                   </th>
+                  <th scope="col" className="px-6 py-4 text-center">
+                    Jogos Pontuados
+                  </th>
+                  <th scope="col" className="px-6 py-4 text-center">
+                    Placares Exatos
+                  </th>
                   <th scope="col" className="px-6 py-4 text-right pr-12">
                     Pontuação
                   </th>
@@ -213,6 +219,12 @@ export function RankingList() {
                       </td>
                       <td className="px-6 py-4 font-semibold text-zinc-900 dark:text-zinc-100">
                         {user.nome}
+                      </td>
+                      <td className="px-6 py-4 text-center font-medium text-zinc-600 dark:text-zinc-350">
+                        {user.jogosPontuados}
+                      </td>
+                      <td className="px-6 py-4 text-center font-medium text-zinc-600 dark:text-zinc-350">
+                        {user.palpitesCerteiros}
                       </td>
                       <td className="px-6 py-4 text-right pr-12 font-black text-emerald-600 dark:text-emerald-400 text-lg">
                         {user.pontos}{' '}

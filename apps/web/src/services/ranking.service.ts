@@ -8,6 +8,8 @@ export interface IRankedUser {
   pontos: number;
   posicao: number;
   posicaoGrupo: number;
+  jogosPontuados: number;
+  palpitesCerteiros: number;
 }
 
 const obterVencedor = (golsA: number, golsB: number): 'A' | 'B' | 'EMPATE' => {
@@ -71,6 +73,8 @@ export async function calcularRankingGeral(): Promise<IRankedUser[]> {
   const rankingData = activeUsers.map((user) => {
     const userGuesses = userPalpitesMap.get(user.id) || [];
     let pontos = 0;
+    let jogosPontuados = 0;
+    let palpitesCerteiros = 0;
 
     for (const guess of userGuesses) {
       const match = matchesMap.get(guess.partidaId);
@@ -84,8 +88,11 @@ export async function calcularRankingGeral(): Promise<IRankedUser[]> {
 
         if (acertouPlacarExato) {
           pontos += 2;
+          palpitesCerteiros++;
+          jogosPontuados++;
         } else if (vencedorPalpite === vencedorPartida) {
           pontos += 1;
+          jogosPontuados++;
         }
       }
     }
@@ -95,6 +102,8 @@ export async function calcularRankingGeral(): Promise<IRankedUser[]> {
       nome: user.nome,
       email: user.email,
       pontos,
+      jogosPontuados,
+      palpitesCerteiros,
     };
   });
 

@@ -155,6 +155,31 @@ export default async function MeuEspacoPage() {
     0,
   );
 
+  // 10. Buscar palpites de jogos em andamento (Ao Vivo)
+  const partidasEmAndamento = todasPartidas.filter(
+    (p) => p.status === 'EM_ANDAMENTO',
+  );
+
+  const emAndamentoEnriquecidas: IPartidaDashboard[] = partidasEmAndamento.map(
+    (partida) => {
+      const palpite = palpitesMap.get(partida.id);
+      return {
+        id: partida.id,
+        timeA: partida.timeA,
+        timeB: partida.timeB,
+        timeAEmoji: partida.timeAEmoji,
+        timeBEmoji: partida.timeBEmoji,
+        dataInicio: partida.dataInicio.toISOString(),
+        status: partida.status,
+        golsTimeA: partida.golsTimeA,
+        golsTimeB: partida.golsTimeB,
+        palpiteGolsA: palpite ? palpite.golsTimeA : null,
+        palpiteGolsB: palpite ? palpite.golsTimeB : null,
+        jaPalpitou: !!palpite,
+      };
+    },
+  );
+
   return (
     <DashboardPalpites
       nomeUsuario={user.nome}
@@ -169,6 +194,7 @@ export default async function MeuEspacoPage() {
       isTudoBloqueado={isTudoBloqueado}
       palpitesSalvosIniciais={palpitesSalvosIniciais}
       totalPalpitesSalvos={totalPalpitesSalvos}
+      partidasEmAndamento={emAndamentoEnriquecidas}
     />
   );
 }

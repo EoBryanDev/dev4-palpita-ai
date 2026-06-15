@@ -48,4 +48,5 @@ export interface IDashboardPalpitesProps {
   isTudoBloqueado: boolean;
   palpitesSalvosIniciais: IPartidaDashboard[];
   totalPalpitesSalvos: number;
+  partidasEmAndamento: IPartidaDashboard[];
 }
