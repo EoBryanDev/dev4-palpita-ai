@@ -32,6 +32,9 @@ export function EventosClient() {
   const [eventos, setEventos] = useState<IEventoTimeline[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [visibleLimit, setVisibleLimit] = useState(5);
+
+  const visibleEventos = eventos.slice(0, visibleLimit);
 
   // Estados do Modal de Comentários
   const [selectedMatch, setSelectedMatch] = useState<IEventoTimeline | null>(
@@ -299,109 +302,126 @@ export function EventosClient() {
           </p>
         </div>
       ) : (
-        <div className="relative border-l border-zinc-200 dark:border-zinc-800 ml-4 md:ml-6 space-y-12">
-          {eventos.map((evento) => {
-            const statusInfo = getStatusLabel(evento.status, evento.dataInicio);
+        <div className="space-y-8">
+          <div className="relative border-l border-zinc-200 dark:border-zinc-800 ml-4 md:ml-6 space-y-12">
+            {visibleEventos.map((evento) => {
+              const statusInfo = getStatusLabel(
+                evento.status,
+                evento.dataInicio,
+              );
 
-            return (
-              <div key={evento.id} className="relative pl-8 md:pl-10">
-                {/* Marcador na Timeline */}
-                <span className="absolute -left-[9px] top-1.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-emerald-600 dark:bg-emerald-500 ring-4 ring-white dark:ring-zinc-950 shadow-sm" />
+              return (
+                <div key={evento.id} className="relative pl-8 md:pl-10">
+                  {/* Marcador na Timeline */}
+                  <span className="absolute -left-[9px] top-1.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-emerald-600 dark:bg-emerald-500 ring-4 ring-white dark:ring-zinc-950 shadow-sm" />
 
-                <div className="rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-md dark:border-zinc-800/80 dark:bg-zinc-900/30 transition-all hover:shadow-lg">
-                  {/* Cabeçalho do Confronto */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
-                        {evento.rodadaNome}
-                      </span>
-                      <span className="text-xs text-zinc-500 dark:text-zinc-450 font-semibold flex items-center gap-1">
-                        <Clock className="h-3.5 w-3.5" />
-                        {formatarData(evento.dataInicio)}
-                      </span>
-                    </div>
-                    <span
-                      className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${statusInfo.styles}`}
-                    >
-                      {statusInfo.label}
-                    </span>
-                  </div>
-
-                  {/* Detalhes do Jogo */}
-                  <div className="flex items-center justify-between py-3 border-b border-zinc-100 dark:border-zinc-800/50 pb-5 mb-4 select-none">
-                    <div className="w-[42%] text-right font-black text-zinc-850 dark:text-zinc-200 truncate flex items-center justify-end gap-2">
-                      <span className="text-sm md:text-base">
-                        {evento.timeA}
-                      </span>
-                      {evento.timeAEmoji && (
-                        <FlagImage
-                          emoji={evento.timeAEmoji}
-                          alt={evento.timeA}
-                          className="h-5 w-5 shrink-0"
-                        />
-                      )}
-                    </div>
-                    <div className="flex items-center justify-center gap-2 bg-zinc-55 dark:bg-zinc-800/60 px-3.5 py-1.5 rounded-2xl border border-zinc-200/50 dark:border-zinc-800 font-black text-lg md:text-xl text-zinc-900 dark:text-zinc-50">
-                      <span>
-                        {evento.golsTimeA !== null ? evento.golsTimeA : '-'}
-                      </span>
-                      <span className="text-zinc-350 dark:text-zinc-650 text-sm font-normal">
-                        x
-                      </span>
-                      <span>
-                        {evento.golsTimeB !== null ? evento.golsTimeB : '-'}
-                      </span>
-                    </div>
-                    <div className="w-[42%] text-left font-black text-zinc-850 dark:text-zinc-200 truncate flex items-center justify-start gap-2">
-                      {evento.timeBEmoji && (
-                        <FlagImage
-                          emoji={evento.timeBEmoji}
-                          alt={evento.timeB}
-                          className="h-5 w-5 shrink-0"
-                        />
-                      )}
-                      <span className="text-sm md:text-base">
-                        {evento.timeB}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Ações e Informações Adicionais */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    {/* Botão para Pontuadores */}
-                    <div className="flex items-center">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => carregarPontuadoresPartida(evento)}
-                        className="text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 p-0 hover:bg-transparent flex items-center gap-1.5"
+                  <div className="rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-md dark:border-zinc-800/80 dark:bg-zinc-900/30 transition-all hover:shadow-lg">
+                    {/* Cabeçalho do Confronto */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+                          {evento.rodadaNome}
+                        </span>
+                        <span className="text-xs text-zinc-500 dark:text-zinc-450 font-semibold flex items-center gap-1">
+                          <Clock className="h-3.5 w-3.5" />
+                          {formatarData(evento.dataInicio)}
+                        </span>
+                      </div>
+                      <span
+                        className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${statusInfo.styles}`}
                       >
-                        <Trophy className="h-4 w-4 text-amber-500" />
-                        Ver palpites e pontuadores
+                        {statusInfo.label}
+                      </span>
+                    </div>
+
+                    {/* Detalhes do Jogo */}
+                    <div className="flex items-center justify-between py-3 border-b border-zinc-100 dark:border-zinc-800/50 pb-5 mb-4 select-none">
+                      <div className="w-[42%] text-right font-black text-zinc-850 dark:text-zinc-200 truncate flex items-center justify-end gap-2">
+                        <span className="text-sm md:text-base">
+                          {evento.timeA}
+                        </span>
+                        {evento.timeAEmoji && (
+                          <FlagImage
+                            emoji={evento.timeAEmoji}
+                            alt={evento.timeA}
+                            className="h-5 w-5 shrink-0"
+                          />
+                        )}
+                      </div>
+                      <div className="flex items-center justify-center gap-2 bg-zinc-55 dark:bg-zinc-800/60 px-3.5 py-1.5 rounded-2xl border border-zinc-200/50 dark:border-zinc-800 font-black text-lg md:text-xl text-zinc-900 dark:text-zinc-50">
+                        <span>
+                          {evento.golsTimeA !== null ? evento.golsTimeA : '-'}
+                        </span>
+                        <span className="text-zinc-350 dark:text-zinc-650 text-sm font-normal">
+                          x
+                        </span>
+                        <span>
+                          {evento.golsTimeB !== null ? evento.golsTimeB : '-'}
+                        </span>
+                      </div>
+                      <div className="w-[42%] text-left font-black text-zinc-850 dark:text-zinc-200 truncate flex items-center justify-start gap-2">
+                        {evento.timeBEmoji && (
+                          <FlagImage
+                            emoji={evento.timeBEmoji}
+                            alt={evento.timeB}
+                            className="h-5 w-5 shrink-0"
+                          />
+                        )}
+                        <span className="text-sm md:text-base">
+                          {evento.timeB}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Ações e Informações Adicionais */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      {/* Botão para Pontuadores */}
+                      <div className="flex items-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => carregarPontuadoresPartida(evento)}
+                          className="text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 p-0 hover:bg-transparent flex items-center gap-1.5"
+                        >
+                          <Trophy className="h-4 w-4 text-amber-500" />
+                          Ver palpites e pontuadores
+                        </Button>
+                      </div>
+
+                      {/* Botão de Comentários */}
+                      <Button
+                        size="sm"
+                        onClick={() => carregarComentarios(evento)}
+                        className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-700 font-bold text-xs px-4 h-9 rounded-xl flex items-center gap-1.5 self-start sm:self-auto transition-all"
+                      >
+                        <MessageCircle className="h-4.5 w-4.5 text-blue-500" />
+                        Comentários
+                        {evento.comentariosCount > 0 && (
+                          <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-blue-500 text-white dark:bg-blue-600 text-[10px] font-bold">
+                            {evento.comentariosCount > 9
+                              ? '9+'
+                              : evento.comentariosCount}
+                          </span>
+                        )}
                       </Button>
                     </div>
-
-                    {/* Botão de Comentários */}
-                    <Button
-                      size="sm"
-                      onClick={() => carregarComentarios(evento)}
-                      className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-700 font-bold text-xs px-4 h-9 rounded-xl flex items-center gap-1.5 self-start sm:self-auto transition-all"
-                    >
-                      <MessageCircle className="h-4.5 w-4.5 text-blue-500" />
-                      Comentários
-                      {evento.comentariosCount > 0 && (
-                        <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-blue-500 text-white dark:bg-blue-600 text-[10px] font-bold">
-                          {evento.comentariosCount > 9
-                            ? '9+'
-                            : evento.comentariosCount}
-                        </span>
-                      )}
-                    </Button>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+
+          {eventos.length > visibleLimit && (
+            <div className="flex justify-center mt-8 pl-4 md:pl-6">
+              <button
+                type="button"
+                onClick={() => setVisibleLimit((prev) => prev + 5)}
+                className="px-6 py-2.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-sm rounded-2xl transition-all shadow-sm border border-zinc-200 dark:border-zinc-800/80 flex items-center gap-2 cursor-pointer"
+              >
+                Visualizar mais
+              </button>
+            </div>
+          )}
         </div>
       )}
 

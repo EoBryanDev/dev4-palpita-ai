@@ -287,8 +287,8 @@ export function DashboardPalpites({
           <div className="mb-10">
             <h2 className="text-xl font-black tracking-tight mb-4 flex items-center gap-2">
               <span className="flex h-2.5 w-2.5 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500" />
               </span>
               Jogos em Andamento ({partidasEmAndamento.length})
             </h2>
@@ -322,21 +322,27 @@ export function DashboardPalpites({
                           </span>
                         )}
                       </div>
-                      <span className="text-sm font-bold truncate">{partida.timeA}</span>
+                      <span className="text-sm font-bold truncate">
+                        {partida.timeA}
+                      </span>
                     </div>
 
                     <div className="flex items-center gap-3">
                       <span className="bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 rounded-xl font-black text-lg min-w-[36px] text-center border border-zinc-200 dark:border-zinc-800">
                         {partida.golsTimeA ?? 0}
                       </span>
-                      <span className="text-zinc-400 text-xs font-bold">VS</span>
+                      <span className="text-zinc-400 text-xs font-bold">
+                        VS
+                      </span>
                       <span className="bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 rounded-xl font-black text-lg min-w-[36px] text-center border border-zinc-200 dark:border-zinc-800">
                         {partida.golsTimeB ?? 0}
                       </span>
                     </div>
 
                     <div className="flex flex-1 items-center justify-end gap-3">
-                      <span className="text-sm font-bold truncate text-right">{partida.timeB}</span>
+                      <span className="text-sm font-bold truncate text-right">
+                        {partida.timeB}
+                      </span>
                       <div className="h-10 w-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden border border-zinc-200 dark:border-zinc-700 select-none shrink-0">
                         {partida.timeBEmoji ? (
                           <FlagImage
