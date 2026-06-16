@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.4.0...v1.4.1) (2026-06-16)
+
+
+### Bug Fixes
+
+* **web:** allow flag cdn domains in csp img-src ([82dcf84](https://github.com/EoBryanDev/dev4-palpita-ai/commit/82dcf846ff624ce87aae7cb66953d8625fc2165c))
+
 # [1.4.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.3.0...v1.4.0) (2026-06-16)
 
 
