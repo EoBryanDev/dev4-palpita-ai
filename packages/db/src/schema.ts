@@ -31,6 +31,7 @@ export const usuarios = pgTable('usuarios', {
   cargo: varchar('cargo', { length: 50 }).$type<TUsuarioCargo>().notNull(),
   senha: varchar('senha', { length: 255 }),
   ultimoLoginAt: timestamp('ultimo_login_at'),
+  dataLiberacao: timestamp('data_liberacao'),
   dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
 });
 
