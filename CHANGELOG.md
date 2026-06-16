@@ -1,3 +1,11 @@
+# [1.4.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.3.0...v1.4.0) (2026-06-16)
+
+
+### Features
+
+* **api:** add individual deadline for late-joiners ([95a23e0](https://github.com/EoBryanDev/dev4-palpita-ai/commit/95a23e054abc87cc2f0475a03c9ef6de61f8e0f5))
+* **db:** add data_liberacao column to usuarios ([9e427a1](https://github.com/EoBryanDev/dev4-palpita-ai/commit/9e427a199a89a56108bf7918da0c5b2fd9290b5c))
+
 # [1.3.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.2.1...v1.3.0) (2026-06-16)
 
 
