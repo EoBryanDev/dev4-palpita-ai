@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.2.0...v1.2.1) (2026-06-16)
+
+
+### Bug Fixes
+
+* **auth:** redirect por cargo no login e limpar cache no logout EOB-178 ([6d439b7](https://github.com/EoBryanDev/dev4-palpita-ai/commit/6d439b7489e40be9509290e11fe0fd8c7e8a6113))
+
 # [1.2.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.1.1...v1.2.0) (2026-06-16)
 
 
