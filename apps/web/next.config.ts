@@ -4,7 +4,7 @@ const cspHeader = `
   default-src 'self';
   script-src 'self' 'unsafe-eval' 'unsafe-inline';
   style-src 'self' 'unsafe-inline';
-  img-src 'self' data: blob:;
+  img-src 'self' data: blob: https://cdn.jsdelivr.net https://flagcdn.com;
   font-src 'self';
   object-src 'none';
   base-uri 'self';

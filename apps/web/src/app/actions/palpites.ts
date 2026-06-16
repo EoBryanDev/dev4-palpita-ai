@@ -121,7 +121,8 @@ export async function salvarPalpite(
       }
 
       const dataLimite = new Date(
-        new Date(primeiraPartidaTorneio[0].dataInicio).getTime() - 30 * 60 * 1000,
+        new Date(primeiraPartidaTorneio[0].dataInicio).getTime() -
+          30 * 60 * 1000,
       );
 
       if (agora >= dataLimite) {

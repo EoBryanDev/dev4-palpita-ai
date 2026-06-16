@@ -215,7 +215,8 @@ export async function liberarUsuarioAtrasado(
   if (!isAdmin) {
     return {
       success: false,
-      message: 'Acesso negado. Apenas administradores podem realizar esta ação.',
+      message:
+        'Acesso negado. Apenas administradores podem realizar esta ação.',
     };
   }
 
@@ -258,7 +259,8 @@ export async function liberarUsuarioAtrasado(
 
     return {
       success: true,
-      message: 'Usuário liberado para palpitar! Ele tem 30 minutos para registrar seus palpites.',
+      message:
+        'Usuário liberado para palpitar! Ele tem 30 minutos para registrar seus palpites.',
     };
   } catch (error) {
     console.error('Erro ao liberar usuário tardio:', error);

@@ -49,7 +49,9 @@ export default async function MeuEspacoPage() {
   // Se o usuário tem dataLiberacao, calcular deadline individual de 30 min
   if (user.dataLiberacao) {
     const dataLiberacao = new Date(user.dataLiberacao);
-    const deadlineIndividual = new Date(dataLiberacao.getTime() + 30 * 60 * 1000);
+    const deadlineIndividual = new Date(
+      dataLiberacao.getTime() + 30 * 60 * 1000,
+    );
     prazoLimite = deadlineIndividual.toISOString();
     isTudoBloqueado = new Date() >= deadlineIndividual;
     isLiberacaoTardia = true;
