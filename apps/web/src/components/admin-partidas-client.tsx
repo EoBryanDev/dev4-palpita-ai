@@ -62,6 +62,19 @@ export function AdminPartidasClient({
     Record<string, { golsA: string; golsB: string }>
   >({});
 
+  // Estado de paginação por rodada (6 partidas visíveis por padrão)
+  const PARTIDAS_POR_PAGINA = 6;
+  const [visibleLimits, setVisibleLimits] = useState<Record<string, number>>(
+    {},
+  );
+
+  const handleVerMais = (rodadaId: string) => {
+    setVisibleLimits((prev) => ({
+      ...prev,
+      [rodadaId]: (prev[rodadaId] ?? PARTIDAS_POR_PAGINA) + PARTIDAS_POR_PAGINA,
+    }));
+  };
+
   const handleCriarRodada = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!novaRodadaNum || !novaRodadaNome) {
@@ -183,10 +196,22 @@ export function AdminPartidasClient({
     }));
   };
 
-  // Separação de partidas por rodada
+  // Separação e ordenação de partidas por rodada
+  // Ordem: futuras e em andamento primeiro; finalizadas ao final
   const partidasAgrupadas = rodadas.reduce(
     (acc, rodada) => {
-      acc[rodada.id] = partidas.filter((p) => p.rodadaId === rodada.id);
+      const todas = partidas.filter((p) => p.rodadaId === rodada.id);
+      const ordenadas = [...todas].sort((a, b) => {
+        const aFinalizado =
+          a.status === 'FINALIZADO' || a.status === 'FINALIZADA';
+        const bFinalizado =
+          b.status === 'FINALIZADO' || b.status === 'FINALIZADA';
+        if (aFinalizado !== bFinalizado) return aFinalizado ? 1 : -1;
+        return (
+          new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime()
+        );
+      });
+      acc[rodada.id] = ordenadas;
       return acc;
     },
     {} as Record<string, IPartidaAdmin[]>,
@@ -395,155 +420,185 @@ export function AdminPartidasClient({
                         Nenhum confronto cadastrado nesta rodada.
                       </div>
                     ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {partidasDaRodada.map((partida) => {
-                          const isFinalizado =
-                            partida.status === 'FINALIZADO' ||
-                            partida.status === 'FINALIZADA';
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {partidasDaRodada
+                            .slice(
+                              0,
+                              visibleLimits[rodada.id] ?? PARTIDAS_POR_PAGINA,
+                            )
+                            .map((partida) => {
+                              const isFinalizado =
+                                partida.status === 'FINALIZADO' ||
+                                partida.status === 'FINALIZADA';
 
-                          const isJogoNoFuturo =
-                            new Date() < new Date(partida.dataInicio);
+                              const isJogoNoFuturo =
+                                new Date() < new Date(partida.dataInicio);
 
-                          const dataFormatada = new Date(
-                            partida.dataInicio,
-                          ).toLocaleString('pt-BR', {
-                            timeZone: 'America/Sao_Paulo',
-                            day: '2-digit',
-                            month: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          });
+                              const dataFormatada = new Date(
+                                partida.dataInicio,
+                              ).toLocaleString('pt-BR', {
+                                timeZone: 'America/Sao_Paulo',
+                                day: '2-digit',
+                                month: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              });
 
-                          const placarA = placares[partida.id]?.golsA ?? '';
-                          const placarB = placares[partida.id]?.golsB ?? '';
+                              const placarA = placares[partida.id]?.golsA ?? '';
+                              const placarB = placares[partida.id]?.golsB ?? '';
 
-                          return (
-                            <div
-                              key={partida.id}
-                              className="rounded-3xl border border-zinc-200/80 bg-white p-5 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/30 flex flex-col justify-between gap-4 transition-all hover:border-zinc-350 dark:hover:border-zinc-700"
+                              return (
+                                <div
+                                  key={partida.id}
+                                  className="rounded-3xl border border-zinc-200/80 bg-white p-5 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/30 flex flex-col justify-between gap-4 transition-all hover:border-zinc-350 dark:hover:border-zinc-700"
+                                >
+                                  {/* Header Card */}
+                                  <div className="flex justify-between items-center text-xs text-zinc-400">
+                                    <span>{dataFormatada}</span>
+                                    {isFinalizado ? (
+                                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 flex items-center gap-1">
+                                        <CheckCircle className="h-3 w-3 text-emerald-500" />
+                                        Finalizado
+                                      </span>
+                                    ) : isJogoNoFuturo ? (
+                                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100/50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-455 flex items-center gap-1">
+                                        <Calendar className="h-3 w-3 text-blue-500" />
+                                        Futuro
+                                      </span>
+                                    ) : (
+                                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100/50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 flex items-center gap-1">
+                                        <Play className="h-3 w-3 animate-pulse" />
+                                        Agendado
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  {/* Times e Placar */}
+                                  <div className="flex items-center justify-between gap-2 py-2">
+                                    <div className="flex-1 text-right font-black text-sm truncate flex items-center justify-end gap-1.5">
+                                      <span>{partida.timeA}</span>
+                                      {partida.timeAEmoji && (
+                                        <FlagImage
+                                          emoji={partida.timeAEmoji}
+                                          alt={partida.timeA}
+                                          className="h-4 w-4 shrink-0"
+                                        />
+                                      )}
+                                    </div>
+
+                                    {/* Area Placar */}
+                                    <div className="flex items-center gap-2 shrink-0">
+                                      {isFinalizado ? (
+                                        <div className="flex items-center gap-1.5 px-3 py-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl font-black text-sm">
+                                          <span>{partida.golsTimeA}</span>
+                                          <span className="text-zinc-400 text-xs">
+                                            x
+                                          </span>
+                                          <span>{partida.golsTimeB}</span>
+                                        </div>
+                                      ) : (
+                                        <div className="flex items-center gap-1.5">
+                                          <input
+                                            type="text"
+                                            maxLength={2}
+                                            placeholder="-"
+                                            value={placarA}
+                                            onChange={(e) =>
+                                              handlePlacarChange(
+                                                partida.id,
+                                                'A',
+                                                e.target.value,
+                                              )
+                                            }
+                                            disabled={
+                                              isPending || isJogoNoFuturo
+                                            }
+                                            className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
+                                          />
+                                          <span className="text-zinc-400 text-xs">
+                                            x
+                                          </span>
+                                          <input
+                                            type="text"
+                                            maxLength={2}
+                                            placeholder="-"
+                                            value={placarB}
+                                            onChange={(e) =>
+                                              handlePlacarChange(
+                                                partida.id,
+                                                'B',
+                                                e.target.value,
+                                              )
+                                            }
+                                            disabled={
+                                              isPending || isJogoNoFuturo
+                                            }
+                                            className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
+                                          />
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    <div className="flex-1 text-left font-black text-sm truncate flex items-center justify-start gap-1.5">
+                                      {partida.timeBEmoji && (
+                                        <FlagImage
+                                          emoji={partida.timeBEmoji}
+                                          alt={partida.timeB}
+                                          className="h-4 w-4 shrink-0"
+                                        />
+                                      )}
+                                      <span>{partida.timeB}</span>
+                                    </div>
+                                  </div>
+
+                                  {/* Ação Finalizar */}
+                                  {!isFinalizado && (
+                                    <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
+                                      {isJogoNoFuturo ? (
+                                        <span className="text-[10px] text-zinc-400 dark:text-zinc-500 flex items-center gap-1">
+                                          <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
+                                          Não iniciado
+                                        </span>
+                                      ) : (
+                                        <span />
+                                      )}
+                                      <Button
+                                        size="sm"
+                                        disabled={isPending || isJogoNoFuturo}
+                                        onClick={() =>
+                                          handleLancarResultado(partida.id)
+                                        }
+                                        className="bg-zinc-900 hover:bg-zinc-800 text-white font-semibold text-xs px-3 h-8 rounded-xl flex items-center gap-1 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                      >
+                                        <CheckCircle className="h-3.5 w-3.5" />
+                                        Finalizar Jogo
+                                      </Button>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                        </div>
+
+                        {/* Botão Visualizar Mais */}
+                        {partidasDaRodada.length >
+                          (visibleLimits[rodada.id] ?? PARTIDAS_POR_PAGINA) && (
+                          <div className="flex justify-center pt-2">
+                            <button
+                              type="button"
+                              onClick={() => handleVerMais(rodada.id)}
+                              className="text-sm font-semibold text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300 flex items-center gap-1.5 transition-colors"
                             >
-                              {/* Header Card */}
-                              <div className="flex justify-between items-center text-xs text-zinc-400">
-                                <span>{dataFormatada}</span>
-                                {isFinalizado ? (
-                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 flex items-center gap-1">
-                                    <CheckCircle className="h-3 w-3 text-emerald-500" />
-                                    Finalizado
-                                  </span>
-                                ) : isJogoNoFuturo ? (
-                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100/50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-455 flex items-center gap-1">
-                                    <Calendar className="h-3 w-3 text-blue-500" />
-                                    Futuro
-                                  </span>
-                                ) : (
-                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100/50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 flex items-center gap-1">
-                                    <Play className="h-3 w-3 animate-pulse" />
-                                    Agendado
-                                  </span>
-                                )}
-                              </div>
-
-                              {/* Times e Placar */}
-                              <div className="flex items-center justify-between gap-2 py-2">
-                                <div className="flex-1 text-right font-black text-sm truncate flex items-center justify-end gap-1.5">
-                                  <span>{partida.timeA}</span>
-                                  {partida.timeAEmoji && (
-                                    <FlagImage
-                                      emoji={partida.timeAEmoji}
-                                      alt={partida.timeA}
-                                      className="h-4 w-4 shrink-0"
-                                    />
-                                  )}
-                                </div>
-
-                                {/* Area Placar */}
-                                <div className="flex items-center gap-2 shrink-0">
-                                  {isFinalizado ? (
-                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl font-black text-sm">
-                                      <span>{partida.golsTimeA}</span>
-                                      <span className="text-zinc-400 text-xs">
-                                        x
-                                      </span>
-                                      <span>{partida.golsTimeB}</span>
-                                    </div>
-                                  ) : (
-                                    <div className="flex items-center gap-1.5">
-                                      <input
-                                        type="text"
-                                        maxLength={2}
-                                        placeholder="-"
-                                        value={placarA}
-                                        onChange={(e) =>
-                                          handlePlacarChange(
-                                            partida.id,
-                                            'A',
-                                            e.target.value,
-                                          )
-                                        }
-                                        disabled={isPending || isJogoNoFuturo}
-                                        className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
-                                      />
-                                      <span className="text-zinc-400 text-xs">
-                                        x
-                                      </span>
-                                      <input
-                                        type="text"
-                                        maxLength={2}
-                                        placeholder="-"
-                                        value={placarB}
-                                        onChange={(e) =>
-                                          handlePlacarChange(
-                                            partida.id,
-                                            'B',
-                                            e.target.value,
-                                          )
-                                        }
-                                        disabled={isPending || isJogoNoFuturo}
-                                        className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
-                                      />
-                                    </div>
-                                  )}
-                                </div>
-
-                                <div className="flex-1 text-left font-black text-sm truncate flex items-center justify-start gap-1.5">
-                                  {partida.timeBEmoji && (
-                                    <FlagImage
-                                      emoji={partida.timeBEmoji}
-                                      alt={partida.timeB}
-                                      className="h-4 w-4 shrink-0"
-                                    />
-                                  )}
-                                  <span>{partida.timeB}</span>
-                                </div>
-                              </div>
-
-                              {/* Ação Finalizar */}
-                              {!isFinalizado && (
-                                <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
-                                  {isJogoNoFuturo ? (
-                                    <span className="text-[10px] text-zinc-400 dark:text-zinc-500 flex items-center gap-1">
-                                      <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
-                                      Não iniciado
-                                    </span>
-                                  ) : (
-                                    <span />
-                                  )}
-                                  <Button
-                                    size="sm"
-                                    disabled={isPending || isJogoNoFuturo}
-                                    onClick={() =>
-                                      handleLancarResultado(partida.id)
-                                    }
-                                    className="bg-zinc-900 hover:bg-zinc-800 text-white font-semibold text-xs px-3 h-8 rounded-xl flex items-center gap-1 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                                  >
-                                    <CheckCircle className="h-3.5 w-3.5" />
-                                    Finalizar Jogo
-                                  </Button>
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
+                              <Plus className="h-4 w-4" />
+                              Visualizar mais (
+                              {partidasDaRodada.length -
+                                (visibleLimits[rodada.id] ??
+                                  PARTIDAS_POR_PAGINA)}{' '}
+                              restantes)
+                            </button>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
