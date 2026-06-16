@@ -35,3 +35,4 @@ Co-Authored-By: Antigravity <noreply@google.com>
 - Commits: Use Conventional Commits and append the Linear Ticket ID (e.g., `feat(api): description ENG-XXX`).
 - Resolving: Add `Fixes ENG-XXX` or `Closes ENG-XXX` to PR descriptions or final merge commits.
 - Direct management: Use the `$LINEAR_API_KEY` from [.env](file:///home/bryan-galaxy-zos/Programming/dev4-palpita-ai/.env) to call `https://api.linear.app/graphql` when asked to manage/update Linear tickets.
+- Linear ticket types: Never move or transition parent Feature or Epic tickets (e.g., `EOB-166`) automatically. Only transition individual sub-tasks (e.g., `EOB-168`, `EOB-176`) and stories (e.g., `EOB-167`). The parent Feature/Epic ticket remains controlled manually by team members.
