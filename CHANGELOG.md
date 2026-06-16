@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.1.1...v1.2.0) (2026-06-16)
+
+
+### Features
+
+* **dashboard:** paginate history and include ongoing matches EOB-180 EOB-182 ([47e0a73](https://github.com/EoBryanDev/dev4-palpita-ai/commit/47e0a7309ae2701041dcdc34de18baab44505ea4))
+
 ## [1.1.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.1.0...v1.1.1) (2026-06-15)
 
 
