@@ -306,4 +306,66 @@ describe('DashboardPalpites Component', () => {
     expect(screen.getByText('Ao Vivo')).toBeDefined();
     expect(screen.getByText('3 x 1')).toBeDefined();
   });
+
+  it('deve exibir o botão "Visualizar mais" se houver mais de 10 itens no histórico e paginar corretamente ao clicar', () => {
+    const historicoLongo = Array.from({ length: 12 }, (_, i) => ({
+      partidaId: `partida-hist-${i}`,
+      timeA: `Time A ${i}`,
+      timeB: `Time B ${i}`,
+      placarOficialA: 1,
+      placarOficialB: 1,
+      palpiteA: 1,
+      palpiteB: 1,
+      pontosGanhos: 2,
+      dataInicio: new Date(Date.now() - 1000 * 60 * 60 * (i + 1)).toISOString(),
+    }));
+
+    const propsComHistoricoLongo = {
+      ...defaultProps,
+      historico: historicoLongo,
+    };
+
+    render(<DashboardPalpites {...propsComHistoricoLongo} />);
+
+    // Deve mostrar apenas os 10 primeiros inicialmente
+    expect(screen.getByText('Time A 0')).toBeDefined();
+    expect(screen.getByText('Time A 9')).toBeDefined();
+    expect(screen.queryByText('Time A 10')).toBeNull();
+
+    const btnVisualizarMais = screen.getByRole('button', {
+      name: /Visualizar mais/i,
+    });
+    expect(btnVisualizarMais).toBeDefined();
+
+    fireEvent.click(btnVisualizarMais);
+
+    // Agora deve exibir todos
+    expect(screen.getByText('Time A 10')).toBeDefined();
+    expect(screen.getByText('Time A 11')).toBeDefined();
+  });
+
+  it('deve renderizar partidas em andamento/iniciadas no histórico de palpites com o badge "Ao Vivo"', () => {
+    const propsComPartidaAoVivoNoHistorico = {
+      ...defaultProps,
+      historico: [
+        {
+          partidaId: 'partida-hist-live',
+          timeA: 'Brasil',
+          timeB: 'Croácia',
+          placarOficialA: 1,
+          placarOficialB: 0,
+          palpiteA: 2,
+          palpiteB: 0,
+          pontosGanhos: 1,
+          dataInicio: new Date().toISOString(),
+          status: 'EM_ANDAMENTO',
+        },
+      ],
+    };
+
+    render(<DashboardPalpites {...propsComPartidaAoVivoNoHistorico} />);
+
+    expect(screen.getByText('Placar Ao Vivo')).toBeDefined();
+    expect(screen.getAllByText('Ao Vivo').length).toBe(1);
+  });
 });

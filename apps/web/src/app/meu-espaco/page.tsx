@@ -107,23 +107,29 @@ export default async function MeuEspacoPage() {
   };
 
   // 8. Histórico de palpites do competidor (reusing todasPartidas from step 5)
-  const todasPartidasFinalizadas = todasPartidas.filter(
-    (p) => p.status === 'FINALIZADO',
+  const todasPartidasHistorico = todasPartidas.filter(
+    (p) =>
+      p.status === 'FINALIZADO' ||
+      p.status === 'FINALIZADA' ||
+      p.status === 'EM_ANDAMENTO' ||
+      p.status === 'INICIADO',
   );
 
   const historico: IHistoricoDashboard[] = [];
-  for (const match of todasPartidasFinalizadas) {
+  for (const match of todasPartidasHistorico) {
     const palpite = palpitesMap.get(match.id);
-    if (palpite && match.golsTimeA !== null && match.golsTimeB !== null) {
+    if (palpite) {
+      const golsA = match.golsTimeA ?? 0;
+      const golsB = match.golsTimeB ?? 0;
+
       const vencedorPalpite = obterVencedor(
         palpite.golsTimeA,
         palpite.golsTimeB,
       );
-      const vencedorPartida = obterVencedor(match.golsTimeA, match.golsTimeB);
+      const vencedorPartida = obterVencedor(golsA, golsB);
 
       const acertouPlacarExato =
-        palpite.golsTimeA === match.golsTimeA &&
-        palpite.golsTimeB === match.golsTimeB;
+        palpite.golsTimeA === golsA && palpite.golsTimeB === golsB;
 
       const pontosGanhos = acertouPlacarExato
         ? 2
@@ -137,15 +143,22 @@ export default async function MeuEspacoPage() {
         timeB: match.timeB,
         timeAEmoji: match.timeAEmoji,
         timeBEmoji: match.timeBEmoji,
-        placarOficialA: match.golsTimeA,
-        placarOficialB: match.golsTimeB,
+        placarOficialA: golsA,
+        placarOficialB: golsB,
         palpiteA: palpite.golsTimeA,
         palpiteB: palpite.golsTimeB,
         pontosGanhos,
         dataInicio: match.dataInicio.toISOString(),
+        status: match.status,
       });
     }
   }
+
+  // Ordenar pelo mais recente (dataInicio desc)
+  historico.sort(
+    (a, b) =>
+      new Date(b.dataInicio).getTime() - new Date(a.dataInicio).getTime(),
+  );
 
   // 9. Buscar palpites salvos futuros iniciais paginados (limit 5, offset 0)
   const totalPalpitesSalvos = await obterTotalPalpitesSalvosFuturos(session.id);
