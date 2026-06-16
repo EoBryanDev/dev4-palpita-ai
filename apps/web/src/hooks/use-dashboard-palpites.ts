@@ -2,6 +2,7 @@ import { logoutUsuario } from '@/app/actions/auth';
 import { salvarPalpite } from '@/app/actions/palpites';
 import { useToast } from '@/components/ui/use-toast';
 import type { IPartidaDashboard } from '@/interface/IDashboard';
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
@@ -10,6 +11,7 @@ export function useDashboardPalpites() {
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
   const [logoutPending, startLogout] = useTransition();
+  const queryClient = useQueryClient();
 
   // Estado para armazenar os valores temporários digitados nos inputs de palpites
   const [valoresPalpites, setValoresPalpites] = useState<
@@ -78,6 +80,7 @@ export function useDashboardPalpites() {
   const handleLogout = () => {
     startLogout(async () => {
       await logoutUsuario();
+      queryClient.clear();
       router.push('/login');
       router.refresh();
     });

@@ -41,6 +41,12 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
+vi.mock('@tanstack/react-query', () => ({
+  useQueryClient: () => ({
+    clear: vi.fn(),
+  }),
+}));
+
 vi.mock('@/hooks/use-countdown', () => ({
   useCountdown: () => ({
     timeLeft: { days: 5, hours: 12, minutes: 30, seconds: 0, isExpired: false },

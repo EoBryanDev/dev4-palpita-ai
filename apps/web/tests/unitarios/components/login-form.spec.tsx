@@ -5,13 +5,23 @@ import type { Mock } from 'vitest';
 import { loginUsuario } from '@/app/actions/auth';
 import { LoginForm } from '@/components/form/login-form';
 
+const mockPush = vi.fn();
+const mockQueryClear = vi.fn();
+
 vi.mock('@/app/actions/auth', () => ({
   loginUsuario: vi.fn(),
 }));
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: vi.fn(),
+    push: mockPush,
+    refresh: vi.fn(),
+  }),
+}));
+
+vi.mock('@tanstack/react-query', () => ({
+  useQueryClient: () => ({
+    clear: mockQueryClear,
   }),
 }));
 
@@ -88,37 +98,102 @@ describe('LoginForm', () => {
     expect(await screen.findByText(/Credenciais inválidas/i)).toBeDefined();
   });
 
-  it('deve chamar loginUsuario, armazenar no localStorage se lembrarMe for true, e mostrar sucesso', async () => {
+  it('deve redirecionar colaborador para /meu-espaco após login bem-sucedido', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     (loginUsuario as Mock).mockResolvedValueOnce({
       success: true,
       message: 'Sucesso!',
+      user: {
+        id: '1',
+        nome: 'User',
+        email: 'user@empresa.com',
+        cargo: 'COLABORADOR',
+      },
     });
 
     render(<LoginForm />);
 
     const emailInput = screen.getByLabelText(/^E-mail$/i);
     const senhaInput = screen.getByLabelText(/^Senha$/i);
-    const lembrarCheckbox = screen.getByLabelText(/Lembrar de mim/i);
     const submitBtn = screen.getByRole('button', {
       name: /Entrar na plataforma/i,
     });
 
-    fireEvent.change(emailInput, { target: { value: 'lembrar@empresa.com' } });
+    fireEvent.change(emailInput, { target: { value: 'user@empresa.com' } });
     fireEvent.change(senhaInput, { target: { value: 'senha123' } });
-    fireEvent.click(lembrarCheckbox);
     fireEvent.click(submitBtn);
 
-    await waitFor(() => {
-      expect(loginUsuario).toHaveBeenCalledWith(
-        'lembrar@empresa.com',
-        'senha123',
-      );
+    await vi.waitFor(() => expect(loginUsuario).toHaveBeenCalled());
+
+    await vi.advanceTimersByTimeAsync(1500);
+
+    expect(mockPush).toHaveBeenCalledWith('/meu-espaco');
+    vi.useRealTimers();
+  });
+
+  it('deve redirecionar admin para /admin após login bem-sucedido', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    (loginUsuario as Mock).mockResolvedValueOnce({
+      success: true,
+      message: 'Sucesso!',
+      user: {
+        id: '2',
+        nome: 'Admin',
+        email: 'admin@empresa.com',
+        cargo: 'ADMIN',
+      },
     });
 
-    expect(localStorage.setItem).toHaveBeenCalledWith(
-      'palpita_user_email',
-      'lembrar@empresa.com',
-    );
-    expect(await screen.findByText(/Bem-vindo de volta!/i)).toBeDefined();
+    render(<LoginForm />);
+
+    const emailInput = screen.getByLabelText(/^E-mail$/i);
+    const senhaInput = screen.getByLabelText(/^Senha$/i);
+    const submitBtn = screen.getByRole('button', {
+      name: /Entrar na plataforma/i,
+    });
+
+    fireEvent.change(emailInput, { target: { value: 'admin@empresa.com' } });
+    fireEvent.change(senhaInput, { target: { value: 'senha123' } });
+    fireEvent.click(submitBtn);
+
+    await vi.waitFor(() => expect(loginUsuario).toHaveBeenCalled());
+
+    await vi.advanceTimersByTimeAsync(1500);
+
+    expect(mockPush).toHaveBeenCalledWith('/admin');
+    vi.useRealTimers();
+  });
+
+  it('deve chamar queryClient.clear() após login bem-sucedido para evitar dados obsoletos', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    (loginUsuario as Mock).mockResolvedValueOnce({
+      success: true,
+      message: 'Sucesso!',
+      user: {
+        id: '1',
+        nome: 'User',
+        email: 'user@empresa.com',
+        cargo: 'COLABORADOR',
+      },
+    });
+
+    render(<LoginForm />);
+
+    const emailInput = screen.getByLabelText(/^E-mail$/i);
+    const senhaInput = screen.getByLabelText(/^Senha$/i);
+    const submitBtn = screen.getByRole('button', {
+      name: /Entrar na plataforma/i,
+    });
+
+    fireEvent.change(emailInput, { target: { value: 'user@empresa.com' } });
+    fireEvent.change(senhaInput, { target: { value: 'senha123' } });
+    fireEvent.click(submitBtn);
+
+    await vi.waitFor(() => expect(loginUsuario).toHaveBeenCalled());
+
+    await vi.advanceTimersByTimeAsync(1500);
+
+    expect(mockQueryClear).toHaveBeenCalled();
+    vi.useRealTimers();
   });
 });

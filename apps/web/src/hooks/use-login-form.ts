@@ -1,4 +1,5 @@
 import { loginUsuario } from '@/app/actions/auth';
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
 import { useState } from 'react';
@@ -11,6 +12,7 @@ export function useLoginForm() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,16 +34,16 @@ export function useLoginForm() {
       const res = await loginUsuario(email, senha);
       if (res.success) {
         setSuccess(true);
-        // Armazena no localStorage apenas para simular a persistência da sessão
-        if (lembrarMe) {
-          localStorage.setItem('palpita_user_email', email);
-        }
+        queryClient.clear();
+        const redirectTo =
+          res.user?.cargo === 'ADMIN' ? '/admin' : '/meu-espaco';
         setTimeout(() => {
-          router.push('/meu-espaco');
+          router.push(redirectTo);
           router.refresh();
         }, 1500);
       } else {
         setErrorMsg(res.message);
+        setSenha('');
       }
     } catch (err) {
       setErrorMsg('Ocorreu um erro ao realizar o login. Tente novamente.');
