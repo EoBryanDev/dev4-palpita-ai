@@ -1,6 +1,7 @@
 import {
   alterarStatusUsuario,
   aprovarSolicitacao,
+  liberarUsuarioAtrasado,
   rejeitarSolicitacao,
 } from '@/app/actions/admin';
 import { useMutation } from '@tanstack/react-query';
@@ -21,6 +22,18 @@ export function useMutationRejeitarSolicitacao() {
   return useMutation({
     mutationFn: async (usuarioId: string) => {
       const res = await rejeitarSolicitacao(usuarioId);
+      if (!res.success) {
+        throw new Error(res.message);
+      }
+      return res;
+    },
+  });
+}
+
+export function useMutationLiberarUsuarioAtrasado() {
+  return useMutation({
+    mutationFn: async (usuarioId: string) => {
+      const res = await liberarUsuarioAtrasado(usuarioId);
       if (!res.success) {
         throw new Error(res.message);
       }

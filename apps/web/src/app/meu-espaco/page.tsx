@@ -40,12 +40,20 @@ export default async function MeuEspacoPage() {
     palpitesMap.set(p.partidaId, p);
   }
 
-  // 5. Buscar todas as partidas e calcular prazo limite global
+  // 5. Buscar todas as partidas e calcular prazo limite
   const todasPartidas = await obterPartidas();
   let prazoLimite: string | undefined;
   let isTudoBloqueado = false;
+  let isLiberacaoTardia = false;
 
-  if (todasPartidas.length > 0) {
+  // Se o usuário tem dataLiberacao, calcular deadline individual de 30 min
+  if (user.dataLiberacao) {
+    const dataLiberacao = new Date(user.dataLiberacao);
+    const deadlineIndividual = new Date(dataLiberacao.getTime() + 30 * 60 * 1000);
+    prazoLimite = deadlineIndividual.toISOString();
+    isTudoBloqueado = new Date() >= deadlineIndividual;
+    isLiberacaoTardia = true;
+  } else if (todasPartidas.length > 0) {
     const primeiraPartida = todasPartidas[0];
     const deadline = new Date(
       primeiraPartida.dataInicio.getTime() - 30 * 60 * 1000,
@@ -54,11 +62,16 @@ export default async function MeuEspacoPage() {
     isTudoBloqueado = new Date() >= deadline;
   }
 
-  // 6. Enriquecer partidas por rodada
+  // 6. Para usuários com liberação tardia, filtrar apenas partidas futuras
+  const partidasVisiveis = isLiberacaoTardia
+    ? todasPartidas.filter((p) => new Date(p.dataInicio) > new Date())
+    : todasPartidas;
+
+  // 7. Enriquecer partidas por rodada
   const rodadasDashboard: IRodadaDashboard[] = [];
 
   for (const rodada of todasRodadas) {
-    const partidasDaRodada = todasPartidas.filter(
+    const partidasDaRodada = partidasVisiveis.filter(
       (p) => p.rodadaId === rodada.id,
     );
 
@@ -205,6 +218,7 @@ export default async function MeuEspacoPage() {
       historico={historico}
       prazoLimite={prazoLimite}
       isTudoBloqueado={isTudoBloqueado}
+      isLiberacaoTardia={isLiberacaoTardia}
       palpitesSalvosIniciais={palpitesSalvosIniciais}
       totalPalpitesSalvos={totalPalpitesSalvos}
       partidasEmAndamento={emAndamentoEnriquecidas}

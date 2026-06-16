@@ -47,6 +47,7 @@ export interface IDashboardPalpitesProps {
   historico: IHistoricoDashboard[];
   prazoLimite?: string;
   isTudoBloqueado: boolean;
+  isLiberacaoTardia?: boolean;
   palpitesSalvosIniciais: IPartidaDashboard[];
   totalPalpitesSalvos: number;
   partidasEmAndamento: IPartidaDashboard[];
