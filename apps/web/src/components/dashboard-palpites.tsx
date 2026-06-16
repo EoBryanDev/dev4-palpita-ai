@@ -40,6 +40,7 @@ export function DashboardPalpites({
   historico,
   prazoLimite,
   isTudoBloqueado,
+  isLiberacaoTardia = false,
   palpitesSalvosIniciais,
   totalPalpitesSalvos,
   partidasEmAndamento,
@@ -227,7 +228,9 @@ export function DashboardPalpites({
                     : 'text-emerald-700 dark:text-emerald-400'
                 }`}
               >
-                Prazo para palpitar termina em:
+                {isLiberacaoTardia
+                  ? 'Seu prazo para palpitar termina em:'
+                  : 'Prazo para palpitar termina em:'}
               </span>
             </div>
             <div className="flex items-center gap-1 font-mono text-sm sm:text-base font-bold">
@@ -270,15 +273,16 @@ export function DashboardPalpites({
           </div>
         )}
 
-        {/* Banner de bloqueio global */}
+        {/* Banner de bloqueio */}
         {isTudoBloqueado && (
           <div className="mb-8 p-4 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:border-zinc-800/30 dark:bg-zinc-900/20 text-zinc-700 dark:text-zinc-400 flex items-start gap-3">
             <Timer className="h-5 w-5 mt-0.5 shrink-0 text-zinc-500" />
             <div>
               <h4 className="font-bold text-sm">Palpites encerrados</h4>
               <p className="text-xs mt-1">
-                O prazo limite para palpitar expirou (bloqueado 30 minutos antes
-                do início do primeiro jogo da Copa do Mundo).
+                {isLiberacaoTardia
+                  ? 'Seu prazo de 30 minutos para palpitar expirou. Entre em contato com o administrador caso queira um novo prazo.'
+                  : 'O prazo limite para palpitar expirou (bloqueado 30 minutos antes do início do primeiro jogo da Copa do Mundo).'}
               </p>
             </div>
           </div>

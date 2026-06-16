@@ -195,6 +195,77 @@ export async function rejeitarSolicitacao(
 /**
  * Altera o status de liberação de palpites do usuário (entre ATIVO e LIBERADO ou desativação).
  */
+/**
+ * Libera um usuário com status ATIVO para palpitar com janela de 30 min (participação parcial).
+ * Usado quando a Copa já começou e o usuário entrou atrasado.
+ */
+export async function liberarUsuarioAtrasado(
+  usuarioId: string,
+): Promise<IAdminActionResponse> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
+  const isAdmin = await verificarPermissaoAdmin();
+  if (!isAdmin) {
+    return {
+      success: false,
+      message: 'Acesso negado. Apenas administradores podem realizar esta ação.',
+    };
+  }
+
+  if (!usuarioId) {
+    return { success: false, message: 'ID do usuário inválido.' };
+  }
+
+  try {
+    const user = await db.query.usuarios.findFirst({
+      where: eq(usuarios.id, usuarioId),
+    });
+
+    if (!user) {
+      return { success: false, message: 'Usuário não encontrado.' };
+    }
+
+    if (user.status === 'PENDENTE') {
+      return {
+        success: false,
+        message: 'Usuário com status PENDENTE deve primeiro ativar sua conta.',
+      };
+    }
+
+    if (user.status === 'LIBERADO') {
+      return {
+        success: false,
+        message: 'Usuário já está liberado para palpitar.',
+      };
+    }
+
+    const agora = new Date();
+
+    await db
+      .update(usuarios)
+      .set({
+        status: 'LIBERADO',
+        dataLiberacao: agora,
+      })
+      .where(eq(usuarios.id, usuarioId));
+
+    return {
+      success: true,
+      message: 'Usuário liberado para palpitar! Ele tem 30 minutos para registrar seus palpites.',
+    };
+  } catch (error) {
+    console.error('Erro ao liberar usuário tardio:', error);
+    return { success: false, message: 'Erro interno ao liberar usuário.' };
+  }
+}
+
 export async function alterarStatusUsuario(
   usuarioId: string,
   novoStatus: 'ATIVO' | 'LIBERADO' | 'DESATIVADO',

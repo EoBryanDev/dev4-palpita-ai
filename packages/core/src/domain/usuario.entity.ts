@@ -9,6 +9,7 @@ export interface IUsuarioProps {
   cargo: TUsuarioCargo;
   dataCriacao: Date;
   ultimoLoginAt?: Date | null;
+  dataLiberacao?: Date | null;
   senha?: string | null;
 }
 
@@ -20,6 +21,7 @@ export class Usuario {
   private _cargo: TUsuarioCargo;
   private readonly _dataCriacao: Date;
   private _ultimoLoginAt?: Date | null;
+  private _dataLiberacao?: Date | null;
   private _senha?: string | null;
 
   constructor(props: IUsuarioProps) {
@@ -30,6 +32,7 @@ export class Usuario {
     this._cargo = props.cargo;
     this._dataCriacao = props.dataCriacao;
     this._ultimoLoginAt = props.ultimoLoginAt;
+    this._dataLiberacao = props.dataLiberacao;
     this._senha = props.senha;
   }
 
@@ -61,6 +64,10 @@ export class Usuario {
     return this._ultimoLoginAt;
   }
 
+  public get dataLiberacao(): Date | null | undefined {
+    return this._dataLiberacao;
+  }
+
   public registrarLogin(): void {
     this._ultimoLoginAt = new Date();
   }
@@ -77,8 +84,11 @@ export class Usuario {
     this._status = 'ATIVO';
   }
 
-  public liberar(): void {
+  public liberar(data?: Date): void {
     this._status = 'LIBERADO';
+    if (data) {
+      this._dataLiberacao = data;
+    }
   }
 
   public desativar(): void {

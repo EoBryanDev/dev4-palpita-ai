@@ -36,6 +36,7 @@ vi.mock('@palpita/db', () => {
     usuarios: {
       id: 'usuarios.id',
       status: 'usuarios.status',
+      dataLiberacao: 'usuarios.dataLiberacao',
     },
     partidas: {
       id: 'partidas.id',
@@ -96,7 +97,7 @@ describe('salvarPalpite', () => {
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
-          limit: vi.fn(() => Promise.resolve([{ status: 'ATIVO' }])),
+          limit: vi.fn(() => Promise.resolve([{ status: 'ATIVO', dataLiberacao: null }])),
         })),
       })),
     }));
@@ -116,7 +117,7 @@ describe('salvarPalpite', () => {
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
-          limit: vi.fn(() => Promise.resolve([{ status: 'LIBERADO' }])),
+          limit: vi.fn(() => Promise.resolve([{ status: 'LIBERADO', dataLiberacao: null }])),
         })),
       })),
     }));
@@ -143,7 +144,7 @@ describe('salvarPalpite', () => {
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
-          limit: vi.fn(() => Promise.resolve([{ status: 'LIBERADO' }])),
+          limit: vi.fn(() => Promise.resolve([{ status: 'LIBERADO', dataLiberacao: null }])),
         })),
       })),
     }));
@@ -167,18 +168,9 @@ describe('salvarPalpite', () => {
       })),
     }));
 
-    // mock da busca da primeira partida do torneio (iniciada no passado)
-    mockSelect.mockImplementationOnce(() => ({
-      from: vi.fn(() => ({
-        orderBy: vi.fn(() => ({
-          limit: vi.fn(() => Promise.resolve([{ dataInicio: dataPassado }])),
-        })),
-      })),
-    }));
-
     const result = await salvarPalpite('partida-123', 2, 1);
     expect(result.success).toBe(false);
-    expect(result.message).toContain('O prazo para palpitar expirou');
+    expect(result.message).toContain('Esta partida já começou');
   });
 
   it('deve atualizar o palpite com sucesso se já existir um palpite anterior', async () => {
@@ -190,7 +182,7 @@ describe('salvarPalpite', () => {
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
-          limit: vi.fn(() => Promise.resolve([{ status: 'LIBERADO' }])),
+          limit: vi.fn(() => Promise.resolve([{ status: 'LIBERADO', dataLiberacao: null }])),
         })),
       })),
     }));
@@ -254,7 +246,7 @@ describe('salvarPalpite', () => {
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
-          limit: vi.fn(() => Promise.resolve([{ status: 'LIBERADO' }])),
+          limit: vi.fn(() => Promise.resolve([{ status: 'LIBERADO', dataLiberacao: null }])),
         })),
       })),
     }));

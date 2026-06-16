@@ -6,6 +6,7 @@ import { useToast } from '@/components/ui/use-toast';
 import {
   useMutationAlterarStatusUsuario,
   useMutationAprovarSolicitacao,
+  useMutationLiberarUsuarioAtrasado,
   useMutationRejeitarSolicitacao,
 } from '@/hooks/mutations/useMutationUsuarios';
 import {
@@ -38,11 +39,13 @@ export function AdminUsuariosClient({
   const mutationAprovar = useMutationAprovarSolicitacao();
   const mutationRejeitar = useMutationRejeitarSolicitacao();
   const mutationAlterarStatus = useMutationAlterarStatusUsuario();
+  const mutationLiberarAtrasado = useMutationLiberarUsuarioAtrasado();
 
   const isPending =
     mutationAprovar.isPending ||
     mutationRejeitar.isPending ||
-    mutationAlterarStatus.isPending;
+    mutationAlterarStatus.isPending ||
+    mutationLiberarAtrasado.isPending;
 
   // Armazena links recém-gerados na sessão local para cópia rápida
   const [linksGerados, setLinksGerados] = useState<Record<string, string>>({});
@@ -113,6 +116,24 @@ export function AdminUsuariosClient({
       toast({
         title: 'Erro ao atualizar status',
         description: err.message || 'Erro ao atualizar status.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleLiberarAtrasado = async (usuarioId: string) => {
+    try {
+      const res = await mutationLiberarAtrasado.mutateAsync(usuarioId);
+      toast({
+        title: 'Acesso Tardio Liberado!',
+        description: res.message,
+      });
+      router.refresh();
+    } catch (error) {
+      const err = error as { message?: string };
+      toast({
+        title: 'Erro ao liberar',
+        description: err.message || 'Erro ao liberar acesso tardio.',
         variant: 'destructive',
       });
     }
@@ -372,18 +393,32 @@ export function AdminUsuariosClient({
                           <div className="flex items-center justify-end gap-2">
                             {/* Lógica de controle de liberação */}
                             {usuario.status === 'ATIVO' && !isSelf && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                disabled={isPending}
-                                onClick={() =>
-                                  handleAlterarStatus(usuario.id, 'LIBERADO')
-                                }
-                                className="h-8 rounded-lg text-xs font-bold border-emerald-600/20 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-500/20 dark:text-emerald-400 dark:hover:bg-emerald-950/20"
-                              >
-                                <UserCheck className="h-3.5 w-3.5 mr-1" />
-                                Liberar Apostas
-                              </Button>
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  disabled={isPending}
+                                  onClick={() =>
+                                    handleAlterarStatus(usuario.id, 'LIBERADO')
+                                  }
+                                  className="h-8 rounded-lg text-xs font-bold border-emerald-600/20 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-500/20 dark:text-emerald-400 dark:hover:bg-emerald-950/20"
+                                >
+                                  <UserCheck className="h-3.5 w-3.5 mr-1" />
+                                  Liberar Apostas
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  disabled={isPending}
+                                  onClick={() =>
+                                    handleLiberarAtrasado(usuario.id)
+                                  }
+                                  className="h-8 rounded-lg text-xs font-bold border-blue-600/20 text-blue-600 hover:bg-blue-50 dark:border-blue-500/20 dark:text-blue-400 dark:hover:bg-blue-950/20"
+                                >
+                                  <Shield className="h-3.5 w-3.5 mr-1" />
+                                  Liberar Acesso Tardio
+                                </Button>
+                              </>
                             )}
 
                             {usuario.status === 'LIBERADO' && !isSelf && (

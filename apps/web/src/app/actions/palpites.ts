@@ -44,7 +44,10 @@ export async function salvarPalpite(
   try {
     // 2. Verificar status de liberação do usuário no banco
     const user = await db
-      .select({ status: usuarios.status })
+      .select({
+        status: usuarios.status,
+        dataLiberacao: usuarios.dataLiberacao,
+      })
       .from(usuarios)
       .where(eq(usuarios.id, session.id))
       .limit(1);
@@ -61,7 +64,7 @@ export async function salvarPalpite(
       };
     }
 
-    // 3. Buscar a partida para validar o prazo global
+    // 3. Buscar a partida para validar o prazo
     const match = await db
       .select({
         dataInicio: partidas.dataInicio,
@@ -75,34 +78,59 @@ export async function salvarPalpite(
       return { success: false, message: 'Partida não encontrada.' };
     }
 
-    // Buscar a primeira partida de todo o torneio para estabelecer o prazo limite global
-    const primeiraPartidaTorneio = await db
-      .select({ dataInicio: partidas.dataInicio })
-      .from(partidas)
-      .orderBy(partidas.dataInicio)
-      .limit(1);
-
-    if (primeiraPartidaTorneio.length === 0) {
-      return { success: false, message: 'Nenhuma partida encontrada.' };
-    }
-
-    const dataLimite = new Date(
-      new Date(primeiraPartidaTorneio[0].dataInicio).getTime() - 30 * 60 * 1000,
-    );
-
-    if (new Date() >= dataLimite) {
-      return {
-        success: false,
-        message:
-          'O prazo para palpitar expirou (palpites fechados 30 minutos antes do primeiro jogo da Copa do Mundo).',
-      };
-    }
+    // 4. Validar prazos
+    const agora = new Date();
 
     if (match[0].status === 'FINALIZADO') {
       return {
         success: false,
         message: 'Esta partida já foi finalizada.',
       };
+    }
+
+    // Se a partida já começou, bloquear
+    if (agora >= new Date(match[0].dataInicio)) {
+      return {
+        success: false,
+        message: 'Esta partida já começou. Não é mais possível palpitar.',
+      };
+    }
+
+    // Verificar se usuário tem dataLiberacao (liberado tardiamente)
+    if (user[0].dataLiberacao) {
+      const dataLiberacao = new Date(user[0].dataLiberacao);
+      const prazoLiberacao = new Date(dataLiberacao.getTime() + 30 * 60 * 1000);
+
+      if (agora >= prazoLiberacao) {
+        return {
+          success: false,
+          message:
+            'Seu prazo de 30 minutos para palpitar expirou. Entre em contato com o administrador.',
+        };
+      }
+    } else {
+      // Usuário normal: validar deadline global (30 min antes da 1ª partida)
+      const primeiraPartidaTorneio = await db
+        .select({ dataInicio: partidas.dataInicio })
+        .from(partidas)
+        .orderBy(partidas.dataInicio)
+        .limit(1);
+
+      if (primeiraPartidaTorneio.length === 0) {
+        return { success: false, message: 'Nenhuma partida encontrada.' };
+      }
+
+      const dataLimite = new Date(
+        new Date(primeiraPartidaTorneio[0].dataInicio).getTime() - 30 * 60 * 1000,
+      );
+
+      if (agora >= dataLimite) {
+        return {
+          success: false,
+          message:
+            'O prazo para palpitar expirou (palpites fechados 30 minutos antes do primeiro jogo da Copa do Mundo).',
+        };
+      }
     }
 
     // 4. Salvar ou Atualizar o Palpite
