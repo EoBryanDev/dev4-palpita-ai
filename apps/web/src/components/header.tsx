@@ -3,6 +3,7 @@
 import { logoutUsuario, obterSessao } from '@/app/actions/auth';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
+import { useQueryClient } from '@tanstack/react-query';
 import { LogOut, Menu, Trophy, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -21,6 +22,7 @@ export function Header({
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<ISessionUser | null>(initialSession);
   const [isPending, startTransition] = useTransition();
+  const queryClient = useQueryClient();
 
   // Sincronizar com a sessão inicial que pode ser alterada na navegação do servidor
   useEffect(() => {
@@ -53,6 +55,7 @@ export function Header({
   const handleLogout = () => {
     startTransition(async () => {
       await logoutUsuario();
+      queryClient.clear();
       setUser(null);
       router.push('/login');
       router.refresh();

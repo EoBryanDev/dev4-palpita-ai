@@ -22,6 +22,9 @@ out/
 .env.development
 .env.production
 
+# Cobertura de Testes
+coverage/
+
 # Arquivos do Sistema Operacional
 .DS_Store
 Thumbs.db

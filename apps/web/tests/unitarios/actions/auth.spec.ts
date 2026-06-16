@@ -1,6 +1,7 @@
 import { loginUsuario, logoutUsuario, obterSessao } from '@/app/actions/auth';
 import { db } from '@palpita/db';
 import bcrypt from 'bcryptjs';
+import { revalidatePath } from 'next/cache';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 
@@ -25,6 +26,10 @@ vi.mock('@palpita/core', () => ({
   logAuditoria: vi.fn(),
   verificarRateLimit: vi.fn(() => ({ permitido: true, resetEmMs: 0 })),
   verificarToken: vi.fn(),
+}));
+
+vi.mock('next/cache', () => ({
+  revalidatePath: vi.fn(),
 }));
 
 vi.mock('@palpita/db', () => {
@@ -207,11 +212,12 @@ describe('loginUsuario', () => {
 });
 
 describe('logoutUsuario', () => {
-  it('deve remover o cookie palpita_session e retornar sucesso', async () => {
+  it('deve remover o cookie palpita_session, revalidar cache e retornar sucesso', async () => {
     const result = await logoutUsuario();
     expect(result.success).toBe(true);
     expect(result.message).toBe('Logout realizado com sucesso!');
     expect(mockCookiesStore.delete).toHaveBeenCalledWith('palpita_session');
+    expect(revalidatePath).toHaveBeenCalledWith('/', 'layout');
   });
 });
 

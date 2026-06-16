@@ -11,6 +11,7 @@ import {
 import { db, usuarios } from '@palpita/db';
 import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
+import { revalidatePath } from 'next/cache';
 import { cookies, headers } from 'next/headers';
 import { z } from 'zod';
 
@@ -193,6 +194,7 @@ export async function logoutUsuario(): Promise<{
     const cookieStore = await cookies();
     cookieStore.delete('palpita_session');
     logAuditoria('LOGOUT', {});
+    revalidatePath('/', 'layout');
     return { success: true, message: 'Logout realizado com sucesso!' };
   } catch (error) {
     console.error('Erro ao realizar logout:', error);
