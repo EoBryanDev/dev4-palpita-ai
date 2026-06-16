@@ -97,7 +97,9 @@ describe('salvarPalpite', () => {
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
-          limit: vi.fn(() => Promise.resolve([{ status: 'ATIVO', dataLiberacao: null }])),
+          limit: vi.fn(() =>
+            Promise.resolve([{ status: 'ATIVO', dataLiberacao: null }]),
+          ),
         })),
       })),
     }));
@@ -117,7 +119,9 @@ describe('salvarPalpite', () => {
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
-          limit: vi.fn(() => Promise.resolve([{ status: 'LIBERADO', dataLiberacao: null }])),
+          limit: vi.fn(() =>
+            Promise.resolve([{ status: 'LIBERADO', dataLiberacao: null }]),
+          ),
         })),
       })),
     }));
@@ -144,7 +148,9 @@ describe('salvarPalpite', () => {
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
-          limit: vi.fn(() => Promise.resolve([{ status: 'LIBERADO', dataLiberacao: null }])),
+          limit: vi.fn(() =>
+            Promise.resolve([{ status: 'LIBERADO', dataLiberacao: null }]),
+          ),
         })),
       })),
     }));
@@ -182,7 +188,9 @@ describe('salvarPalpite', () => {
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
-          limit: vi.fn(() => Promise.resolve([{ status: 'LIBERADO', dataLiberacao: null }])),
+          limit: vi.fn(() =>
+            Promise.resolve([{ status: 'LIBERADO', dataLiberacao: null }]),
+          ),
         })),
       })),
     }));
@@ -246,7 +254,9 @@ describe('salvarPalpite', () => {
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
-          limit: vi.fn(() => Promise.resolve([{ status: 'LIBERADO', dataLiberacao: null }])),
+          limit: vi.fn(() =>
+            Promise.resolve([{ status: 'LIBERADO', dataLiberacao: null }]),
+          ),
         })),
       })),
     }));
