@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.2.1...v1.3.0) (2026-06-16)
+
+
+### Features
+
+* **admin:** paginar e ordenar partidas por rodada (EOB-181) ([7a7182d](https://github.com/EoBryanDev/dev4-palpita-ai/commit/7a7182d40057009d3257ebd5d8d5fc280fc5801a))
+
 ## [1.2.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.2.0...v1.2.1) (2026-06-16)
 
 
