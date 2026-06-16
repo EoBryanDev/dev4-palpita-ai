@@ -33,6 +33,7 @@ export interface IHistoricoDashboard {
   palpiteB: number;
   pontosGanhos: number;
   dataInicio: string;
+  status?: string;
 }
 
 export interface IDashboardPalpitesProps {

@@ -58,12 +58,14 @@ export function DashboardPalpites({
   const [totalSalvos, setTotalSalvos] = useState(totalPalpitesSalvos);
   const [offset, setOffset] = useState(5);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [visibleHistoryLimit, setVisibleHistoryLimit] = useState(10);
 
   // Sincronizar os estados locais quando as props iniciais mudarem (devido ao router.refresh())
   useEffect(() => {
     setPalpitesSalvos(palpitesSalvosIniciais);
     setTotalSalvos(totalPalpitesSalvos);
     setOffset(5);
+    setVisibleHistoryLimit(10);
   }, [palpitesSalvosIniciais, totalPalpitesSalvos]);
 
   const handleCarregarMais = async () => {
@@ -685,31 +687,47 @@ export function DashboardPalpites({
               </div>
             ) : (
               <div className="space-y-4">
-                {historico.map((item) => (
+                {historico.slice(0, visibleHistoryLimit).map((item) => (
                   <div
                     key={item.partidaId}
-                    className="rounded-3xl border border-zinc-200/80 bg-white p-5 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/30 flex flex-col gap-3"
+                    className={`rounded-3xl border p-5 shadow-sm flex flex-col gap-3 transition-all ${
+                      item.status === 'EM_ANDAMENTO' ||
+                      item.status === 'INICIADO'
+                        ? 'border-red-500/20 bg-red-500/5 dark:border-red-500/10 dark:bg-red-950/5'
+                        : 'border-zinc-200/80 bg-white dark:border-zinc-800/80 dark:bg-zinc-900/30'
+                    }`}
                   >
                     <div className="flex items-center justify-between text-xs">
                       <span className="font-semibold text-zinc-500 dark:text-zinc-400">
                         {formatarData(item.dataInicio)}
                       </span>
-                      <span
-                        className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
-                          item.pontosGanhos > 0
-                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-400'
-                            : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800/50 dark:text-zinc-400'
-                        }`}
-                      >
-                        {item.pontosGanhos > 0
-                          ? `+${item.pontosGanhos} ${item.pontosGanhos === 1 ? 'Ponto' : 'Pontos'}`
-                          : '0 Pontos'}
-                      </span>
+                      {item.status === 'EM_ANDAMENTO' ||
+                      item.status === 'INICIADO' ? (
+                        <span className="px-2 py-0.5 rounded-full font-bold text-[10px] bg-red-500/10 text-red-500 dark:bg-red-500/20 dark:text-red-400 flex items-center gap-1 animate-pulse">
+                          <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-ping" />
+                          Ao Vivo
+                        </span>
+                      ) : (
+                        <span
+                          className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
+                            item.pontosGanhos > 0
+                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-400'
+                              : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800/50 dark:text-zinc-400'
+                          }`}
+                        >
+                          {item.pontosGanhos > 0
+                            ? `+${item.pontosGanhos} ${item.pontosGanhos === 1 ? 'Ponto' : 'Pontos'}`
+                            : '0 Pontos'}
+                        </span>
+                      )}
                     </div>
 
                     <div className="flex items-center justify-between gap-2 border-b border-zinc-100 dark:border-zinc-800/50 pb-2">
                       <span className="text-sm font-semibold text-zinc-500 dark:text-zinc-400">
-                        Placar Oficial
+                        {item.status === 'EM_ANDAMENTO' ||
+                        item.status === 'INICIADO'
+                          ? 'Placar Ao Vivo'
+                          : 'Placar Oficial'}
                       </span>
                       <div className="flex items-center gap-2 select-none">
                         {item.timeAEmoji && (
@@ -750,6 +768,19 @@ export function DashboardPalpites({
                     </div>
                   </div>
                 ))}
+
+                {historico.length > visibleHistoryLimit && (
+                  <div className="flex justify-center mt-6">
+                    <Button
+                      onClick={() =>
+                        setVisibleHistoryLimit((prev) => prev + 10)
+                      }
+                      className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-xs px-4 h-9 rounded-xl border border-zinc-200 dark:border-zinc-800/80 flex items-center gap-2"
+                    >
+                      Visualizar mais
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </div>
