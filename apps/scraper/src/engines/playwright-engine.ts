@@ -30,6 +30,34 @@ export class PlaywrightEngine implements IScraperEngine {
 
       await page.waitForTimeout(2_000);
 
+      // Try to expand the sports card to get detailed stats and timeline
+      try {
+        const expanded = await page.evaluate(() => {
+          const els = Array.from(
+            document.querySelectorAll('a, button, [role="button"], span, div'),
+          );
+          for (const el of els) {
+            const txt = el.textContent?.trim() || '';
+            if (
+              txt.toLowerCase() === 'mais sobre este jogo' ||
+              txt.toLowerCase().includes('mais sobre este jogo')
+            ) {
+              (el as HTMLElement).click();
+              return true;
+            }
+          }
+          return false;
+        });
+        if (expanded) {
+          await page.waitForTimeout(3000);
+        }
+      } catch (e) {
+        console.warn(
+          '[PlaywrightEngine] Warning: failed to expand sports widget:',
+          (e as Error).message,
+        );
+      }
+
       const golsA = await this.extractScore(page, 'l');
       const golsB = await this.extractScore(page, 'r');
 
@@ -132,6 +160,40 @@ export class PlaywrightEngine implements IScraperEngine {
     timeB: string,
   ): Promise<IScrapeEvent[]> {
     try {
+      // Check if timeline container exists, if not try to click "Linha do tempo" tab
+      const tabClicked = await page.evaluate(() => {
+        const selectors = [
+          '[class*="imso_hs__mntc"]',
+          '[class*="imso-hs__mntc"]',
+          '[class*="timeline"]',
+          '[jsname*="timeline"]',
+        ];
+        let exists = false;
+        for (const sel of selectors) {
+          if (document.querySelector(sel)) {
+            exists = true;
+            break;
+          }
+        }
+        if (!exists) {
+          const tabs = Array.from(
+            document.querySelectorAll('div[role="tab"], span, a, button'),
+          );
+          for (const el of tabs) {
+            const txt = el.textContent?.trim() || '';
+            if (txt.toLowerCase() === 'linha do tempo') {
+              (el as HTMLElement).click();
+              return true;
+            }
+          }
+        }
+        return false;
+      });
+
+      if (tabClicked) {
+        await page.waitForTimeout(2000);
+      }
+
       const eventos = await page.evaluate(
         ({ tA, tB }: { tA: string; tB: string }) => {
           const results: Array<{
@@ -140,6 +202,7 @@ export class PlaywrightEngine implements IScraperEngine {
             minuto: number;
             acrescimos?: number;
             info?: string;
+            timeNome?: string;
           }> = [];
 
           const containerSelectors = [
@@ -163,78 +226,96 @@ export class PlaywrightEngine implements IScraperEngine {
 
           if (items.length === 0) return [];
 
+          const cleanTA = tA.toLowerCase().trim();
+          const cleanTB = tB.toLowerCase().trim();
+
           for (const item of items) {
             const text = item.textContent?.trim() || '';
             if (!text) continue;
 
-            const timeMatch = text.match(/^(\d+)(?:\+(\d+))?'?\s*/);
-            let minuto = 0;
-            let acrescimos: number | undefined;
-            if (timeMatch) {
-              minuto = Number.parseInt(timeMatch[1], 10);
-              if (timeMatch[2]) acrescimos = Number.parseInt(timeMatch[2], 10);
+            const timeEl = item.querySelector('[class*="t-ev-tm"]');
+            const timeText = timeEl?.textContent?.trim() || '';
+
+            const timeMatch = timeText.match(/^(\d+)(?:\+(\d+))?'?/);
+            if (!timeMatch) continue;
+
+            const minuto = Number.parseInt(timeMatch[1], 10);
+            const acrescimos = timeMatch[2]
+              ? Number.parseInt(timeMatch[2], 10)
+              : undefined;
+
+            const infoEl = item.querySelector(
+              '[class*="t-ev-info"], [class*="info"]',
+            );
+            if (!infoEl) continue;
+
+            const infoText = infoEl.textContent?.trim() || '';
+            const infoTextLower = infoText.toLowerCase();
+
+            const playerEl = infoEl.querySelector(
+              '.lr-imso-evt-text-title, [class*="evt-text-title"]',
+            );
+            let jogador = '';
+            if (playerEl) {
+              jogador = playerEl.textContent?.trim() || '';
+            } else {
+              jogador = infoEl.firstElementChild?.textContent?.trim() || '';
             }
 
-            const textoLimpo = text.replace(/^\d+(?:\+\d+)?'?\s*/, '').trim();
+            const fullItemTextLower = text.toLowerCase();
+            let timeNome: string | undefined;
+            if (fullItemTextLower.includes(cleanTA)) {
+              timeNome = tA;
+            } else if (fullItemTextLower.includes(cleanTB)) {
+              timeNome = tB;
+            }
+
+            let tipo: string | null = null;
+            let finalInfo = '';
 
             if (
-              textoLimpo.includes('gol') ||
-              textoLimpo.includes('⚽') ||
-              textoLimpo.includes('penalidade') ||
-              (textoLimpo.includes('final') &&
-                !textoLimpo.includes('finalização'))
+              infoTextLower.includes('gol') ||
+              infoTextLower.includes('⚽') ||
+              infoTextLower.includes('penalidade')
             ) {
-              results.push({
-                tipo: 'GOL',
-                jogador: textoLimpo
-                  .replace(/gol\s+(d[eo])\s+/i, '')
-                  .replace(/⚽\s*/, '')
-                  .replace(/penalidade/i, '')
-                  .trim(),
-                minuto,
-                acrescimos,
-              });
+              tipo = 'GOL';
+              if (
+                infoTextLower.includes('pênalti') ||
+                infoTextLower.includes('penal')
+              ) {
+                finalInfo = 'Pênalti';
+              }
             } else if (
-              textoLimpo.includes('cartão amarelo') ||
-              textoLimpo.includes('🟨')
+              infoTextLower.includes('cartão amarelo') ||
+              infoTextLower.includes('🟨')
             ) {
-              results.push({
-                tipo: 'CARTAO_AMARELO',
-                jogador: textoLimpo
-                  .replace(/cartão amarelo\s+(para|p\/)\s+/i, '')
-                  .replace(/🟨\s*/, '')
-                  .trim(),
-                minuto,
-                acrescimos,
-              });
+              tipo = 'CARTAO_AMARELO';
             } else if (
-              textoLimpo.includes('cartão vermelho') ||
-              textoLimpo.includes('🟥')
+              infoTextLower.includes('cartão vermelho') ||
+              infoTextLower.includes('🟥')
             ) {
-              results.push({
-                tipo: 'CARTAO_VERMELHO',
-                jogador: textoLimpo
-                  .replace(/cartão vermelho\s+(para|p\/)\s+/i, '')
-                  .replace(/🟥\s*/, '')
-                  .trim(),
-                minuto,
-                acrescimos,
-              });
+              tipo = 'CARTAO_VERMELHO';
             } else if (
-              textoLimpo.includes('substituição') ||
-              textoLimpo.includes('🔃') ||
-              textoLimpo.includes('sai') ||
-              textoLimpo.includes('entra')
+              infoTextLower.includes('substituição') ||
+              infoTextLower.includes('saída') ||
+              infoTextLower.includes('entrada') ||
+              infoTextLower.includes('sai') ||
+              infoTextLower.includes('entra') ||
+              infoTextLower.includes('substituído') ||
+              infoTextLower.includes('🔃')
             ) {
+              tipo = 'SUBSTITUICAO';
+              finalInfo = infoText;
+            }
+
+            if (tipo) {
               results.push({
-                tipo: 'SUBSTITUICAO',
-                jogador: textoLimpo
-                  .replace(/substituição\s*/i, '')
-                  .replace(/🔃\s*/, '')
-                  .trim(),
+                tipo,
+                jogador,
                 minuto,
                 acrescimos,
-                info: textoLimpo,
+                info: finalInfo || undefined,
+                timeNome,
               });
             }
           }

@@ -1,6 +1,7 @@
 export interface IScrapeEvent {
   tipo: 'GOL' | 'CARTAO_AMARELO' | 'CARTAO_VERMELHO' | 'SUBSTITUICAO';
   timeId?: string;
+  timeNome?: string;
   jogador: string;
   minuto: number;
   acrescimos?: number;

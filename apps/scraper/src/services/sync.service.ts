@@ -72,10 +72,23 @@ export async function syncOnce(engine: IScraperEngine): Promise<void> {
 
       let eventosInseridos = 0;
       if (resultado.eventos && resultado.eventos.length > 0) {
+        const eventosComTimeId = resultado.eventos.map((evt) => {
+          let timeId: string | undefined = undefined;
+          if (evt.timeNome === partida.timeANome) {
+            timeId = partida.timeAId;
+          } else if (evt.timeNome === partida.timeBNome) {
+            timeId = partida.timeBId;
+          }
+          return {
+            ...evt,
+            timeId,
+          };
+        });
+
         const existentes = await buscarEventosExistentes(partida.id);
         eventosInseridos = await inserirEventos(
           partida.id,
-          resultado.eventos,
+          eventosComTimeId,
           existentes,
         );
       }
