@@ -2,6 +2,7 @@
   "name": "@palpita/scraper",
   "version": "1.0.0",
   "private": true,
+  "files": ["dist"],
   "type": "module",
   "scripts": {
     "scraper": "tsx src/index.ts",
