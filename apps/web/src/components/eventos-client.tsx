@@ -246,6 +246,39 @@ export function EventosClient() {
     };
   };
 
+  const renderEventIcon = (tipo: string) => {
+    switch (tipo) {
+      case 'GOL':
+        return (
+          <span className="text-sm select-none" title="Gol">
+            ⚽
+          </span>
+        );
+      case 'CARTAO_AMARELO':
+        return (
+          <div
+            className="w-2.5 h-3.5 bg-amber-400 rounded-[2px] border border-amber-500/35 shadow-xs shrink-0"
+            title="Cartão Amarelo"
+          />
+        );
+      case 'CARTAO_VERMELHO':
+        return (
+          <div
+            className="w-2.5 h-3.5 bg-red-500 rounded-[2px] border border-red-650/35 shadow-xs shrink-0"
+            title="Cartão Vermelho"
+          />
+        );
+      case 'SUBSTITUICAO':
+        return (
+          <span className="text-sm select-none" title="Substituição">
+            🔃
+          </span>
+        );
+      default:
+        return null;
+    }
+  };
+
   const formatarData = (dateStr: string) => {
     return new Date(dateStr).toLocaleString('pt-BR', {
       timeZone: 'America/Sao_Paulo',
@@ -372,6 +405,49 @@ export function EventosClient() {
                         </span>
                       </div>
                     </div>
+
+                    {/* Eventos da Partida */}
+                    {evento.eventosJogo && evento.eventosJogo.length > 0 && (
+                      <div className="mb-4 pb-4 border-b border-zinc-100 dark:border-zinc-800/50">
+                        <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2 select-none">
+                          Acontecimentos do Jogo
+                        </p>
+                        <div className="max-h-28 overflow-y-auto pr-1 space-y-1.5 scrollbar-thin scrollbar-thumb-zinc-200 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent">
+                          {evento.eventosJogo.map((evt) => (
+                            <div
+                              key={evt.id}
+                              className="flex items-center gap-2 text-xs bg-zinc-50/50 dark:bg-zinc-950/20 px-2.5 py-1.5 rounded-xl border border-zinc-100/50 dark:border-zinc-850/30"
+                            >
+                              <span className="font-bold text-zinc-400 dark:text-zinc-500 shrink-0 select-none bg-zinc-100 dark:bg-zinc-800/80 px-1.5 py-0.5 rounded-[4px] text-[10px]">
+                                {evt.minuto}
+                                {evt.acrescimos ? `+${evt.acrescimos}` : ''}'
+                              </span>
+                              <div className="flex items-center shrink-0">
+                                {renderEventIcon(evt.tipo)}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <span className="font-semibold text-zinc-700 dark:text-zinc-300 truncate block">
+                                  {evt.jogador}
+                                </span>
+                                {evt.info && (
+                                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500 truncate block">
+                                    {evt.info}
+                                  </span>
+                                )}
+                              </div>
+                              {evt.timeEmoji && (
+                                <span
+                                  className="text-xs shrink-0 select-none opacity-85"
+                                  title={evt.timeNome || ''}
+                                >
+                                  {evt.timeEmoji}
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Ações e Informações Adicionais */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
