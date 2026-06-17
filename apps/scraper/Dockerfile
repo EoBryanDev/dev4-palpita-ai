@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright:v1.40.0-jammy AS base
+FROM mcr.microsoft.com/playwright:v1.61.0-jammy AS base
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 FROM base AS builder
