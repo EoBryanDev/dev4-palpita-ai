@@ -1,0 +1,31 @@
+{
+  "name": "@palpita/scraper",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "scraper": "tsx src/index.ts",
+    "build": "tsc",
+    "test": "vitest run",
+    "lint": "biome check src/"
+  },
+  "dependencies": {
+    "@palpita/db": "workspace:*",
+    "@palpita/core": "workspace:*",
+    "cheerio": "^1.0.0",
+    "drizzle-orm": "^0.31.2",
+    "postgres": "^3.4.4",
+    "zod": "^3.23.8",
+    "node-cron": "^3.0.3",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@palpita/tsconfig": "workspace:*",
+    "@types/node": "^20",
+    "@types/node-cron": "^3.0.11",
+    "typescript": "^5.4.5",
+    "tsx": "^4.19.1",
+    "vitest": "^1.6.1",
+    "playwright": "^1.40.0"
+  }
+}
