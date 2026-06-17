@@ -3,7 +3,7 @@ import type { IScrapeEvent, IScrapeResult, IScraperEngine } from '../types.js';
 
 export class PlaywrightEngine implements IScraperEngine {
   private getSearchUrl(timeA: string, timeB: string): string {
-    const q = `${timeA} ${timeB} copa 2026 resultado minuto a minuto`;
+    const q = `${timeA} x ${timeB} copa 2026 resultado`;
     return `https://www.google.com/search?q=${encodeURIComponent(q)}&hl=pt-BR`;
   }
 
@@ -11,7 +11,10 @@ export class PlaywrightEngine implements IScraperEngine {
     timeA: string,
     timeB: string,
   ): Promise<IScrapeResult | null> {
-    const browser = await chromium.launch({ headless: true });
+    const browser = await chromium.launch({
+      headless: true,
+      args: ['--disable-blink-features=AutomationControlled'],
+    });
 
     try {
       const context = await browser.newContext({
@@ -23,7 +26,7 @@ export class PlaywrightEngine implements IScraperEngine {
       const page = await context.newPage();
       const url = this.getSearchUrl(timeA, timeB);
 
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30_000 });
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
 
       await page.waitForTimeout(2_000);
 
