@@ -17,5 +17,5 @@ COPY --from=builder /pruned /app
 
 ENV NODE_ENV=production
 ENV SCRAPER_ENGINE=playwright
-ENTRYPOINT ["node", "dist/index.js"]
+ENTRYPOINT ["node", "--import", "tsx", "src/index.ts"]
 CMD ["watch"]

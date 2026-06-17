@@ -47,9 +47,15 @@ importers:
       node-cron:
         specifier: ^3.0.3
         version: 3.0.3
+      playwright:
+        specifier: ^1.40.0
+        version: 1.61.0
       postgres:
         specifier: ^3.4.4
         version: 3.4.9
+      tsx:
+        specifier: ^4.19.1
+        version: 4.22.4
       zod:
         specifier: ^3.23.8
         version: 3.25.76
@@ -63,12 +69,6 @@ importers:
       '@types/node-cron':
         specifier: ^3.0.11
         version: 3.0.11
-      playwright:
-        specifier: ^1.40.0
-        version: 1.61.0
-      tsx:
-        specifier: ^4.19.1
-        version: 4.22.4
       typescript:
         specifier: ^5.4.5
         version: 5.9.3
