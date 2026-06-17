@@ -108,7 +108,22 @@ export const configuracoes = pgTable('configuracoes', {
   dataAtualizacao: timestamp('data_atualizacao').defaultNow().notNull(),
 });
 
-// 7. Tabela de Comentários
+// 7. Tabela de Eventos de Partida (scraper)
+export const eventosPartida = pgTable('eventos_partida', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  partidaId: uuid('partida_id')
+    .notNull()
+    .references(() => partidas.id, { onDelete: 'cascade' }),
+  tipo: varchar('tipo', { length: 30 }).notNull(),
+  timeId: uuid('time_id').references(() => times.id, { onDelete: 'set null' }),
+  jogador: varchar('jogador', { length: 100 }),
+  minuto: integer('minuto').notNull(),
+  acrescimos: integer('acrescimos'),
+  info: varchar('info', { length: 255 }),
+  dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
+});
+
+// 8. Tabela de Comentários
 export const comentarios = pgTable('comentarios', {
   id: uuid('id').primaryKey().defaultRandom(),
   partidaId: uuid('partida_id')

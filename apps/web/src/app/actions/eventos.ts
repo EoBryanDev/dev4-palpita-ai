@@ -5,6 +5,7 @@ import { Palpite } from '@palpita/core';
 import {
   comentarios,
   db,
+  eventosPartida,
   palpites,
   partidas,
   rodadas,
@@ -25,6 +26,18 @@ import {
 import { alias } from 'drizzle-orm/pg-core';
 import { obterSessao } from './auth';
 
+export interface IEventoJogo {
+  id: string;
+  tipo: string;
+  timeId: string | null;
+  timeNome: string | null;
+  timeEmoji: string | null;
+  jogador: string | null;
+  minuto: number;
+  acrescimos: number | null;
+  info: string | null;
+}
+
 export interface IEventoTimeline {
   id: string;
   timeA: string;
@@ -38,6 +51,7 @@ export interface IEventoTimeline {
   rodadaId: string;
   rodadaNome: string;
   comentariosCount: number;
+  eventosJogo?: IEventoJogo[];
 }
 
 export interface IPontuadorRodada {
@@ -118,6 +132,39 @@ export async function obterEventosTimeline(): Promise<{
       )
       .orderBy(desc(partidas.dataInicio));
 
+    if (queryResult.length === 0) {
+      return { success: true, eventos: [] };
+    }
+
+    const partidaIds = queryResult.map((p) => p.id);
+
+    // Fetch all match events for these matches
+    const allMatchEvents = await db
+      .select({
+        id: eventosPartida.id,
+        partidaId: eventosPartida.partidaId,
+        tipo: eventosPartida.tipo,
+        timeId: eventosPartida.timeId,
+        timeNome: times.nome,
+        timeEmoji: times.emoji,
+        jogador: eventosPartida.jogador,
+        minuto: eventosPartida.minuto,
+        acrescimos: eventosPartida.acrescimos,
+        info: eventosPartida.info,
+      })
+      .from(eventosPartida)
+      .leftJoin(times, eq(eventosPartida.timeId, times.id))
+      .where(inArrayOrTrue(eventosPartida.partidaId, partidaIds))
+      .orderBy(asc(eventosPartida.minuto), asc(eventosPartida.acrescimos));
+
+    // Group match events by match ID
+    const eventsByMatch = new Map<string, typeof allMatchEvents>();
+    for (const evt of allMatchEvents) {
+      const list = eventsByMatch.get(evt.partidaId) || [];
+      list.push(evt);
+      eventsByMatch.set(evt.partidaId, list);
+    }
+
     const eventos: IEventoTimeline[] = queryResult.map((item) => ({
       id: item.id,
       timeA: item.timeA,
@@ -131,6 +178,17 @@ export async function obterEventosTimeline(): Promise<{
       rodadaId: item.rodadaId,
       rodadaNome: item.rodadaNome,
       comentariosCount: Number(item.comentariosCount),
+      eventosJogo: (eventsByMatch.get(item.id) || []).map((e) => ({
+        id: e.id,
+        tipo: e.tipo,
+        timeId: e.timeId,
+        timeNome: e.timeNome,
+        timeEmoji: e.timeEmoji,
+        jogador: e.jogador,
+        minuto: e.minuto,
+        acrescimos: e.acrescimos,
+        info: e.info,
+      })),
     }));
 
     return { success: true, eventos };

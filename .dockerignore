@@ -1,0 +1,14 @@
+node_modules
+**/node_modules
+.git
+.github
+.next
+dist
+**/dist
+.turbo
+**/out
+postgres-data
+pgdata
+*.env
+.env*
+temp-pruned
