@@ -1,5 +1,5 @@
 import { db, eventosPartida, partidas, times } from '@palpita/db';
-import { and, asc, eq, lte, or } from 'drizzle-orm';
+import { and, asc, eq, gte, lte, or } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import type { IScrapeEvent } from '../types.js';
 
@@ -21,6 +21,7 @@ export interface IPartidaPendente {
 
 export async function buscarPartidasPendentes(): Promise<IPartidaPendente[]> {
   const agora = new Date();
+  const tresHorasAtras = new Date(agora.getTime() - 3 * 60 * 60 * 1000);
   const rows = await db
     .select({
       id: partidas.id,
@@ -41,9 +42,14 @@ export async function buscarPartidasPendentes(): Promise<IPartidaPendente[]> {
       and(
         lte(partidas.dataInicio, agora),
         or(
-          eq(partidas.status, 'AGENDADO'),
-          eq(partidas.status, 'AGENDADA'),
           eq(partidas.status, 'EM_ANDAMENTO'),
+          and(
+            or(
+              eq(partidas.status, 'AGENDADO'),
+              eq(partidas.status, 'AGENDADA'),
+            ),
+            gte(partidas.dataInicio, tresHorasAtras),
+          ),
         ),
       ),
     )
