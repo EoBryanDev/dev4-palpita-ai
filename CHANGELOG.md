@@ -1,3 +1,12 @@
+## [1.5.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.5.0...v1.5.1) (2026-06-17)
+
+
+### Bug Fixes
+
+* **ci:** remove explicit pnpm version — action-setup@v4 reads from packageManager EOB-164 ([8dac117](https://github.com/EoBryanDev/dev4-palpita-ai/commit/8dac117356177c5c8c4053dbde1ab3ec57261e38))
+* **ci:** update pnpm to v10, sync lockfile, add validate gate to scraper-deploy EOB-164 ([23514bb](https://github.com/EoBryanDev/dev4-palpita-ai/commit/23514bbf5bd8c0216da191c6164621623472711e))
+* **scraper:** update playwright docker image and pin dep to v1.61.0 EOB-164 ([2b34659](https://github.com/EoBryanDev/dev4-palpita-ai/commit/2b34659b9de429810c7381831a57551bd3f41b3d))
+
 # [1.5.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.4.1...v1.5.0) (2026-06-17)
 
 
