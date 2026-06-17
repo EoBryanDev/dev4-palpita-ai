@@ -7,6 +7,7 @@ const __dirname = dirname(__filename);
 
 dotenv.config({ path: join(__dirname, '../../../.env') });
 
+import { GoogleEngine } from './engines/google-engine.js';
 import { PlaywrightEngine } from './engines/playwright-engine.js';
 import { syncOnce } from './services/sync.service.js';
 
@@ -17,7 +18,10 @@ const WATCH_INTERVAL_MS =
 
 async function main() {
   const mode = process.argv[2] ?? 'run';
-  const engine = new PlaywrightEngine();
+
+  const engineType = process.env.SCRAPER_ENGINE ?? 'google';
+  const engine =
+    engineType === 'playwright' ? new PlaywrightEngine() : new GoogleEngine();
 
   let intervalMinutes =
     Number.parseInt(process.env.SCRAPER_INTERVAL_MINUTES ?? '5', 10) || 5;
