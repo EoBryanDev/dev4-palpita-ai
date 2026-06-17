@@ -1,3 +1,31 @@
+# [1.5.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.4.1...v1.5.0) (2026-06-17)
+
+
+### Bug Fixes
+
+* **scraper:** allow match events sync even when scoreboard score is unchanged EOB-164 ([c32345d](https://github.com/EoBryanDev/dev4-palpita-ai/commit/c32345d5f850b74a79266a557fc3640cee74c593))
+* **scraper:** bypass google bot detection and prevent playwright timeouts EOB-164 ([f78dec2](https://github.com/EoBryanDev/dev4-palpita-ai/commit/f78dec25938f92acb39d83c7a4f4ead00ad14eda))
+* **scraper:** limit pending matches query to recent or active matches EOB-164 ([d3fd451](https://github.com/EoBryanDev/dev4-palpita-ai/commit/d3fd451f5b7caec0f76a3639f5e0842d1618e1ad))
+* **scraper:** run container via tsx to resolve workspace packages EOB-165 ([24c6d1a](https://github.com/EoBryanDev/dev4-palpita-ai/commit/24c6d1a12d5e0dd26d3bef9f70dfa6e6206ac245))
+
+
+### Features
+
+* **api:** fetch match events inside obterEventosTimeline query EOB-164 ([fd27aa4](https://github.com/EoBryanDev/dev4-palpita-ai/commit/fd27aa4ef3513de92565edddedca521c837a590e))
+* **db:** add eventos_partida table and migration EOB-163 ([7d29778](https://github.com/EoBryanDev/dev4-palpita-ai/commit/7d29778fe409cedf766f8c6e493a210e0cb00775))
+* **scraper:** expand sports widget and improve timeline events extraction ([7888d6f](https://github.com/EoBryanDev/dev4-palpita-ai/commit/7888d6fe25a893412d7c6550f9f5610d879e7b05))
+* **scraper:** extract substitutions and cards from ogol for finished matches EOB-164 ([5c87d2a](https://github.com/EoBryanDev/dev4-palpita-ai/commit/5c87d2a9160c9e72a7226b7761ffc387de035a4b))
+* **scraper:** implement playwright engine with timeline extraction EOB-164 ([afc6b3a](https://github.com/EoBryanDev/dev4-palpita-ai/commit/afc6b3acec83dc0f568de3222ec1dc6fec1c23f2))
+* **scraper:** implement scraping engines with cheerio and playwright EOB-164 ([cc60a9d](https://github.com/EoBryanDev/dev4-palpita-ai/commit/cc60a9df817ca135bd7bb2b4ae6dd9847ea02365))
+* **scraper:** implement sync engine with dedup and cli EOB-164 ([ac3f677](https://github.com/EoBryanDev/dev4-palpita-ai/commit/ac3f677ad544b42f5f4dd6acdbee25bc31c61f93))
+* **scraper:** make timeline tab click robust and load root .env relative to index.ts ([e54bfa7](https://github.com/EoBryanDev/dev4-palpita-ai/commit/e54bfa74cd8ee8bb894340830de7c5541689c309))
+* **scraper:** optimize docker image size and support configurable engine EOB-165 ([634db45](https://github.com/EoBryanDev/dev4-palpita-ai/commit/634db451f42eaa80172af8a91e76ab8b2488b21f))
+* **scraper:** set default CMD to watch in Dockerfile EOB-165 ([c2f34c2](https://github.com/EoBryanDev/dev4-palpita-ai/commit/c2f34c26b5e7457b2694106003a7e9f9632fa1ab))
+* **scraper:** support interval option in watch mode command EOB-164 ([38145ed](https://github.com/EoBryanDev/dev4-palpita-ai/commit/38145ed7376569dc185ae6e03dd6b36fa0ba3eda))
+* **scraper:** use official playwright base image in Dockerfile EOB-165 ([8d13c26](https://github.com/EoBryanDev/dev4-palpita-ai/commit/8d13c26ce3a8c24272dfb9c2c4f61925fc356457))
+* **scraper:** whitelist dist folder in package.json for pnpm deploy EOB-165 ([ba91105](https://github.com/EoBryanDev/dev4-palpita-ai/commit/ba91105f4d108827be4c41c525a777a83d012a54))
+* **web:** render match events scrollbox in timeline card EOB-164 ([31291db](https://github.com/EoBryanDev/dev4-palpita-ai/commit/31291dbc235c6e594d4cd18a97355401cedf2f8a))
+
 ## [1.4.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.4.0...v1.4.1) (2026-06-16)
 
 
