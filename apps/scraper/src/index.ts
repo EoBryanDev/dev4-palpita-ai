@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { GoogleEngine } from './engines/google-engine.js';
+import { PlaywrightEngine } from './engines/playwright-engine.js';
 import { syncOnce } from './services/sync.service.js';
 
 const WATCH_INTERVAL_MS =
@@ -11,7 +11,7 @@ const WATCH_INTERVAL_MS =
 
 async function main() {
   const mode = process.argv[2] ?? 'run';
-  const engine = new GoogleEngine();
+  const engine = new PlaywrightEngine();
 
   if (mode === 'watch') {
     console.log(
