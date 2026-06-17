@@ -2,9 +2,14 @@ import { type Page, chromium } from 'playwright';
 import type { IScrapeEvent, IScrapeResult, IScraperEngine } from '../types.js';
 
 export class PlaywrightEngine implements IScraperEngine {
-  private getSearchUrl(timeA: string, timeB: string): string {
+  private getGoogleUrl(timeA: string, timeB: string): string {
     const q = `${timeA} x ${timeB} copa 2026 resultado`;
     return `https://www.google.com/search?q=${encodeURIComponent(q)}&hl=pt-BR`;
+  }
+
+  private getOgolSearchUrl(timeA: string, timeB: string): string {
+    const q = `${timeA} ${timeB} copa mundo 2026`;
+    return `https://www.ogol.com.br/pesquisa?q=${encodeURIComponent(q)}&tipo=jogos`;
   }
 
   async scrapeMatch(
@@ -24,13 +29,16 @@ export class PlaywrightEngine implements IScraperEngine {
       });
 
       const page = await context.newPage();
-      const url = this.getSearchUrl(timeA, timeB);
 
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
-
+      // ─── Step 1: Google → placar e status ────────────────────────────
+      const googleUrl = this.getGoogleUrl(timeA, timeB);
+      await page.goto(googleUrl, {
+        waitUntil: 'domcontentloaded',
+        timeout: 30_000,
+      });
       await page.waitForTimeout(2_000);
 
-      // Try to expand the sports card to get detailed stats and timeline
+      // Expand Google card
       try {
         const expanded = await page.evaluate(() => {
           const els = Array.from(
@@ -38,30 +46,22 @@ export class PlaywrightEngine implements IScraperEngine {
           );
           for (const el of els) {
             const txt = el.textContent?.trim() || '';
-            if (
-              txt.toLowerCase() === 'mais sobre este jogo' ||
-              txt.toLowerCase().includes('mais sobre este jogo')
-            ) {
+            if (txt.toLowerCase().includes('mais sobre este jogo')) {
               (el as HTMLElement).click();
               return true;
             }
           }
           return false;
         });
-        console.log(`[PlaywrightEngine] Expand clicked: ${expanded}`);
-        if (expanded) {
-          await page.waitForTimeout(3000);
-        }
-      } catch (e) {
-        console.warn(
-          '[PlaywrightEngine] Warning: failed to expand sports widget:',
-          (e as Error).message,
-        );
+        console.log(`[PlaywrightEngine] Google expand: ${expanded}`);
+        if (expanded) await page.waitForTimeout(3_000);
+      } catch {
+        /* ignore */
       }
 
       const golsA = await this.extractScore(page, 'l');
       const golsB = await this.extractScore(page, 'r');
-      console.log(`[PlaywrightEngine] Score extracted: A=${golsA}, B=${golsB}`);
+      console.log(`[PlaywrightEngine] Score: A=${golsA}, B=${golsB}`);
 
       if (golsA === null || golsB === null) {
         await browser.close();
@@ -69,15 +69,36 @@ export class PlaywrightEngine implements IScraperEngine {
       }
 
       const status = await this.extractStatus(page);
-      const eventos = await this.extractTimeline(page, timeA, timeB);
+      console.log(`[PlaywrightEngine] Status: ${status}`);
+
+      // ─── Step 2: Google goals summary ────────────────────────────────
+      const goalEvents = await this.extractGoals(page, timeA, timeB);
+      console.log(`[PlaywrightEngine] Goals from Google: ${goalEvents.length}`);
+
+      // ─── Step 3: Ogol → substituições, cartões e demais eventos ─────
+      let ogolEvents: IScrapeEvent[] = [];
+      try {
+        ogolEvents = await this.scrapeOgolEvents(page, timeA, timeB);
+        console.log(
+          `[PlaywrightEngine] Events from Ogol: ${ogolEvents.length}`,
+        );
+      } catch (e) {
+        console.warn(
+          '[PlaywrightEngine] Ogol scrape failed:',
+          (e as Error).message,
+        );
+      }
 
       await browser.close();
+
+      // Merge: use Google goals as authoritative + Ogol non-goal events
+      const merged = this.mergeEvents(goalEvents, ogolEvents);
 
       return {
         golsTimeA: golsA,
         golsTimeB: golsB,
         status: status as IScrapeResult['status'],
-        eventos: eventos.length > 0 ? eventos : undefined,
+        eventos: merged.length > 0 ? merged : undefined,
       };
     } catch (error) {
       await browser.close();
@@ -89,14 +110,14 @@ export class PlaywrightEngine implements IScraperEngine {
     }
   }
 
+  // ─── Score ────────────────────────────────────────────────────────────
   private async extractScore(
     page: Page,
     side: 'l' | 'r',
   ): Promise<number | null> {
     const selectors = [
+      `.imso_mh__${side}-tm-sc`,
       `[class*="imso_mh__${side}-tm-sc"]`,
-      `[class*="imso-hov__${side}-tr-sc"]`,
-      `[data-half="${side}"] [class*="score"]`,
     ];
 
     for (const sel of selectors) {
@@ -112,29 +133,33 @@ export class PlaywrightEngine implements IScraperEngine {
       }
     }
 
-    const allText = await page.evaluate(() => {
-      const els = document.querySelectorAll('[class*="imso_mh__"]');
-      return Array.from(els)
-        .map((el) => el.textContent?.trim())
-        .filter(Boolean);
-    });
-
-    const nums = allText
-      .map((t: string) => Number.parseInt(t, 10))
-      .filter((n: number) => !Number.isNaN(n));
-    if (nums.length >= 2) {
-      return side === 'l' ? nums[0] : nums[1];
+    // Fallback: score separator "3×0"
+    try {
+      const sep = await page.$(
+        '[class*="imso_mh__scr-sep"], [class*="imso_mh__ma-sc-cont"]',
+      );
+      if (sep) {
+        const text = (await sep.textContent())?.trim() || '';
+        const m = text.match(/(\d+)\s*[×x]\s*(\d+)/);
+        if (m) {
+          return side === 'l'
+            ? Number.parseInt(m[1], 10)
+            : Number.parseInt(m[2], 10);
+        }
+      }
+    } catch {
+      /* empty */
     }
 
     return null;
   }
 
+  // ─── Status ───────────────────────────────────────────────────────────
   private async extractStatus(page: Page): Promise<string> {
     const selectors = [
+      '.imso_mh__ft-mtch',
+      '[class*="imso_mh__ft-mtch"]',
       '[class*="imso_mh__m-st"]',
-      '[class*="imso-hov__m-st"]',
-      '[class*="status"]',
-      '[data-attrid*="status"]',
     ];
 
     for (const sel of selectors) {
@@ -143,11 +168,11 @@ export class PlaywrightEngine implements IScraperEngine {
         if (!el) continue;
         const text = (await el.textContent())?.trim().toLowerCase();
         if (!text) continue;
-        if (text.includes('final')) return 'FINALIZADO';
+        if (text.includes('encerrado') || text.includes('final'))
+          return 'FINALIZADO';
         if (text.includes('ao vivo') || text.includes('andamento'))
           return 'EM_ANDAMENTO';
         if (text.includes('agendado')) return 'AGENDADO';
-        if (text.includes('encerrado')) return 'FINALIZADO';
       } catch {
         /* empty */
       }
@@ -156,186 +181,323 @@ export class PlaywrightEngine implements IScraperEngine {
     return 'EM_ANDAMENTO';
   }
 
-  private async extractTimeline(
+  // ─── Goals from Google goal summary ──────────────────────────────────
+  private async extractGoals(
     page: Page,
     timeA: string,
     timeB: string,
   ): Promise<IScrapeEvent[]> {
     try {
-      // Check if timeline container exists, if not try to click "Linha do tempo" tab
-      const tabClicked = await page.evaluate(() => {
-        const selectors = [
-          '[class*="imso_hs__mntc"]',
-          '[class*="imso-hs__mntc"]',
-          '[class*="timeline"]',
-          '[jsname*="timeline"]',
-        ];
-        let exists = false;
-        for (const sel of selectors) {
-          if (document.querySelector(sel)) {
-            exists = true;
-            break;
-          }
-        }
-        if (!exists) {
-          const tabs = Array.from(
-            document.querySelectorAll('div[role="tab"], span, a, button, .imso-ln, [class*="imso-ln"]'),
-          );
-          for (const el of tabs) {
-            const txt = el.textContent?.trim() || '';
-            if (txt.toLowerCase() === 'linha do tempo') {
-              (el as HTMLElement).click();
-              return true;
-            }
-          }
-        }
-        return false;
-      });
-
-      console.log(`[PlaywrightEngine] Tab clicked: ${tabClicked}`);
-      if (tabClicked) {
-        await page.waitForTimeout(2000);
-      }
-
-      const eventos = await page.evaluate(
-        ({ tA, tB }: { tA: string; tB: string }) => {
+      const raw = await page.evaluate(
+        (args: { tA: string; tB: string }) => {
+          const tA = args.tA;
+          const tB = args.tB;
           const results: Array<{
             tipo: string;
             jogador: string;
             minuto: number;
-            acrescimos?: number;
-            info?: string;
-            timeNome?: string;
+            acrescimos: number | undefined;
+            timeNome: string;
           }> = [];
 
-          const containerSelectors = [
-            '[class*="imso_hs__mntc"]',
-            '[class*="imso-hs__mntc"]',
-            '[class*="timeline"]',
-            '[jsname*="timeline"]',
+          const sides = [
+            { suffix: 'imso_gs__left-team', team: tA },
+            { suffix: 'imso_gs__right-team', team: tB },
           ];
 
-          let container: Element | null = null;
-          for (const sel of containerSelectors) {
-            container = document.querySelector(sel);
-            if (container) break;
-          }
-
-          if (!container) {
-            console.log("[PlaywrightEngine DOM] Container not found");
-            return [];
-          }
-
-           const items = container.querySelectorAll(
-            '[class*="imso_gs__t-ev"], [class*="gs__t-ev"], [class*="event-item"], [class*="evt"]',
-          );
-
-          console.log(`[PlaywrightEngine DOM] Timeline items found: ${items.length}`);
-
-          if (items.length === 0) return [];
-
-          const cleanTA = tA.toLowerCase().trim();
-          const cleanTB = tB.toLowerCase().trim();
-
-          for (const item of items) {
-            const text = item.textContent?.trim() || '';
-            if (!text) continue;
-
-            const timeEl = item.querySelector('[class*="t-ev-tm"]');
-            const timeText = timeEl?.textContent?.trim() || '';
-
-            const timeMatch = timeText.match(/^(\d+)(?:\+(\d+))?'?/);
-            if (!timeMatch) continue;
-
-            const minuto = Number.parseInt(timeMatch[1], 10);
-            const acrescimos = timeMatch[2]
-              ? Number.parseInt(timeMatch[2], 10)
-              : undefined;
-
-            const infoEl = item.querySelector(
-              '[class*="t-ev-info"], [class*="info"]',
-            );
-            if (!infoEl) continue;
-
-            const infoText = infoEl.textContent?.trim() || '';
-            const infoTextLower = infoText.toLowerCase();
-
-            const playerEl = infoEl.querySelector(
-              '.lr-imso-evt-text-title, [class*="evt-text-title"]',
-            );
-            let jogador = '';
-            if (playerEl) {
-              jogador = playerEl.textContent?.trim() || '';
-            } else {
-              jogador = infoEl.firstElementChild?.textContent?.trim() || '';
-            }
-
-            const fullItemTextLower = text.toLowerCase();
-            let timeNome: string | undefined;
-            if (fullItemTextLower.includes(cleanTA)) {
-              timeNome = tA;
-            } else if (fullItemTextLower.includes(cleanTB)) {
-              timeNome = tB;
-            }
-
-            let tipo: string | null = null;
-            let finalInfo = '';
-
-            if (
-              infoTextLower.includes('gol') ||
-              infoTextLower.includes('⚽') ||
-              infoTextLower.includes('penalidade')
-            ) {
-              tipo = 'GOL';
-              if (
-                infoTextLower.includes('pênalti') ||
-                infoTextLower.includes('penal')
-              ) {
-                finalInfo = 'Pênalti';
+          for (let si = 0; si < sides.length; si++) {
+            const selectorSuffix = sides[si].suffix;
+            const teamName = sides[si].team;
+            const allTgs = document.querySelectorAll('[class*="imso_gs__tgs"]');
+            let container: Element | null = null;
+            for (let i = 0; i < allTgs.length; i++) {
+              if (allTgs[i].className.indexOf(selectorSuffix) >= 0) {
+                container = allTgs[i];
+                break;
               }
-            } else if (
-              infoTextLower.includes('cartão amarelo') ||
-              infoTextLower.includes('🟨')
-            ) {
-              tipo = 'CARTAO_AMARELO';
-            } else if (
-              infoTextLower.includes('cartão vermelho') ||
-              infoTextLower.includes('🟥')
-            ) {
-              tipo = 'CARTAO_VERMELHO';
-            } else if (
-              infoTextLower.includes('substituição') ||
-              infoTextLower.includes('saída') ||
-              infoTextLower.includes('entrada') ||
-              infoTextLower.includes('sai') ||
-              infoTextLower.includes('entra') ||
-              infoTextLower.includes('substituído') ||
-              infoTextLower.includes('🔃')
-            ) {
-              tipo = 'SUBSTITUICAO';
-              finalInfo = infoText;
             }
+            if (!container) continue;
 
-            if (tipo) {
-              results.push({
-                tipo,
-                jogador,
-                minuto,
-                acrescimos,
-                info: finalInfo || undefined,
-                timeNome,
-              });
+            const rows = container.querySelectorAll('[class*="imso_gs__gs-r"]');
+            for (let ri = 0; ri < rows.length; ri++) {
+              const row = rows[ri];
+              const fullText = row.textContent ? row.textContent.trim() : '';
+              if (!fullText) continue;
+
+              let jogador = '';
+              const directChildren = row.children;
+              if (directChildren.length > 0) {
+                const firstText = directChildren[0].textContent
+                  ? directChildren[0].textContent.trim()
+                  : '';
+                if (firstText && firstText.search(/\d/) === -1) {
+                  jogador = firstText;
+                }
+              }
+              if (!jogador) {
+                const idx = fullText.search(/\d/);
+                if (idx > 0) jogador = fullText.slice(0, idx).trim();
+              }
+              if (!jogador) continue;
+
+              const minuteEls = row.querySelectorAll(
+                '[class*="imso_gs__g-a-t"]',
+              );
+              if (minuteEls.length > 0) {
+                for (let mi = 0; mi < minuteEls.length; mi++) {
+                  const t = minuteEls[mi].textContent
+                    ? minuteEls[mi].textContent?.trim().replace(/[',\s]/g, '')
+                    : '';
+                  const m = t.match(/^(\d+)(\+(\d+))?/);
+                  if (!m) continue;
+                  const minuto = Number.parseInt(m[1], 10);
+                  const acrescimos = m[3]
+                    ? Number.parseInt(m[3], 10)
+                    : undefined;
+                  if (!Number.isNaN(minuto)) {
+                    results.push({
+                      tipo: 'GOL',
+                      jogador,
+                      minuto,
+                      acrescimos,
+                      timeNome: teamName,
+                    });
+                  }
+                }
+              } else {
+                const re = /(\d+)(\+(\d+))?'/g;
+                let m = re.exec(fullText);
+                while (m) {
+                  const minuto = Number.parseInt(m[1], 10);
+                  const acrescimos = m[3]
+                    ? Number.parseInt(m[3], 10)
+                    : undefined;
+                  if (!Number.isNaN(minuto)) {
+                    results.push({
+                      tipo: 'GOL',
+                      jogador,
+                      minuto,
+                      acrescimos,
+                      timeNome: teamName,
+                    });
+                  }
+                  m = re.exec(fullText);
+                }
+              }
             }
           }
 
+          results.sort(
+            (a, b) =>
+              a.minuto + (a.acrescimos || 0) - (b.minuto + (b.acrescimos || 0)),
+          );
           return results;
         },
         { tA: timeA, tB: timeB },
       );
 
-      return eventos as IScrapeEvent[];
-    } catch {
+      return raw.map((e) => ({
+        tipo: e.tipo as IScrapeEvent['tipo'],
+        jogador: e.jogador,
+        minuto: e.minuto,
+        acrescimos: e.acrescimos,
+        timeNome: e.timeNome,
+      }));
+    } catch (err) {
+      console.warn(
+        '[PlaywrightEngine] Goals extraction failed:',
+        (err as Error).message,
+      );
       return [];
     }
+  }
+
+  // ─── Full events from Ogol ────────────────────────────────────────────
+  private async scrapeOgolEvents(
+    page: Page,
+    timeA: string,
+    timeB: string,
+  ): Promise<IScrapeEvent[]> {
+    // Navigate to ogol search to find the match
+    const searchUrl = this.getOgolSearchUrl(timeA, timeB);
+    await page.goto(searchUrl, {
+      waitUntil: 'domcontentloaded',
+      timeout: 30_000,
+    });
+    await page.waitForTimeout(1_500);
+
+    // Find the match link
+    const matchUrl = await page.evaluate(
+      (args: { tA: string; tB: string }) => {
+        const tA = args.tA.toLowerCase();
+        const tB = args.tB.toLowerCase();
+        const allEls = Array.from(document.querySelectorAll('*'));
+        for (const el of allEls) {
+          const txt = (el.textContent || '').trim().toLowerCase();
+          if (txt.includes(tA) && txt.includes(tB) && txt.length < 250) {
+            const link =
+              el.querySelector('a') || (el.tagName === 'A' ? el : null);
+            if (link) {
+              const href = (link as HTMLAnchorElement).href;
+              if (href.includes('jogo') || href.includes('ao-vivo'))
+                return href;
+            }
+          }
+        }
+        return null;
+      },
+      { tA: timeA, tB: timeB },
+    );
+
+    if (!matchUrl) {
+      console.warn('[PlaywrightEngine] Ogol: match page not found');
+      return [];
+    }
+
+    console.log(`[PlaywrightEngine] Ogol match URL: ${matchUrl}`);
+    await page.goto(matchUrl, {
+      waitUntil: 'domcontentloaded',
+      timeout: 30_000,
+    });
+    await page.waitForTimeout(2_000);
+
+    // Extract full text and parse events
+    const pageText = await page.evaluate(() => document.body.innerText);
+
+    return this.parseOgolEvents(pageText, timeA, timeB);
+  }
+
+  /**
+   * Parses ogol's plain text timeline to extract structured events.
+   * Lines follow patterns like:
+   *   "81'\nArgélia: Adil Boulbina(entra) - Ibrahim Maza(sai)"
+   *   "35'\nArgélia: Youcef Atal recebeu cartão amarelo"
+   *   "17'\n1-0"  (goal marker - we skip, handled by Google)
+   */
+  private parseOgolEvents(
+    text: string,
+    timeA: string,
+    timeB: string,
+  ): IScrapeEvent[] {
+    const events: IScrapeEvent[] = [];
+    const lines = text
+      .split('\n')
+      .map((l) => l.trim())
+      .filter(Boolean);
+
+    const minuteRe = /^(\d{1,3})'(\+(\d+))?$/;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const minMatch = line.match(minuteRe);
+      if (!minMatch) continue;
+
+      const minuto = Number.parseInt(minMatch[1], 10);
+      const acrescimos = minMatch[3]
+        ? Number.parseInt(minMatch[3], 10)
+        : undefined;
+      const nextLine = lines[i + 1] || '';
+
+      // Skip score lines (e.g. "1-0", "2-0", "3-0")
+      if (/^\d+-\d+$/.test(nextLine)) continue;
+
+      // Detect substitution: "Time: Player(entra) - Player(sai)"
+      const subMatch = nextLine.match(
+        /^(.+?):\s*(.+?)\(entra\)\s*-\s*(.+?)\(sai\)/,
+      );
+      if (subMatch) {
+        const teamRaw = subMatch[1].trim();
+        const playerIn = subMatch[2].trim();
+        const playerOut = subMatch[3].trim();
+        let timeNome: string | undefined;
+        if (teamRaw.toLowerCase().includes(timeA.toLowerCase())) {
+          timeNome = timeA;
+        } else if (teamRaw.toLowerCase().includes(timeB.toLowerCase())) {
+          timeNome = timeB;
+        }
+
+        events.push({
+          tipo: 'SUBSTITUICAO',
+          jogador: playerIn,
+          minuto,
+          acrescimos,
+          info: `Entra: ${playerIn} | Sai: ${playerOut}`,
+          timeNome,
+        });
+        continue;
+      }
+
+      // Detect yellow card
+      if (
+        nextLine.toLowerCase().includes('cartão amarelo') ||
+        nextLine.toLowerCase().includes('cartao amarelo')
+      ) {
+        const cardMatch = nextLine.match(/^(.+?):\s*(.+?)\s+recebeu/i);
+        if (cardMatch) {
+          const teamRaw = cardMatch[1].trim();
+          const player = cardMatch[2].trim();
+          let timeNome: string | undefined;
+          if (teamRaw.toLowerCase().includes(timeA.toLowerCase())) {
+            timeNome = timeA;
+          } else if (teamRaw.toLowerCase().includes(timeB.toLowerCase())) {
+            timeNome = timeB;
+          }
+          events.push({
+            tipo: 'CARTAO_AMARELO',
+            jogador: player,
+            minuto,
+            acrescimos,
+            timeNome,
+          });
+        }
+        continue;
+      }
+
+      // Detect red card
+      if (
+        nextLine.toLowerCase().includes('cartão vermelho') ||
+        nextLine.toLowerCase().includes('cartao vermelho')
+      ) {
+        const cardMatch = nextLine.match(/^(.+?):\s*(.+?)\s+recebeu/i);
+        if (cardMatch) {
+          const teamRaw = cardMatch[1].trim();
+          const player = cardMatch[2].trim();
+          let timeNome: string | undefined;
+          if (teamRaw.toLowerCase().includes(timeA.toLowerCase())) {
+            timeNome = timeA;
+          } else if (teamRaw.toLowerCase().includes(timeB.toLowerCase())) {
+            timeNome = timeB;
+          }
+          events.push({
+            tipo: 'CARTAO_VERMELHO',
+            jogador: player,
+            minuto,
+            acrescimos,
+            timeNome,
+          });
+        }
+      }
+    }
+
+    return events;
+  }
+
+  /**
+   * Merges Google goals with Ogol non-goal events.
+   * Google goals are authoritative (correct minute/player).
+   * Ogol provides substitutions and cards.
+   */
+  private mergeEvents(
+    goals: IScrapeEvent[],
+    ogolEvents: IScrapeEvent[],
+  ): IScrapeEvent[] {
+    // Take all goals from Google, all non-goals from Ogol
+    const nonGoals = ogolEvents.filter((e) => e.tipo !== 'GOL');
+    const merged = [...goals, ...nonGoals];
+    merged.sort(
+      (a, b) =>
+        a.minuto + (a.acrescimos || 0) - (b.minuto + (b.acrescimos || 0)),
+    );
+    return merged;
   }
 }
