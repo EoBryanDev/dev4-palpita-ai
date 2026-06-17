@@ -1,5 +1,11 @@
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
-dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+dotenv.config({ path: join(__dirname, '../../../.env') });
 
 import { PlaywrightEngine } from './engines/playwright-engine.js';
 import { syncOnce } from './services/sync.service.js';

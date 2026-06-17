@@ -48,6 +48,7 @@ export class PlaywrightEngine implements IScraperEngine {
           }
           return false;
         });
+        console.log(`[PlaywrightEngine] Expand clicked: ${expanded}`);
         if (expanded) {
           await page.waitForTimeout(3000);
         }
@@ -60,6 +61,7 @@ export class PlaywrightEngine implements IScraperEngine {
 
       const golsA = await this.extractScore(page, 'l');
       const golsB = await this.extractScore(page, 'r');
+      console.log(`[PlaywrightEngine] Score extracted: A=${golsA}, B=${golsB}`);
 
       if (golsA === null || golsB === null) {
         await browser.close();
@@ -177,7 +179,7 @@ export class PlaywrightEngine implements IScraperEngine {
         }
         if (!exists) {
           const tabs = Array.from(
-            document.querySelectorAll('div[role="tab"], span, a, button'),
+            document.querySelectorAll('div[role="tab"], span, a, button, .imso-ln, [class*="imso-ln"]'),
           );
           for (const el of tabs) {
             const txt = el.textContent?.trim() || '';
@@ -190,6 +192,7 @@ export class PlaywrightEngine implements IScraperEngine {
         return false;
       });
 
+      console.log(`[PlaywrightEngine] Tab clicked: ${tabClicked}`);
       if (tabClicked) {
         await page.waitForTimeout(2000);
       }
@@ -218,11 +221,16 @@ export class PlaywrightEngine implements IScraperEngine {
             if (container) break;
           }
 
-          if (!container) return [];
+          if (!container) {
+            console.log("[PlaywrightEngine DOM] Container not found");
+            return [];
+          }
 
-          const items = container.querySelectorAll(
+           const items = container.querySelectorAll(
             '[class*="imso_gs__t-ev"], [class*="gs__t-ev"], [class*="event-item"], [class*="evt"]',
           );
+
+          console.log(`[PlaywrightEngine DOM] Timeline items found: ${items.length}`);
 
           if (items.length === 0) return [];
 
