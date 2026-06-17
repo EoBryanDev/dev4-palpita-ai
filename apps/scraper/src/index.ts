@@ -13,18 +13,32 @@ async function main() {
   const mode = process.argv[2] ?? 'run';
   const engine = new PlaywrightEngine();
 
+  let intervalMinutes =
+    Number.parseInt(process.env.SCRAPER_INTERVAL_MINUTES ?? '5', 10) || 5;
+  const intervalIndex = process.argv.findIndex(
+    (arg) => arg === '--interval' || arg === '-i',
+  );
+  if (intervalIndex !== -1 && process.argv[intervalIndex + 1]) {
+    const val = Number.parseInt(process.argv[intervalIndex + 1], 10);
+    if (!Number.isNaN(val) && val > 0) {
+      intervalMinutes = val;
+    }
+  }
+
+  const watchIntervalMs = intervalMinutes * 60 * 1000;
+
   if (mode === 'watch') {
     console.log(
       JSON.stringify({
         timestamp: new Date().toISOString(),
         tipo: 'watch_start',
-        interval: WATCH_INTERVAL_MS,
+        interval: watchIntervalMs,
       }),
     );
 
     const { default: cron } = await import('node-cron');
 
-    cron.schedule(`*/${WATCH_INTERVAL_MS / 60000} * * * *`, async () => {
+    cron.schedule(`*/${intervalMinutes} * * * *`, async () => {
       await syncOnce(engine);
     });
 
