@@ -56,24 +56,19 @@ export async function syncOnce(engine: IScraperEngine): Promise<void> {
       const oldScore = `${partida.golsTimeA ?? '?'}x${partida.golsTimeB ?? '?'}`;
       const newScore = `${parsed.golsTimeA}x${parsed.golsTimeB}`;
 
-      if (
-        partida.golsTimeA === parsed.golsTimeA &&
-        partida.golsTimeB === parsed.golsTimeB &&
-        partida.status === parsed.status
-      ) {
-        log('sync_no_change', {
-          matchId: partida.id,
-          score: oldScore,
-        });
-        continue;
-      }
+      const scoreOrStatusChanged =
+        partida.golsTimeA !== parsed.golsTimeA ||
+        partida.golsTimeB !== parsed.golsTimeB ||
+        partida.status !== parsed.status;
 
-      await atualizarResultado(
-        partida.id,
-        parsed.golsTimeA,
-        parsed.golsTimeB,
-        parsed.status,
-      );
+      if (scoreOrStatusChanged) {
+        await atualizarResultado(
+          partida.id,
+          parsed.golsTimeA,
+          parsed.golsTimeB,
+          parsed.status,
+        );
+      }
 
       let eventosInseridos = 0;
       if (resultado.eventos && resultado.eventos.length > 0) {
@@ -85,15 +80,22 @@ export async function syncOnce(engine: IScraperEngine): Promise<void> {
         );
       }
 
-      log('sync_updated', {
-        matchId: partida.id,
-        timeA: partida.timeANome,
-        timeB: partida.timeBNome,
-        oldScore,
-        newScore,
-        newStatus: parsed.status,
-        eventosInseridos,
-      });
+      if (scoreOrStatusChanged || eventosInseridos > 0) {
+        log('sync_updated', {
+          matchId: partida.id,
+          timeA: partida.timeANome,
+          timeB: partida.timeBNome,
+          oldScore,
+          newScore,
+          newStatus: parsed.status,
+          eventosInseridos,
+        });
+      } else {
+        log('sync_no_change', {
+          matchId: partida.id,
+          score: oldScore,
+        });
+      }
     } catch (error) {
       if (error instanceof ZodError) {
         log('sync_error', {
