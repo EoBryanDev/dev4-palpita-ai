@@ -107,21 +107,24 @@ export async function calcularRankingGeral(): Promise<IRankedUser[]> {
     };
   });
 
-  // 5. Ordenar por pontos (desc) e nome (asc)
+  // 5. Ordenar: pontos (desc), palpitesCerteiros (desc), jogosPontuados (desc), nome (asc)
   rankingData.sort((a, b) => {
-    if (b.pontos !== a.pontos) {
-      return b.pontos - a.pontos;
-    }
+    if (b.pontos !== a.pontos) return b.pontos - a.pontos;
+    if (b.palpitesCerteiros !== a.palpitesCerteiros)
+      return b.palpitesCerteiros - a.palpitesCerteiros;
+    if (b.jogosPontuados !== a.jogosPontuados)
+      return b.jogosPontuados - a.jogosPontuados;
     return a.nome.localeCompare(b.nome);
   });
 
   // 6. Atribuir posições considerando empates
   let rankGrupo = 1;
-  let lastPoints = -1;
+  let lastKey = '';
   const rankedUsers = rankingData.map((user, index) => {
-    if (user.pontos !== lastPoints) {
+    const key = `${user.pontos}-${user.palpitesCerteiros}-${user.jogosPontuados}`;
+    if (key !== lastKey) {
       rankGrupo = index + 1;
-      lastPoints = user.pontos;
+      lastKey = key;
     }
     return {
       ...user,
