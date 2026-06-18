@@ -1,3 +1,10 @@
+## [1.5.2](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.5.1...v1.5.2) (2026-06-18)
+
+
+### Bug Fixes
+
+* **ci:** also push :latest tag to DockerHub on scraper deploy EOB-164 ([0f5ca80](https://github.com/EoBryanDev/dev4-palpita-ai/commit/0f5ca800270284df0ba05c1f4b45f9db96d835c7))
+
 ## [1.5.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.5.0...v1.5.1) (2026-06-17)
 
 
