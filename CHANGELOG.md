@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.5.2...v1.6.0) (2026-06-18)
+
+
+### Features
+
+* **ranking:** ordenar por pontos, acertos exatos e jogos pontuados ([85866ad](https://github.com/EoBryanDev/dev4-palpita-ai/commit/85866adc59a5bae630c95a19e67533a23b20a4da))
+
 ## [1.5.2](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.5.1...v1.5.2) (2026-06-18)
 
 
