@@ -327,7 +327,7 @@ export class PlaywrightEngine implements IScraperEngine {
     await page.waitForTimeout(1_500);
 
     // Find the match link
-    const matchUrl = await page.evaluate(
+    let matchUrl = await page.evaluate(
       (args: { tA: string; tB: string }) => {
         const tA = args.tA.toLowerCase();
         const tB = args.tB.toLowerCase();
@@ -348,6 +348,47 @@ export class PlaywrightEngine implements IScraperEngine {
       },
       { tA: timeA, tB: timeB },
     );
+
+    if (!matchUrl) {
+      console.warn(
+        '[PlaywrightEngine] Ogol search failed, trying Google fallback',
+      );
+      const googleQ = `${timeA} ${timeB} ogol`;
+      try {
+        await page.goto(
+          `https://www.google.com/search?q=${encodeURIComponent(googleQ)}&hl=pt-BR`,
+          { waitUntil: 'domcontentloaded', timeout: 30_000 },
+        );
+        await page.waitForTimeout(2_000);
+
+        matchUrl = await page.evaluate(
+          (args: { tA: string; tB: string }) => {
+            const links = Array.from(document.querySelectorAll('a'));
+            for (const link of links) {
+              const href = link.href;
+              if (
+                href.includes('ogol.com.br') &&
+                (href.includes('ao-vivo') || href.includes('jogo'))
+              ) {
+                const txt = (link.textContent || '').toLowerCase();
+                if (
+                  txt.includes(args.tA.toLowerCase()) ||
+                  txt.includes(args.tB.toLowerCase())
+                )
+                  return href;
+              }
+            }
+            return null;
+          },
+          { tA: timeA, tB: timeB },
+        );
+      } catch (err) {
+        console.warn(
+          '[PlaywrightEngine] Google fallback failed:',
+          (err as Error).message,
+        );
+      }
+    }
 
     if (!matchUrl) {
       console.warn('[PlaywrightEngine] Ogol: match page not found');
@@ -432,10 +473,12 @@ export class PlaywrightEngine implements IScraperEngine {
         nextLine.toLowerCase().includes('cartão amarelo') ||
         nextLine.toLowerCase().includes('cartao amarelo')
       ) {
-        const cardMatch = nextLine.match(/^(.+?):\s*(.+?)\s+recebeu/i);
+        const cardMatch = nextLine.match(
+          /^Cart[ãa]o\s+\S+\s+para\s+(.+?)\s*\((.+?)\)/i,
+        );
         if (cardMatch) {
-          const teamRaw = cardMatch[1].trim();
-          const player = cardMatch[2].trim();
+          const player = cardMatch[1].trim();
+          const teamRaw = cardMatch[2].trim();
           let timeNome: string | undefined;
           if (teamRaw.toLowerCase().includes(timeA.toLowerCase())) {
             timeNome = timeA;
@@ -458,10 +501,12 @@ export class PlaywrightEngine implements IScraperEngine {
         nextLine.toLowerCase().includes('cartão vermelho') ||
         nextLine.toLowerCase().includes('cartao vermelho')
       ) {
-        const cardMatch = nextLine.match(/^(.+?):\s*(.+?)\s+recebeu/i);
+        const cardMatch = nextLine.match(
+          /^Cart[ãa]o\s+\S+\s+para\s+(.+?)\s*\((.+?)\)/i,
+        );
         if (cardMatch) {
-          const teamRaw = cardMatch[1].trim();
-          const player = cardMatch[2].trim();
+          const player = cardMatch[1].trim();
+          const teamRaw = cardMatch[2].trim();
           let timeNome: string | undefined;
           if (teamRaw.toLowerCase().includes(timeA.toLowerCase())) {
             timeNome = timeA;
