@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.6.0...v1.6.1) (2026-06-18)
+
+
+### Bug Fixes
+
+* **scraper:** corrigindo regex de cartoes e adicionando fallback google para busca ogol ([4223e8f](https://github.com/EoBryanDev/dev4-palpita-ai/commit/4223e8f41dca9518c5fac61b3369d18e923d5a32))
+
 # [1.6.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.5.2...v1.6.0) (2026-06-18)
 
 
