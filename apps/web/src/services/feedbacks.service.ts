@@ -12,6 +12,8 @@ export interface IFeedbackListaItem {
   usuarioVotou: boolean;
   usuarioId: string;
   usuarioNome: string;
+  respostaAdmin?: string | null;
+  linkAdmin?: string | null;
 }
 
 export async function listarFeedbacks(
@@ -37,6 +39,8 @@ export async function listarFeedbacks(
       usuarioId: feedbacks.usuarioId,
       usuarioNome: sql<string>`(SELECT nome FROM usuarios WHERE id = ${feedbacks.usuarioId})`,
       totalVotos: sql<number>`COALESCE(${votosSubquery.total}, 0)`,
+      respostaAdmin: feedbacks.respostaAdmin,
+      linkAdmin: feedbacks.linkAdmin,
     })
     .from(feedbacks)
     .leftJoin(votosSubquery, eq(feedbacks.id, votosSubquery.feedbackId))

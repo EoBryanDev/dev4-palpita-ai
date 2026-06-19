@@ -60,6 +60,63 @@ describe('FeedbackCard', () => {
     expect(screen.getByText('Concluído')).toBeDefined();
   });
 
+  it('deve exibir o rótulo de Rejeitado quando status for rejeitado', () => {
+    render(
+      <FeedbackCard
+        id="1"
+        titulo="Bug crítico"
+        descricao="Descrição"
+        tipo="bug"
+        status="rejeitado"
+        totalVotos={0}
+        usuarioVotou={false}
+        usuarioNome="Maria"
+      />,
+    );
+
+    expect(screen.getByText('Rejeitado')).toBeDefined();
+  });
+
+  it('deve renderizar a resposta do admin se presente', () => {
+    render(
+      <FeedbackCard
+        id="1"
+        titulo="Ideia"
+        descricao="Descrição"
+        tipo="sugestao"
+        status="rejeitado"
+        totalVotos={0}
+        usuarioVotou={false}
+        usuarioNome="João"
+        respostaAdmin="Inviável no momento"
+      />,
+    );
+
+    expect(screen.getByText('Razão da Rejeição:')).toBeDefined();
+    expect(screen.getByText('Inviável no momento')).toBeDefined();
+  });
+
+  it('deve renderizar o link da implementação se presente', () => {
+    render(
+      <FeedbackCard
+        id="1"
+        titulo="Ideia"
+        descricao="Descrição"
+        tipo="sugestao"
+        status="concluido"
+        totalVotos={0}
+        usuarioVotou={false}
+        usuarioNome="João"
+        linkAdmin="https://github.com/my-pr"
+      />,
+    );
+
+    expect(screen.getByText('Link da implementação:')).toBeDefined();
+    const linkElement = screen.getByText('https://github.com/my-pr');
+    expect(linkElement).toBeDefined();
+    expect(linkElement.getAttribute('href')).toBe('https://github.com/my-pr');
+  });
+
   it('deve desabilitar o botão de voto se usuário não estiver logado', () => {
     render(
       <FeedbackCard

@@ -16,6 +16,8 @@ interface FeedbackCardProps {
   usuarioVotou: boolean;
   usuarioNome: string;
   usuarioLogado?: boolean;
+  respostaAdmin?: string | null;
+  linkAdmin?: string | null;
 }
 
 const statusLabels: Record<string, { label: string; color: string }> = {
@@ -37,6 +39,10 @@ const statusLabels: Record<string, { label: string; color: string }> = {
     color:
       'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400',
   },
+  rejeitado: {
+    label: 'Rejeitado',
+    color: 'bg-red-100 text-red-600 dark:bg-red-900/50 dark:text-red-400',
+  },
 };
 
 const tipoIcon = {
@@ -54,6 +60,8 @@ export function FeedbackCard({
   usuarioVotou,
   usuarioNome,
   usuarioLogado,
+  respostaAdmin,
+  linkAdmin,
 }: FeedbackCardProps) {
   const [votou, setVotou] = useOptimistic(usuarioVotou);
   const [votos, setVotos] = useOptimistic(totalVotos);
@@ -136,6 +144,36 @@ export function FeedbackCard({
           <p className="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400 line-clamp-2">
             {descricao}
           </p>
+          {respostaAdmin && (
+            <div
+              className={cn(
+                'mt-3 rounded-xl border p-3 text-xs leading-relaxed',
+                status === 'rejeitado'
+                  ? 'border-red-100 bg-red-50/50 text-red-800 dark:border-red-950/30 dark:bg-red-950/20 dark:text-red-300'
+                  : 'border-zinc-100 bg-zinc-50 text-zinc-800 dark:border-zinc-800/30 dark:bg-zinc-950/20 dark:text-zinc-300',
+              )}
+            >
+              <span className="font-bold block mb-1">
+                {status === 'rejeitado'
+                  ? 'Razão da Rejeição:'
+                  : 'Resposta do Admin:'}
+              </span>
+              <p>{respostaAdmin}</p>
+            </div>
+          )}
+          {linkAdmin && (
+            <div className="mt-3 text-xs flex flex-wrap items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+              <span className="font-bold">Link da implementação:</span>
+              <a
+                href={linkAdmin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-emerald-500 font-medium break-all"
+              >
+                {linkAdmin}
+              </a>
+            </div>
+          )}
           <p className="mt-2 text-[11px] text-zinc-400 dark:text-zinc-500">
             por {usuarioNome}
           </p>

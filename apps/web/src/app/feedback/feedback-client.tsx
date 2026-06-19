@@ -17,6 +17,8 @@ interface FeedbackItem {
   usuarioVotou: boolean;
   usuarioId: string;
   usuarioNome: string;
+  respostaAdmin?: string | null;
+  linkAdmin?: string | null;
 }
 
 interface FeedbackPageClientProps {

@@ -235,6 +235,40 @@ describe('Ações de Feedback (feedback.ts)', () => {
       expect(res.error).toContain('Status inválido');
     });
 
+    it('deve retornar erro se o status for rejeitado e não houver razão de rejeição', async () => {
+      (obterSessao as Mock).mockResolvedValueOnce({
+        id: 'user-id',
+        cargo: 'ADMIN',
+      });
+
+      const res = await atualizarStatusFeedback('feedback-id', 'rejeitado');
+
+      expect(res.success).toBe(false);
+      expect(res.error).toContain('razão da rejeição');
+    });
+
+    it('deve atualizar status para rejeitado com sucesso se houver razão', async () => {
+      (obterSessao as Mock).mockResolvedValueOnce({
+        id: 'user-id',
+        cargo: 'ADMIN',
+      });
+
+      const mockUpdate = db.update as Mock;
+      mockUpdate.mockImplementationOnce(() => ({
+        set: vi.fn(() => ({
+          where: vi.fn(() => Promise.resolve()),
+        })),
+      }));
+
+      const res = await atualizarStatusFeedback(
+        'feedback-id',
+        'rejeitado',
+        'Já possuímos esta funcionalidade planejada',
+      );
+
+      expect(res.success).toBe(true);
+    });
+
     it('deve atualizar status com sucesso', async () => {
       (obterSessao as Mock).mockResolvedValueOnce({
         id: 'user-id',
@@ -249,6 +283,29 @@ describe('Ações de Feedback (feedback.ts)', () => {
       }));
 
       const res = await atualizarStatusFeedback('feedback-id', 'concluido');
+
+      expect(res.success).toBe(true);
+    });
+
+    it('deve atualizar status para concluído com link e comentário com sucesso', async () => {
+      (obterSessao as Mock).mockResolvedValueOnce({
+        id: 'user-id',
+        cargo: 'ADMIN',
+      });
+
+      const mockUpdate = db.update as Mock;
+      mockUpdate.mockImplementationOnce(() => ({
+        set: vi.fn(() => ({
+          where: vi.fn(() => Promise.resolve()),
+        })),
+      }));
+
+      const res = await atualizarStatusFeedback(
+        'feedback-id',
+        'concluido',
+        'Funcionalidade entregue',
+        'https://github.com/pull/1',
+      );
 
       expect(res.success).toBe(true);
     });
