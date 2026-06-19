@@ -426,7 +426,7 @@ export class PlaywrightEngine implements IScraperEngine {
       .map((l) => l.trim())
       .filter(Boolean);
 
-    const minuteRe = /^(\d{1,3})'(\+(\d+))?$/;
+    const minuteRe = /^(\d{1,3})(\+(\d+))?'$/;
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -450,10 +450,15 @@ export class PlaywrightEngine implements IScraperEngine {
         const teamRaw = subMatch[1].trim();
         const playerIn = subMatch[2].trim();
         const playerOut = subMatch[3].trim();
+        
+        const normA = this.normalizeName(timeA);
+        const normB = this.normalizeName(timeB);
+        const normTeam = this.normalizeName(teamRaw);
+        
         let timeNome: string | undefined;
-        if (teamRaw.toLowerCase().includes(timeA.toLowerCase())) {
+        if (normTeam.includes(normA) || normA.includes(normTeam)) {
           timeNome = timeA;
-        } else if (teamRaw.toLowerCase().includes(timeB.toLowerCase())) {
+        } else if (normTeam.includes(normB) || normB.includes(normTeam)) {
           timeNome = timeB;
         }
 
@@ -468,25 +473,62 @@ export class PlaywrightEngine implements IScraperEngine {
         continue;
       }
 
-      // Detect yellow card
-      if (
+      // Detect card type (yellow / red)
+      const hasYellow =
         nextLine.toLowerCase().includes('cartão amarelo') ||
-        nextLine.toLowerCase().includes('cartao amarelo')
-      ) {
-        const cardMatch = nextLine.match(
+        nextLine.toLowerCase().includes('cartao amarelo');
+      const hasRed =
+        nextLine.toLowerCase().includes('cartão vermelho') ||
+        nextLine.toLowerCase().includes('cartao vermelho');
+
+      if (hasYellow || hasRed) {
+        const tipo = hasYellow ? 'CARTAO_AMARELO' : 'CARTAO_VERMELHO';
+        let player: string | undefined;
+        let teamRaw: string | undefined;
+
+        // Try Format 1: "Cartão amarelo para Player (Team)"
+        let cardMatch = nextLine.match(
           /^Cart[ãa]o\s+\S+\s+para\s+(.+?)\s*\((.+?)\)/i,
         );
+
         if (cardMatch) {
-          const player = cardMatch[1].trim();
-          const teamRaw = cardMatch[2].trim();
-          let timeNome: string | undefined;
-          if (teamRaw.toLowerCase().includes(timeA.toLowerCase())) {
-            timeNome = timeA;
-          } else if (teamRaw.toLowerCase().includes(timeB.toLowerCase())) {
-            timeNome = timeB;
+          player = cardMatch[1].trim();
+          teamRaw = cardMatch[2].trim();
+        } else {
+          // Try Format 2: "Team: Player recebeu cartão amarelo"
+          cardMatch = nextLine.match(
+            /^(.+?):\s*(.+?)\s+recebeu\s+cart[ãa]o\s+(?:amarelo|vermelho)/i,
+          );
+          if (cardMatch) {
+            teamRaw = cardMatch[1].trim();
+            player = cardMatch[2].trim();
+          } else {
+            // Try Format 3: "Player recebeu cartão amarelo" (without team prefix)
+            cardMatch = nextLine.match(
+              /^(.+?)\s+recebeu\s+cart[ãa]o\s+(?:amarelo|vermelho)/i,
+            );
+            if (cardMatch) {
+              player = cardMatch[1].trim();
+            }
           }
+        }
+
+        if (player) {
+          const normA = this.normalizeName(timeA);
+          const normB = this.normalizeName(timeB);
+          let timeNome: string | undefined;
+
+          if (teamRaw) {
+            const normTeam = this.normalizeName(teamRaw);
+            if (normTeam.includes(normA) || normA.includes(normTeam)) {
+              timeNome = timeA;
+            } else if (normTeam.includes(normB) || normB.includes(normTeam)) {
+              timeNome = timeB;
+            }
+          }
+
           events.push({
-            tipo: 'CARTAO_AMARELO',
+            tipo,
             jogador: player,
             minuto,
             acrescimos,
@@ -495,36 +537,17 @@ export class PlaywrightEngine implements IScraperEngine {
         }
         continue;
       }
-
-      // Detect red card
-      if (
-        nextLine.toLowerCase().includes('cartão vermelho') ||
-        nextLine.toLowerCase().includes('cartao vermelho')
-      ) {
-        const cardMatch = nextLine.match(
-          /^Cart[ãa]o\s+\S+\s+para\s+(.+?)\s*\((.+?)\)/i,
-        );
-        if (cardMatch) {
-          const player = cardMatch[1].trim();
-          const teamRaw = cardMatch[2].trim();
-          let timeNome: string | undefined;
-          if (teamRaw.toLowerCase().includes(timeA.toLowerCase())) {
-            timeNome = timeA;
-          } else if (teamRaw.toLowerCase().includes(timeB.toLowerCase())) {
-            timeNome = timeB;
-          }
-          events.push({
-            tipo: 'CARTAO_VERMELHO',
-            jogador: player,
-            minuto,
-            acrescimos,
-            timeNome,
-          });
-        }
-      }
     }
 
     return events;
+  }
+
+  private normalizeName(name: string): string {
+    return name
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
   }
 
   /**
