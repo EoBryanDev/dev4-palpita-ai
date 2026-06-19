@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.10.0...v1.11.0) (2026-06-19)
+
+
+### Features
+
+* **web:** render top World Cup champions card for logged-in users EOB-185 ([1ca9f2d](https://github.com/EoBryanDev/dev4-palpita-ai/commit/1ca9f2d27b1be11c87d083dd434b7de9c7df80dc))
+
 # [1.10.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.9.0...v1.10.0) (2026-06-19)
 
 
