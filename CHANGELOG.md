@@ -1,3 +1,12 @@
+# [1.7.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.6.1...v1.7.0) (2026-06-19)
+
+
+### Features
+
+* **api:** calculate partial points, enable timeline sorting and allow admin corrections ([a43b047](https://github.com/EoBryanDev/dev4-palpita-ai/commit/a43b047082ba89fe60df70dc96b54aba11de68cf))
+* **openspec:** add proposal, design and specs for pontuacoes-parciais-revisao ([752217c](https://github.com/EoBryanDev/dev4-palpita-ai/commit/752217c783b1cf9fec29b994b91c9317047145ac))
+* **ui:** display partial score badges, remove calculating status and add review flow for admin ([0a522e9](https://github.com/EoBryanDev/dev4-palpita-ai/commit/0a522e9b3c1222376e575ab592a1f57053da93b6))
+
 ## [1.6.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.6.0...v1.6.1) (2026-06-18)
 
 
