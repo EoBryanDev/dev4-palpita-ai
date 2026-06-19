@@ -150,6 +150,15 @@ export default async function HomePage({
 
       {/* Main Content */}
       <div className="mx-auto w-full max-w-7xl flex-1 p-6 px-6 space-y-12">
+        {/* Banner da Copa (Imagem solo) */}
+        <div className="relative w-full overflow-hidden rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-xs">
+          <img
+            src="/hq720.jpg"
+            alt="Copa do Mundo 2026"
+            className="w-full h-auto select-none"
+          />
+        </div>
+
         {/* Seção Hero */}
         <section className="relative overflow-hidden rounded-3xl border border-zinc-200 bg-linear-to-br from-emerald-500/10 via-transparent to-transparent p-8 dark:border-zinc-800 md:p-12">
           {/* Elementos Decorativos da Copa 2026 flutuando de forma sutil no fundo */}
