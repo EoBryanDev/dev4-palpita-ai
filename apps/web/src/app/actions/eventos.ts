@@ -178,17 +178,22 @@ export async function obterEventosTimeline(): Promise<{
       rodadaId: item.rodadaId,
       rodadaNome: item.rodadaNome,
       comentariosCount: Number(item.comentariosCount),
-      eventosJogo: (eventsByMatch.get(item.id) || []).map((e) => ({
-        id: e.id,
-        tipo: e.tipo,
-        timeId: e.timeId,
-        timeNome: e.timeNome,
-        timeEmoji: e.timeEmoji,
-        jogador: e.jogador,
-        minuto: e.minuto,
-        acrescimos: e.acrescimos,
-        info: e.info,
-      })),
+      eventosJogo: (eventsByMatch.get(item.id) || [])
+        .map((e) => ({
+          id: e.id,
+          tipo: e.tipo,
+          timeId: e.timeId,
+          timeNome: e.timeNome,
+          timeEmoji: e.timeEmoji,
+          jogador: e.jogador,
+          minuto: e.minuto,
+          acrescimos: e.acrescimos,
+          info: e.info,
+        }))
+        .sort(
+          (a, b) =>
+            a.minuto - b.minuto || (a.acrescimos ?? 0) - (b.acrescimos ?? 0),
+        ),
     }));
 
     return { success: true, eventos };
@@ -471,6 +476,7 @@ export async function obterPontuadoresPartida(partidaId: string): Promise<{
   timeB?: string;
   golsA?: number | null;
   golsB?: number | null;
+  isParcial?: boolean;
   message?: string;
 }> {
   const session = await obterSessao();
@@ -511,23 +517,8 @@ export async function obterPontuadoresPartida(partidaId: string): Promise<{
 
     const match = matchResult[0];
 
-    // Se o jogo ainda não foi finalizado/não tem resultado, não há pontuação calculada
-    if (
-      match.golsTimeA === null ||
-      match.golsTimeB === null ||
-      (match.status !== 'FINALIZADO' && match.status !== 'FINALIZADA')
-    ) {
-      return {
-        success: true,
-        pontuadores: [],
-        timeA: match.timeANome,
-        timeB: match.timeBNome,
-        golsA: match.golsTimeA,
-        golsB: match.golsTimeB,
-        message:
-          'A pontuação será exibida quando o jogo for finalizado pelo administrador.',
-      };
-    }
+    const isParcial =
+      match.status !== 'FINALIZADO' && match.status !== 'FINALIZADA';
 
     // Buscar todos os palpites para esta partida, trazendo o nome do usuário
     const listPalpites = await db
@@ -540,8 +531,8 @@ export async function obterPontuadoresPartida(partidaId: string): Promise<{
       .innerJoin(usuarios, eq(palpites.usuarioId, usuarios.id))
       .where(eq(palpites.partidaId, partidaId));
 
-    const golsRealA = match.golsTimeA;
-    const golsRealB = match.golsTimeB;
+    const golsRealA = match.golsTimeA ?? 0;
+    const golsRealB = match.golsTimeB ?? 0;
 
     const pontuadores: IPontuadorPartida[] = listPalpites.map((p) => {
       const palpiteEntity = new Palpite({
@@ -578,6 +569,7 @@ export async function obterPontuadoresPartida(partidaId: string): Promise<{
       timeB: match.timeBNome,
       golsA: match.golsTimeA,
       golsB: match.golsTimeB,
+      isParcial,
     };
   } catch (error) {
     console.error('Erro ao obter pontuadores da partida:', error);

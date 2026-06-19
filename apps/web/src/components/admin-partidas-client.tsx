@@ -62,6 +62,25 @@ export function AdminPartidasClient({
     Record<string, { golsA: string; golsB: string }>
   >({});
 
+  const [editingPartidas, setEditingPartidas] = useState<
+    Record<string, boolean>
+  >({});
+
+  const handleRevisarPartida = (partida: IPartidaAdmin) => {
+    setEditingPartidas((prev) => ({ ...prev, [partida.id]: true }));
+    setPlacares((prev) => ({
+      ...prev,
+      [partida.id]: {
+        golsA: String(partida.golsTimeA ?? ''),
+        golsB: String(partida.golsTimeB ?? ''),
+      },
+    }));
+  };
+
+  const handleCancelarRevisao = (partidaId: string) => {
+    setEditingPartidas((prev) => ({ ...prev, [partidaId]: false }));
+  };
+
   // Estado de paginação por rodada (6 partidas visíveis por padrão)
   const PARTIDAS_POR_PAGINA = 6;
   const [visibleLimits, setVisibleLimits] = useState<Record<string, number>>(
@@ -170,6 +189,7 @@ export function AdminPartidasClient({
         title: 'Resultado Lançado!',
         description: res.message,
       });
+      setEditingPartidas((prev) => ({ ...prev, [partidaId]: false }));
       router.refresh();
     } catch (error) {
       const err = error as { message?: string };
@@ -489,7 +509,8 @@ export function AdminPartidasClient({
 
                                     {/* Area Placar */}
                                     <div className="flex items-center gap-2 shrink-0">
-                                      {isFinalizado ? (
+                                      {isFinalizado &&
+                                      !editingPartidas[partida.id] ? (
                                         <div className="flex items-center gap-1.5 px-3 py-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl font-black text-sm">
                                           <span>{partida.golsTimeA}</span>
                                           <span className="text-zinc-400 text-xs">
@@ -512,7 +533,9 @@ export function AdminPartidasClient({
                                               )
                                             }
                                             disabled={
-                                              isPending || isJogoNoFuturo
+                                              isPending ||
+                                              (isJogoNoFuturo &&
+                                                !editingPartidas[partida.id])
                                             }
                                             className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
                                           />
@@ -532,7 +555,9 @@ export function AdminPartidasClient({
                                               )
                                             }
                                             disabled={
-                                              isPending || isJogoNoFuturo
+                                              isPending ||
+                                              (isJogoNoFuturo &&
+                                                !editingPartidas[partida.id])
                                             }
                                             className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
                                           />
@@ -552,27 +577,58 @@ export function AdminPartidasClient({
                                     </div>
                                   </div>
 
-                                  {/* Ação Finalizar */}
-                                  {!isFinalizado && (
+                                  {/* Ação Finalizar / Revisar */}
+                                  {!isFinalizado ||
+                                  editingPartidas[partida.id] ? (
                                     <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
-                                      {isJogoNoFuturo ? (
+                                      {isJogoNoFuturo &&
+                                      !editingPartidas[partida.id] ? (
                                         <span className="text-[10px] text-zinc-400 dark:text-zinc-500 flex items-center gap-1">
                                           <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
                                           Não iniciado
                                         </span>
+                                      ) : isFinalizado ? (
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          onClick={() =>
+                                            handleCancelarRevisao(partida.id)
+                                          }
+                                          className="text-xs text-zinc-500 hover:text-zinc-700 h-8 rounded-xl"
+                                        >
+                                          Cancelar
+                                        </Button>
                                       ) : (
                                         <span />
                                       )}
                                       <Button
                                         size="sm"
-                                        disabled={isPending || isJogoNoFuturo}
+                                        disabled={
+                                          isPending ||
+                                          (isJogoNoFuturo &&
+                                            !editingPartidas[partida.id])
+                                        }
                                         onClick={() =>
                                           handleLancarResultado(partida.id)
                                         }
                                         className="bg-zinc-900 hover:bg-zinc-800 text-white font-semibold text-xs px-3 h-8 rounded-xl flex items-center gap-1 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                       >
                                         <CheckCircle className="h-3.5 w-3.5" />
-                                        Finalizar Jogo
+                                        {isFinalizado
+                                          ? 'Salvar Correção'
+                                          : 'Finalizar Jogo'}
+                                      </Button>
+                                    </div>
+                                  ) : (
+                                    <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 flex justify-end">
+                                      <Button
+                                        size="sm"
+                                        onClick={() =>
+                                          handleRevisarPartida(partida)
+                                        }
+                                        className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold text-xs px-3.5 h-8 rounded-xl flex items-center gap-1.5 transition-all border border-zinc-200 dark:border-zinc-700"
+                                      >
+                                        Revisar
                                       </Button>
                                     </div>
                                   )}

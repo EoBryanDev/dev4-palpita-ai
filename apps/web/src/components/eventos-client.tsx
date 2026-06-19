@@ -55,6 +55,7 @@ export function EventosClient() {
     golsA: number | null;
     golsB: number | null;
     rodadaNome: string;
+    isParcial?: boolean;
   } | null>(null);
   const [pontuadoresPartida, setPontuadoresPartida] = useState<
     IPontuadorPartida[]
@@ -97,6 +98,8 @@ export function EventosClient() {
       golsA: partida.golsTimeA,
       golsB: partida.golsTimeB,
       rodadaNome: partida.rodadaNome,
+      isParcial:
+        partida.status !== 'FINALIZADO' && partida.status !== 'FINALIZADA',
     });
     setLoadingPontuadoresPartida(true);
     setPontuadoresPartida([]);
@@ -106,6 +109,11 @@ export function EventosClient() {
       const res = await obterPontuadoresPartida(partida.id);
       if (res.success) {
         setPontuadoresPartida(res.pontuadores);
+        if (res.isParcial !== undefined) {
+          setSelectedMatchScorers((prev) =>
+            prev ? { ...prev, isParcial: res.isParcial } : null,
+          );
+        }
         if (res.message) {
           setMensagemPontuadoresPartida(res.message);
         }
@@ -229,14 +237,6 @@ export function EventosClient() {
       return {
         label: 'Agendado',
         styles: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-      };
-    }
-
-    if (diffMinutes >= 115) {
-      return {
-        label: 'Calculando Encerramento',
-        styles:
-          'bg-purple-500/10 text-purple-500 dark:text-purple-400 animate-pulse',
       };
     }
 
@@ -607,9 +607,18 @@ export function EventosClient() {
             {/* Header Modal */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
               <div>
-                <h4 className="font-black text-sm tracking-tight flex items-center gap-1.5">
+                <h4 className="font-black text-sm tracking-tight flex items-center gap-2">
                   <Trophy className="h-4.5 w-4.5 text-amber-500" />
                   Pontuadores do Jogo
+                  {selectedMatchScorers.isParcial ? (
+                    <span className="text-[9px] uppercase font-black tracking-wider px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 animate-pulse shrink-0">
+                      Placar Parcial
+                    </span>
+                  ) : (
+                    <span className="text-[9px] uppercase font-black tracking-wider px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0">
+                      Resultado Final
+                    </span>
+                  )}
                 </h4>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 select-none">
                   {selectedMatchScorers.timeA}{' '}
@@ -656,12 +665,19 @@ export function EventosClient() {
                   {pontuadoresPartida.map((pt, idx) => {
                     let badgeColor =
                       'bg-zinc-100 text-zinc-650 dark:bg-zinc-800 dark:text-zinc-400';
-                    if (pt.pontos === 2) {
-                      badgeColor =
-                        'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400';
-                    } else if (pt.pontos === 1) {
-                      badgeColor =
-                        'bg-blue-500/10 text-blue-600 dark:text-blue-400';
+                    if (selectedMatchScorers.isParcial) {
+                      if (pt.pontos > 0) {
+                        badgeColor =
+                          'bg-amber-500/10 text-amber-600 dark:text-amber-400';
+                      }
+                    } else {
+                      if (pt.pontos === 2) {
+                        badgeColor =
+                          'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400';
+                      } else if (pt.pontos === 1) {
+                        badgeColor =
+                          'bg-blue-500/10 text-blue-600 dark:text-blue-400';
+                      }
                     }
 
                     return (
@@ -681,6 +697,7 @@ export function EventosClient() {
                           className={`font-black text-[10px] px-2 py-0.5 rounded-lg shrink-0 ${badgeColor}`}
                         >
                           {pt.pontos > 0 ? `+${pt.pontos} PTS` : '0 PTS'}
+                          {selectedMatchScorers.isParcial && ' (parcial)'}
                         </span>
                       </div>
                     );
