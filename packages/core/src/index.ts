@@ -55,3 +55,8 @@ export {
   type AuditoriaEvento,
   type AuditoriaDados,
 } from './services/auditoria-service';
+
+export type {
+  TFeedbackStatus,
+  TFeedbackTipo,
+} from './domain/feedback.entity';

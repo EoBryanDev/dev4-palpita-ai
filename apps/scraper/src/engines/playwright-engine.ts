@@ -535,7 +535,6 @@ export class PlaywrightEngine implements IScraperEngine {
             timeNome,
           });
         }
-        continue;
       }
     }
 
@@ -543,11 +542,14 @@ export class PlaywrightEngine implements IScraperEngine {
   }
 
   private normalizeName(name: string): string {
-    return name
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .trim();
+    return (
+      name
+        .normalize('NFD')
+        // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics removal range
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim()
+    );
   }
 
   /**

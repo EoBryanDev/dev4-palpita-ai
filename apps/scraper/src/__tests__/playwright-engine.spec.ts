@@ -4,6 +4,7 @@ import { PlaywrightEngine } from '../engines/playwright-engine.js';
 describe('PlaywrightEngine parseOgolEvents', () => {
   const engine = new PlaywrightEngine();
   const parseEvents = (text: string, timeA: string, timeB: string) => {
+    // biome-ignore lint/suspicious/noExplicitAny: accessing private method for testing
     return (engine as any).parseOgolEvents(text, timeA, timeB);
   };
 
