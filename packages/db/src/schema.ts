@@ -123,7 +123,41 @@ export const eventosPartida = pgTable('eventos_partida', {
   dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
 });
 
-// 8. Tabela de Comentários
+// 9. Tabela de Feedbacks (Palpita a Feature)
+export const feedbacks = pgTable('feedbacks', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  usuarioId: uuid('usuario_id')
+    .notNull()
+    .references(() => usuarios.id, { onDelete: 'cascade' }),
+  titulo: varchar('titulo', { length: 200 }).notNull(),
+  descricao: varchar('descricao', { length: 2000 }).notNull(),
+  tipo: varchar('tipo', { length: 20 }).notNull(),
+  status: varchar('status', { length: 20 }).default('pendente').notNull(),
+  dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
+});
+
+// 10. Tabela de Votos em Feedbacks
+export const feedbacksVotos = pgTable(
+  'feedbacks_votos',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    feedbackId: uuid('feedback_id')
+      .notNull()
+      .references(() => feedbacks.id, { onDelete: 'cascade' }),
+    usuarioId: uuid('usuario_id')
+      .notNull()
+      .references(() => usuarios.id, { onDelete: 'cascade' }),
+    dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
+  },
+  (table) => ({
+    usuarioVotoUnique: uniqueIndex('feedback_voto_unique').on(
+      table.feedbackId,
+      table.usuarioId,
+    ),
+  }),
+);
+
+// 11. Tabela de Comentários
 export const comentarios = pgTable('comentarios', {
   id: uuid('id').primaryKey().defaultRandom(),
   partidaId: uuid('partida_id')
