@@ -1,3 +1,17 @@
+# [1.8.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.7.0...v1.8.0) (2026-06-19)
+
+
+### Bug Fixes
+
+* **scraper:** support live match commentary formats for card events EOB-183 ([961294b](https://github.com/EoBryanDev/dev4-palpita-ai/commit/961294b1a57deaa5f9b019de10158a859669f963))
+
+
+### Features
+
+* **api:** add feedback service and server actions with rate limit ([a3c240c](https://github.com/EoBryanDev/dev4-palpita-ai/commit/a3c240c588fd12689e512faadf25840ead332a97))
+* **db:** add feedbacks and feedbacks_votos tables with domain types ([c3276db](https://github.com/EoBryanDev/dev4-palpita-ai/commit/c3276dbaadfba2e419a31859ad3c08385c661ff9))
+* **ui:** add feedback components, pages, and navigation ([35c72c1](https://github.com/EoBryanDev/dev4-palpita-ai/commit/35c72c155305b480c66e3233c21a45b95be703a4))
+
 # [1.7.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.6.1...v1.7.0) (2026-06-19)
 
 
