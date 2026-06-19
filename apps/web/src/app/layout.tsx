@@ -9,6 +9,7 @@ import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 
 import { obterSessao } from '@/app/actions/auth';
+import { FeedbackButton } from '@/components/feedback/feedback-button';
 import { Toaster } from '@/components/ui/toaster';
 
 const roboto = Roboto({
@@ -76,6 +77,7 @@ export default async function RootLayout({
             <Header initialSession={session} />
             <main className="flex-1 flex flex-col">{children}</main>
             <Footer />
+            <FeedbackButton />
             <ScrollToTop />
             <Toaster />
           </QueryProvider>
