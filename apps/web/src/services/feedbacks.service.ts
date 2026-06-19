@@ -20,7 +20,7 @@ export async function listarFeedbacks(
   const votosSubquery = db
     .select({
       feedbackId: feedbacksVotos.feedbackId,
-      total: count(feedbacksVotos.id),
+      total: count(feedbacksVotos.id).as('total'),
     })
     .from(feedbacksVotos)
     .groupBy(feedbacksVotos.feedbackId)
