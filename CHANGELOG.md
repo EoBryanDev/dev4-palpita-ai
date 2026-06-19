@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.9.0...v1.10.0) (2026-06-19)
+
+
+### Features
+
+* **web:** add admin feedbacks moderation links to navigation and dashboard EOB-184 ([164c497](https://github.com/EoBryanDev/dev4-palpita-ai/commit/164c49727c60f4cfe1db39f4f11c780d7eb4795c))
+
 # [1.9.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.8.1...v1.9.0) (2026-06-19)
 
 
