@@ -14,4 +14,4 @@
 
 - [x] 3.1 Executar typecheck com `pnpm --filter @palpita/web exec tsc --noEmit`
 - [x] 3.2 Executar formatação e lint com `pnpm biome check --write`
-- [ ] 3.3 Validar que o projeto compila com sucesso rodando `pnpm build`
+- [x] 3.3 Validar que o projeto compila com sucesso rodando `pnpm build`
