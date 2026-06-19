@@ -450,11 +450,11 @@ export class PlaywrightEngine implements IScraperEngine {
         const teamRaw = subMatch[1].trim();
         const playerIn = subMatch[2].trim();
         const playerOut = subMatch[3].trim();
-        
+
         const normA = this.normalizeName(timeA);
         const normB = this.normalizeName(timeB);
         const normTeam = this.normalizeName(teamRaw);
-        
+
         let timeNome: string | undefined;
         if (normTeam.includes(normA) || normA.includes(normTeam)) {
           timeNome = timeA;
