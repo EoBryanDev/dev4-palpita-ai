@@ -455,16 +455,19 @@ describe('Ações Administrativas (admin.ts)', () => {
       expect(res.message).toContain('Partida não encontrada');
     });
 
-    it('deve retornar erro se a partida já estiver finalizada', async () => {
+    it('deve permitir atualizar partida mesmo se já estiver finalizada (revisão de placar)', async () => {
       (obterSessao as Mock).mockResolvedValueOnce({ cargo: 'ADMIN' });
+      const umaHoraNoPassado = new Date(Date.now() - 60 * 60 * 1000);
       txMock.query.partidas.findFirst.mockResolvedValueOnce({
         id: 'partida-id',
         status: 'FINALIZADO',
+        dataInicio: umaHoraNoPassado,
       });
 
       const res = await lancarResultadoOficial('partida-id', 2, 1);
-      expect(res.success).toBe(false);
-      expect(res.message).toContain('já foi finalizada');
+      expect(res.success).toBe(true);
+      expect(res.message).toContain('lançado e partida finalizada');
+      expect(txMock.update).toHaveBeenCalled();
     });
 
     it('deve retornar erro se a partida ainda não começou (data de início no futuro)', async () => {
