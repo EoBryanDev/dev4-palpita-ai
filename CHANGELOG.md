@@ -1,3 +1,11 @@
+## [1.8.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.8.0...v1.8.1) (2026-06-19)
+
+
+### Bug Fixes
+
+* **api:** alias count field in feedbacks subquery EOB-183 ([f32191f](https://github.com/EoBryanDev/dev4-palpita-ai/commit/f32191f9edf6ef30d76ab3fe20cf60c7929338d6))
+* **db:** add feedback and voting tables migration EOB-183 ([4e2db64](https://github.com/EoBryanDev/dev4-palpita-ai/commit/4e2db6467bbd60d0d840864e6ceba4591372a7b0))
+
 # [1.8.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.7.0...v1.8.0) (2026-06-19)
 
 
