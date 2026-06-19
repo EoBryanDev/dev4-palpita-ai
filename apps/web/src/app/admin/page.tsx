@@ -214,6 +214,19 @@ export default async function AdminDashboardPage() {
                 </div>
                 <ArrowRight className="h-5 w-5 text-zinc-400 group-hover:text-emerald-500 transition-colors" />
               </Link>
+
+              <Link
+                href="/admin/feedbacks"
+                className="flex items-center justify-between p-4 rounded-2xl border border-zinc-100 hover:border-emerald-500/30 bg-zinc-50 hover:bg-emerald-50/20 dark:border-zinc-800 dark:hover:border-emerald-500/20 dark:bg-zinc-900/50 dark:hover:bg-zinc-900/80 transition-all group"
+              >
+                <div>
+                  <h4 className="text-sm font-bold">Gerenciar Feedbacks</h4>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                    Modere sugestões e bugs da comunidade
+                  </p>
+                </div>
+                <ArrowRight className="h-5 w-5 text-zinc-400 group-hover:text-emerald-500 transition-colors" />
+              </Link>
             </div>
           </div>
         </div>

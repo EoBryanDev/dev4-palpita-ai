@@ -43,6 +43,7 @@ export function Header({
       links.push({ href: '/admin', label: 'Painel Admin' });
       links.push({ href: '/admin/usuarios', label: 'Usuários' });
       links.push({ href: '/admin/partidas', label: 'Partidas' });
+      links.push({ href: '/admin/feedbacks', label: 'Feedbacks' });
     } else {
       links.push({ href: '/palpites', label: 'Palpites' });
       links.push({ href: '/eventos', label: 'Eventos' });
