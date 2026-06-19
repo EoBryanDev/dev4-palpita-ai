@@ -3,4 +3,5 @@ export type TFeedbackStatus =
   | 'pendente'
   | 'revisando'
   | 'planejado'
-  | 'concluido';
+  | 'concluido'
+  | 'rejeitado';

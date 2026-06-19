@@ -91,6 +91,8 @@ export async function votarFeedback(feedbackId: string) {
 export async function atualizarStatusFeedback(
   feedbackId: string,
   status: string,
+  respostaAdmin?: string | null,
+  linkAdmin?: string | null,
 ) {
   const session = await obterSessao();
   if (!session || session.cargo !== 'ADMIN') {
@@ -100,14 +102,31 @@ export async function atualizarStatusFeedback(
     };
   }
 
-  const statusValidos = ['pendente', 'revisando', 'planejado', 'concluido'];
+  const statusValidos = [
+    'pendente',
+    'revisando',
+    'planejado',
+    'concluido',
+    'rejeitado',
+  ];
   if (!statusValidos.includes(status)) {
     return { success: false, error: 'Status inválido.' };
   }
 
+  if (status === 'rejeitado' && (!respostaAdmin || !respostaAdmin.trim())) {
+    return {
+      success: false,
+      error: 'Por favor, informe a razão da rejeição.',
+    };
+  }
+
   await db
     .update(feedbacks)
-    .set({ status })
+    .set({
+      status,
+      respostaAdmin: respostaAdmin?.trim() || null,
+      linkAdmin: linkAdmin?.trim() || null,
+    })
     .where(eq(feedbacks.id, feedbackId));
 
   revalidatePath('/feedback');

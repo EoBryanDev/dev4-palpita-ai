@@ -133,6 +133,8 @@ export const feedbacks = pgTable('feedbacks', {
   descricao: varchar('descricao', { length: 2000 }).notNull(),
   tipo: varchar('tipo', { length: 20 }).notNull(),
   status: varchar('status', { length: 20 }).default('pendente').notNull(),
+  respostaAdmin: varchar('resposta_admin', { length: 2000 }),
+  linkAdmin: varchar('link_admin', { length: 255 }),
   dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
 });
 
