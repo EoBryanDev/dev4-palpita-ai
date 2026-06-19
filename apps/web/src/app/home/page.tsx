@@ -1,3 +1,4 @@
+import { obterSessao } from '@/app/actions/auth';
 import { SolicitarConviteForm } from '@/components/form/solicitar-convite-form';
 import { Button } from '@/components/ui/button';
 import { FlagImage } from '@/components/ui/flag-image';
@@ -16,7 +17,6 @@ import {
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
-import { obterSessao } from '@/app/actions/auth';
 import type React from 'react';
 
 interface IHomePageProps {
@@ -251,17 +251,23 @@ export default async function HomePage({
                 <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-xs dark:border-zinc-800 dark:bg-zinc-900 relative z-10">
                   <div className="flex items-center gap-2 mb-4">
                     <Trophy className="h-5 w-5 text-amber-500 animate-pulse" />
-                    <h2 className="text-lg font-bold">Maiores Campeões da Copa</h2>
+                    <h2 className="text-lg font-bold">
+                      Maiores Campeões da Copa
+                    </h2>
                   </div>
                   <div className="space-y-3">
                     {/* Brasil */}
                     <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800/60">
                       <div className="flex items-center gap-3">
-                        <span className="text-sm font-bold text-zinc-400 w-4">1º</span>
+                        <span className="text-sm font-bold text-zinc-400 w-4">
+                          1º
+                        </span>
                         <span className="text-2xl select-none">🇧🇷</span>
                         <div>
                           <p className="font-bold text-sm">Brasil</p>
-                          <p className="text-xs text-zinc-500 dark:text-zinc-400">1958, 1962, 1970, 1994, 2002</p>
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                            1958, 1962, 1970, 1994, 2002
+                          </p>
                         </div>
                       </div>
                       <span className="text-xs font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2.5 py-1 rounded-full">
@@ -272,11 +278,15 @@ export default async function HomePage({
                     {/* Alemanha */}
                     <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800/60">
                       <div className="flex items-center gap-3">
-                        <span className="text-sm font-bold text-zinc-400 w-4">2º</span>
+                        <span className="text-sm font-bold text-zinc-400 w-4">
+                          2º
+                        </span>
                         <span className="text-2xl select-none">🇩🇪</span>
                         <div>
                           <p className="font-bold text-sm">Alemanha</p>
-                          <p className="text-xs text-zinc-500 dark:text-zinc-400">1954, 1974, 1990, 2014</p>
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                            1954, 1974, 1990, 2014
+                          </p>
                         </div>
                       </div>
                       <span className="text-xs font-bold bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 px-2.5 py-1 rounded-full">
@@ -287,11 +297,15 @@ export default async function HomePage({
                     {/* Itália */}
                     <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800/60">
                       <div className="flex items-center gap-3">
-                        <span className="text-sm font-bold text-zinc-400 w-4">3º</span>
+                        <span className="text-sm font-bold text-zinc-400 w-4">
+                          3º
+                        </span>
                         <span className="text-2xl select-none">🇮🇹</span>
                         <div>
                           <p className="font-bold text-sm">Itália</p>
-                          <p className="text-xs text-zinc-500 dark:text-zinc-400">1934, 1938, 1982, 2006</p>
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                            1934, 1938, 1982, 2006
+                          </p>
                         </div>
                       </div>
                       <span className="text-xs font-bold bg-orange-500/10 text-orange-600 dark:text-orange-400 px-2.5 py-1 rounded-full">
