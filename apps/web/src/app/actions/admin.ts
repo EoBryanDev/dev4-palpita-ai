@@ -521,10 +521,6 @@ export async function lancarResultadoOficial(
         return { success: false, message: 'Partida não encontrada.' };
       }
 
-      if (match.status === 'FINALIZADO') {
-        return { success: false, message: 'Esta partida já foi finalizada.' };
-      }
-
       const partidaEntity = new Partida({
         id: match.id,
         rodadaId: match.rodadaId,
