@@ -75,7 +75,7 @@ export default async function RootLayout({
         >
           <QueryProvider>
             <TimeoutBanner targetDate={targetDate} />
-            <LiveMarquee />
+            <LiveMarquee initialSession={session} />
             <Header initialSession={session} />
             <main className="flex-1 flex flex-col">{children}</main>
             <Footer />

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
+import type { ISessionUser } from '@/interface/IHeader';
+
 interface ILiveMatch {
   timeA: string;
   timeB: string;
@@ -10,10 +12,16 @@ interface ILiveMatch {
   status: string;
 }
 
-export function LiveMarquee() {
+export function LiveMarquee({
+  initialSession,
+}: {
+  initialSession?: ISessionUser | null;
+}) {
   const [matches, setMatches] = useState<ILiveMatch[]>([]);
 
   useEffect(() => {
+    if (!initialSession) return;
+
     const fetchLive = async () => {
       try {
         const res = await fetch('/api/palpites');
@@ -33,7 +41,7 @@ export function LiveMarquee() {
     fetchLive();
     const interval = setInterval(fetchLive, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [initialSession]);
 
   if (matches.length === 0) return null;
 
