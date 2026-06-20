@@ -1,3 +1,10 @@
+## [1.14.2](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.14.1...v1.14.2) (2026-06-20)
+
+
+### Bug Fixes
+
+* **web:** identidade visual do card ao vivo com eventos de gol na marquee ([e268594](https://github.com/EoBryanDev/dev4-palpita-ai/commit/e268594827d06e9d6bdb1bbd01ed1060e173f5e1))
+
 ## [1.14.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.14.0...v1.14.1) (2026-06-20)
 
 
