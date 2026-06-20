@@ -7,138 +7,78 @@ import React, { useState } from 'react';
 
 import type { IBracketMatch, IChavesClientProps } from '@/interface/IChaves';
 
-const BRACKET_MOCK = {
-  oitavas: [
-    {
-      id: 'Jogo 89 (O1)',
-      timeA: 'Vencedor J74',
-      emojiA: '⚽',
-      timeB: 'Vencedor J77',
-      emojiB: '⚽',
-      data: '04/Jul - 13:00',
-    },
-    {
-      id: 'Jogo 90 (O2)',
-      timeA: 'Vencedor J73',
-      emojiA: '⚽',
-      timeB: 'Vencedor J75',
-      emojiB: '⚽',
-      data: '04/Jul - 17:00',
-    },
-    {
-      id: 'Jogo 91 (O3)',
-      timeA: 'Vencedor J76',
-      emojiA: '⚽',
-      timeB: 'Vencedor J78',
-      emojiB: '⚽',
-      data: '05/Jul - 13:00',
-    },
-    {
-      id: 'Jogo 92 (O4)',
-      timeA: 'Vencedor J79',
-      emojiA: '⚽',
-      timeB: 'Vencedor J80',
-      emojiB: '⚽',
-      data: '05/Jul - 17:00',
-    },
-    {
-      id: 'Jogo 93 (O5)',
-      timeA: 'Vencedor J83',
-      emojiA: '⚽',
-      timeB: 'Vencedor J84',
-      emojiB: '⚽',
-      data: '06/Jul - 13:00',
-    },
-    {
-      id: 'Jogo 94 (O6)',
-      timeA: 'Vencedor J81',
-      emojiA: '⚽',
-      timeB: 'Vencedor J82',
-      emojiB: '⚽',
-      data: '06/Jul - 17:00',
-    },
-    {
-      id: 'Jogo 95 (O7)',
-      timeA: 'Vencedor J86',
-      emojiA: '⚽',
-      timeB: 'Vencedor J88',
-      emojiB: '⚽',
-      data: '07/Jul - 13:00',
-    },
-    {
-      id: 'Jogo 96 (O8)',
-      timeA: 'Vencedor J85',
-      emojiA: '⚽',
-      timeB: 'Vencedor J87',
-      emojiB: '⚽',
-      data: '07/Jul - 17:00',
-    },
-  ] as IBracketMatch[],
-  quartas: [
-    {
-      id: 'Jogo 97 (Q1)',
-      timeA: 'Vencedor J89',
-      emojiA: '⚽',
-      timeB: 'Vencedor J90',
-      emojiB: '⚽',
-      data: '09/Jul - 13:00',
-    },
-    {
-      id: 'Jogo 98 (Q2)',
-      timeA: 'Vencedor J93',
-      emojiA: '⚽',
-      timeB: 'Vencedor J94',
-      emojiB: '⚽',
-      data: '10/Jul - 17:00',
-    },
-    {
-      id: 'Jogo 99 (Q3)',
-      timeA: 'Vencedor J91',
-      emojiA: '⚽',
-      timeB: 'Vencedor J92',
-      emojiB: '⚽',
-      data: '11/Jul - 13:00',
-    },
-    {
-      id: 'Jogo 100 (Q4)',
-      timeA: 'Vencedor J95',
-      emojiA: '⚽',
-      timeB: 'Vencedor J96',
-      emojiB: '⚽',
-      data: '12/Jul - 17:00',
-    },
-  ] as IBracketMatch[],
-  semis: [
-    {
-      id: 'Jogo 101 (S1)',
-      timeA: 'Vencedor Q1',
-      emojiA: '⚽',
-      timeB: 'Vencedor Q2',
-      emojiB: '⚽',
-      data: '14/Jul - 16:00',
-    },
-    {
-      id: 'Jogo 102 (S2)',
-      timeA: 'Vencedor Q3',
-      emojiA: '⚽',
-      timeB: 'Vencedor Q4',
-      emojiB: '⚽',
-      data: '15/Jul - 16:00',
-    },
-  ] as IBracketMatch[],
-  final: [
-    {
-      id: 'Jogo 104 (F1)',
-      timeA: 'Vencedor S1',
-      emojiA: '🏆',
-      timeB: 'Vencedor S2',
-      emojiB: '🏆',
-      data: '19/Jul - 16:00',
-    },
-  ] as IBracketMatch[],
-};
+function BracketMatchCard({
+  match,
+  isFinal = false,
+}: { match: IBracketMatch; isFinal?: boolean }) {
+  const isWinnerA = match.vencedor === 'A';
+  const isWinnerB = match.vencedor === 'B';
 
-export default function ChavesClient({ grupos }: IChavesClientProps) {
+  return (
+    <div
+      className={`rounded-xl border bg-white p-3.5 shadow-sm dark:bg-zinc-900 text-xs space-y-2 transition-all hover:shadow-md ${
+        isFinal
+          ? 'border-2 border-amber-500 p-4'
+          : 'border-zinc-200 dark:border-zinc-800'
+      }`}
+    >
+      <div className="flex items-center justify-between">
+        <div
+          className={`flex items-center gap-2 font-medium ${
+            isWinnerA
+              ? 'text-zinc-950 dark:text-zinc-50 font-bold'
+              : match.vencedor
+                ? 'text-zinc-400 dark:text-zinc-500'
+                : 'text-zinc-700 dark:text-zinc-300'
+          }`}
+        >
+          {isFinal ? (
+            <Trophy
+              className={`h-4.5 w-4.5 shrink-0 ${isWinnerA ? 'text-amber-500 fill-amber-500' : 'text-zinc-400'}`}
+            />
+          ) : (
+            <FlagImage
+              emoji={match.emojiA}
+              alt={match.timeA}
+              className="h-5 w-5 shrink-0"
+            />
+          )}
+          <span className="truncate max-w-[110px]">{match.timeA}</span>
+        </div>
+      </div>
+      <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 pt-2">
+        <div
+          className={`flex items-center gap-2 font-medium ${
+            isWinnerB
+              ? 'text-zinc-950 dark:text-zinc-50 font-bold'
+              : match.vencedor
+                ? 'text-zinc-400 dark:text-zinc-500'
+                : 'text-zinc-700 dark:text-zinc-300'
+          }`}
+        >
+          {isFinal ? (
+            <Trophy
+              className={`h-4.5 w-4.5 shrink-0 ${isWinnerB ? 'text-amber-500 fill-amber-500' : 'text-zinc-400'}`}
+            />
+          ) : (
+            <FlagImage
+              emoji={match.emojiB}
+              alt={match.timeB}
+              className="h-5 w-5 shrink-0"
+            />
+          )}
+          <span className="truncate max-w-[110px]">{match.timeB}</span>
+        </div>
+      </div>
+      <div className="text-[9px] text-zinc-400 dark:text-zinc-500 font-medium pt-1 flex justify-between items-center">
+        <span className="font-mono">{match.id}</span>
+        <span>{match.data}</span>
+      </div>
+    </div>
+  );
+}
+
+export default function ChavesClient({ grupos, bracket }: IChavesClientProps) {
   const [activeTab, setActiveTab] = useState<'grupos' | 'mata-mata'>('grupos');
 
   return (
@@ -210,9 +150,18 @@ export default function ChavesClient({ grupos }: IChavesClientProps) {
                         {time.nome}
                       </span>
                     </div>
-                    <span className="font-mono text-zinc-500 text-xs">
-                      {time.pontos} pts
-                    </span>
+                    <div className="flex items-center gap-3 font-mono text-zinc-500 text-xs shrink-0">
+                      <span>{time.pontos} Pts</span>
+                      <span className="text-zinc-300 dark:text-zinc-700">
+                        |
+                      </span>
+                      <span>
+                        {time.saldoGols > 0
+                          ? `+${time.saldoGols}`
+                          : time.saldoGols}{' '}
+                        SG
+                      </span>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -221,113 +170,48 @@ export default function ChavesClient({ grupos }: IChavesClientProps) {
         </div>
       ) : (
         <div className="overflow-x-auto pb-6 scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-800">
-          <div className="flex gap-8 min-w-[1000px] p-4">
+          <div className="flex gap-8 min-w-[1300px] p-4">
+            {/* 16 Avos de Final */}
+            <div className="flex-1 flex flex-col gap-4 justify-center">
+              <h3 className="text-xs uppercase font-extrabold tracking-wider text-zinc-400 mb-2 flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                16 Avos de Final
+              </h3>
+              {bracket.dezesseisAvos.map((match) => (
+                <BracketMatchCard key={match.id} match={match} />
+              ))}
+            </div>
+
             {/* Oitavas */}
-            <div className="flex-1 flex flex-col gap-6 justify-center">
+            <div className="flex-1 flex flex-col gap-10 justify-center">
               <h3 className="text-xs uppercase font-extrabold tracking-wider text-zinc-400 mb-2 flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 Oitavas de Final
               </h3>
-              {BRACKET_MOCK.oitavas.map((match) => (
-                <div
-                  key={match.id}
-                  className="rounded-xl border border-zinc-200 bg-white p-3.5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 text-xs space-y-2"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 font-medium text-zinc-400">
-                      <FlagImage
-                        emoji={match.emojiA}
-                        alt={match.timeA}
-                        className="h-5 w-5 shrink-0"
-                      />
-                      <span>{match.timeA}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 pt-2">
-                    <div className="flex items-center gap-2 font-medium text-zinc-400">
-                      <FlagImage
-                        emoji={match.emojiB}
-                        alt={match.timeB}
-                        className="h-5 w-5 shrink-0"
-                      />
-                      <span>{match.timeB}</span>
-                    </div>
-                  </div>
-                  <div className="text-[9px] text-zinc-400 font-medium pt-1 flex justify-between">
-                    <span>{match.id}</span>
-                    <span>{match.data}</span>
-                  </div>
-                </div>
+              {bracket.oitavas.map((match) => (
+                <BracketMatchCard key={match.id} match={match} />
               ))}
             </div>
 
             {/* Quartas */}
-            <div className="flex-1 flex flex-col gap-12 justify-center">
+            <div className="flex-1 flex flex-col gap-20 justify-center">
               <h3 className="text-xs uppercase font-extrabold tracking-wider text-zinc-400 mb-2 flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 Quartas de Final
               </h3>
-              {BRACKET_MOCK.quartas.map((match) => (
-                <div
-                  key={match.id}
-                  className="rounded-xl border border-zinc-200 bg-white p-3.5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 text-xs space-y-2"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 font-medium text-zinc-400">
-                      <span>{match.emojiA}</span>
-                      <span>{match.timeA}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 pt-2">
-                    <div className="flex items-center gap-2 font-medium text-zinc-400">
-                      <span>{match.emojiB}</span>
-                      <span>{match.timeB}</span>
-                    </div>
-                  </div>
-                  <div className="text-[9px] text-zinc-400 font-medium pt-1 flex justify-between">
-                    <span>{match.id}</span>
-                    <span>{match.data}</span>
-                  </div>
-                </div>
+              {bracket.quartas.map((match) => (
+                <BracketMatchCard key={match.id} match={match} />
               ))}
             </div>
 
             {/* Semis */}
-            <div className="flex-1 flex flex-col gap-24 justify-center">
+            <div className="flex-1 flex flex-col gap-40 justify-center">
               <h3 className="text-xs uppercase font-extrabold tracking-wider text-zinc-400 mb-2 flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 Semifinais
               </h3>
-              {BRACKET_MOCK.semis.map((match) => (
-                <div
-                  key={match.id}
-                  className="rounded-xl border border-zinc-200 bg-white p-3.5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 text-xs space-y-2"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 font-medium text-zinc-400">
-                      <FlagImage
-                        emoji={match.emojiA}
-                        alt={match.timeA}
-                        className="h-5 w-5 shrink-0"
-                      />
-                      <span>{match.timeA}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 pt-2">
-                    <div className="flex items-center gap-2 font-medium text-zinc-400">
-                      <FlagImage
-                        emoji={match.emojiB}
-                        alt={match.timeB}
-                        className="h-5 w-5 shrink-0"
-                      />
-                      <span>{match.timeB}</span>
-                    </div>
-                  </div>
-                  <div className="text-[9px] text-zinc-400 font-medium pt-1 flex justify-between">
-                    <span>{match.id}</span>
-                    <span>{match.data}</span>
-                  </div>
-                </div>
+              {bracket.semis.map((match) => (
+                <BracketMatchCard key={match.id} match={match} />
               ))}
             </div>
 
@@ -337,28 +221,8 @@ export default function ChavesClient({ grupos }: IChavesClientProps) {
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                 Final
               </h3>
-              {BRACKET_MOCK.final.map((match) => (
-                <div
-                  key={match.id}
-                  className="rounded-xl border-2 border-amber-500 bg-white p-4 shadow-md dark:bg-zinc-900 text-xs space-y-3"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 font-bold">
-                      <Trophy className="h-4.5 w-4.5 text-amber-500" />
-                      <span>{match.timeA}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 pt-2">
-                    <div className="flex items-center gap-2 font-bold">
-                      <Trophy className="h-4.5 w-4.5 text-amber-500" />
-                      <span>{match.timeB}</span>
-                    </div>
-                  </div>
-                  <div className="text-[9px] text-zinc-400 font-bold pt-1 flex justify-between">
-                    <span>{match.id}</span>
-                    <span>{match.data}</span>
-                  </div>
-                </div>
+              {bracket.final.map((match) => (
+                <BracketMatchCard key={match.id} match={match} isFinal={true} />
               ))}
             </div>
           </div>
