@@ -16,5 +16,9 @@ export interface IScrapeResult {
 }
 
 export interface IScraperEngine {
-  scrapeMatch(timeA: string, timeB: string): Promise<IScrapeResult | null>;
+  scrapeMatch(
+    timeA: string,
+    timeB: string,
+    date?: Date,
+  ): Promise<IScrapeResult | null>;
 }

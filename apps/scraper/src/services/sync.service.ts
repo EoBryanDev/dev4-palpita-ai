@@ -41,6 +41,7 @@ export async function syncOnce(engine: IScraperEngine): Promise<void> {
       const resultado = await engine.scrapeMatch(
         partida.timeANome,
         partida.timeBNome,
+        partida.dataInicio,
       );
 
       if (!resultado) {
