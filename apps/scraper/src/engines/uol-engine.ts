@@ -66,8 +66,56 @@ export class UolEngine implements IScraperEngine {
         timeout: 20_000,
       });
 
-      // Aguarda um pequeno período para carregamento do widget solar do UOL
-      await page.waitForTimeout(2_000);
+      // Aguarda a hidratação do placar: se houver gols no minuto a minuto, espera até que o placar não seja 0x0
+      try {
+        await page.waitForFunction(
+          () => {
+            const scoreAEl = document.querySelector('.team-one .team-score');
+            const scoreBEl = document.querySelector('.team-two .team-score');
+            if (!scoreAEl || !scoreBEl) return false;
+
+            const scoreAText = scoreAEl.textContent?.trim() || '';
+            const scoreBText = scoreBEl.textContent?.trim() || '';
+            if (scoreAText === '' || scoreBText === '') return false;
+
+            const golsA = Number.parseInt(scoreAText, 10);
+            const golsB = Number.parseInt(scoreBText, 10);
+            if (Number.isNaN(golsA) || Number.isNaN(golsB)) return false;
+
+            // Se o placar já for diferente de 0x0, já está hidratado
+            if (golsA > 0 || golsB > 0) return true;
+
+            // Se o placar for 0x0, verifica se há gols nos cards do minuto a minuto
+            const cards = Array.from(
+              document.querySelectorAll('.solar-card.live-post'),
+            );
+            const hasGoalInTimeline = cards.some((card) => {
+              const txt = card.textContent?.toLowerCase() || '';
+              const heading =
+                card
+                  .querySelector('.solar-card-heading')
+                  ?.textContent?.toLowerCase() || '';
+              return (
+                heading.includes('goool') ||
+                txt.includes('goooooool') ||
+                txt.includes('gol!')
+              );
+            });
+
+            // Se houver gols nos lances mas o placar ainda estiver 0x0, não está hidratado.
+            // Se não houver gols nos lances e o placar for 0x0, consideramos hidratado (ou jogo não iniciado).
+            return !hasGoalInTimeline;
+          },
+          { timeout: 6000 },
+        );
+      } catch {
+        console.warn(
+          `[UolEngine] Timeout ao aguardar hidratação de ${timeA} x ${timeB}, prosseguindo.`,
+        );
+      }
+
+      // Pequena folga para garantir a renderização final de eventos
+      await page.waitForTimeout(500);
 
       // Executa o script de parsing no contexto da página
       const result = await page.evaluate(
