@@ -10,7 +10,7 @@ export const metadata = {
 };
 
 export default async function ChavesPage() {
-  const grupos = await obterGruposClassificados();
+  const { grupos, bracket } = await obterGruposClassificados();
 
-  return <ChavesClient grupos={grupos} />;
+  return <ChavesClient grupos={grupos} bracket={bracket} />;
 }
