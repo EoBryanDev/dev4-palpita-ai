@@ -10,6 +10,7 @@ import { ThemeProvider } from '@/providers/theme-provider';
 
 import { obterSessao } from '@/app/actions/auth';
 import { FeedbackButton } from '@/components/feedback/feedback-button';
+import { LiveMarquee } from '@/components/live-marquee';
 import { Toaster } from '@/components/ui/toaster';
 
 const roboto = Roboto({
@@ -74,6 +75,7 @@ export default async function RootLayout({
         >
           <QueryProvider>
             <TimeoutBanner targetDate={targetDate} />
+            <LiveMarquee />
             <Header initialSession={session} />
             <main className="flex-1 flex flex-col">{children}</main>
             <Footer />
