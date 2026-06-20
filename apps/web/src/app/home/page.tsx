@@ -121,7 +121,7 @@ export default async function HomePage({
   return (
     <>
       {/* Banner de Timeout de Link/Acesso */}
-      {(showTimeoutBanner || true) && (
+      {!session && showTimeoutBanner && (
         <div className="border-b border-amber-200 bg-amber-50 text-amber-900 transition-colors dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200">
           <div className="mx-auto flex max-w-7xl items-center justify-between p-4 px-6">
             <div className="flex items-center gap-3">
