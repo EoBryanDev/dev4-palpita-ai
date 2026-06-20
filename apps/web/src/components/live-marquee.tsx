@@ -51,19 +51,17 @@ export function LiveMarquee({
   const content = items.join(' ● ');
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 text-white text-xs font-bold h-8 flex items-center">
-      <div className="marquee-track whitespace-nowrap will-change-transform">
-        <span className="mx-4">{content}</span>
-        <span className="mx-4">{content}</span>
-      </div>
+    <div className="relative overflow-hidden bg-gradient-to-r from-red-700 via-red-600 to-rose-600 text-white text-xs font-bold h-8 flex items-center">
+      <div className="marquee-content whitespace-nowrap">{content}</div>
       <style>{`
-        .marquee-track {
-          display: inline-flex;
-          animation: marquee-scroll 20s linear infinite;
+        .marquee-content {
+          display: inline-block;
+          padding: 0 2rem;
+          animation: marquee 10s linear infinite;
         }
-        @keyframes marquee-scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
+        @keyframes marquee {
+          0% { transform: translateX(100vw); }
+          100% { transform: translateX(-100%); }
         }
       `}</style>
     </div>
