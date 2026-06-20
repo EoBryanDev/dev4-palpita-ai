@@ -1,3 +1,19 @@
+# [1.13.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.12.0...v1.13.0) (2026-06-20)
+
+
+### Bug Fixes
+
+* corrigir lints (a11y, no-non-null-assertion, exhaustive-deps) ([3ff8d7f](https://github.com/EoBryanDev/dev4-palpita-ai/commit/3ff8d7f1bfed7c8c3ad676ad582fd70447804e20))
+* corrigir lints (a11y, no-non-null-assertion, exhaustive-deps) ([14988e1](https://github.com/EoBryanDev/dev4-palpita-ai/commit/14988e15cbe1c211ec031fbf5a247e0d3128fa24))
+* **web:** ocultar banner de convite para usuarios logados ([6000123](https://github.com/EoBryanDev/dev4-palpita-ai/commit/6000123beaf8cb35f856804339321b2587de6f3d))
+* **web:** passar session ao LiveMarquee para nao buscar dados anonimos ([38735ef](https://github.com/EoBryanDev/dev4-palpita-ai/commit/38735ef4f9d48e86f66e9dab682c1b022434a384))
+
+
+### Features
+
+* **web:** adicionar marquee ao vivo com jogos em andamento ([8c63102](https://github.com/EoBryanDev/dev4-palpita-ai/commit/8c631026a20468b7f907e1da62e0eb545f6ab058))
+* **web:** modal de votos, paginacao 6 e filtro de status nos palpites ([32ac6e9](https://github.com/EoBryanDev/dev4-palpita-ai/commit/32ac6e99ceb3b2f24f3783e51cefad18a65dc2b1))
+
 # [1.12.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.11.0...v1.12.0) (2026-06-20)
 
 
