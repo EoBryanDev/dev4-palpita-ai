@@ -179,6 +179,18 @@ export async function obterGruposClassificados(): Promise<{
 
   // --- CÁLCULO DO CHAVEAMENTO (MATA-MATA) ---
 
+  const isGrupoCompleto = (grupoNome: string) => {
+    const timesNoGrupo = dbTimes.filter((t) => t.grupo === grupoNome).map((t) => t.id);
+    if (timesNoGrupo.length === 0) return false;
+
+    const partidasDoGrupo = dbPartidas.filter(
+      (p) => timesNoGrupo.includes(p.timeAId) && timesNoGrupo.includes(p.timeBId),
+    );
+
+    if (partidasDoGrupo.length === 0) return false;
+    return partidasDoGrupo.every((p) => p.status === 'FINALIZADO');
+  };
+
   const classificados1: Record<string, (typeof dbTimes)[0]> = {};
   const classificados2: Record<string, (typeof dbTimes)[0]> = {};
   const terceiros: {
@@ -194,28 +206,49 @@ export async function obterGruposClassificados(): Promise<{
 
   for (const [grupoNome, grupoData] of gruposMap.entries()) {
     const grupoLetter = grupoNome.replace('Grupo ', '').trim();
-    if (grupoData.times.length >= 1) {
-      const t = timesMap.get(grupoData.times[0].id);
-      if (t) classificados1[grupoLetter] = t;
-    }
-    if (grupoData.times.length >= 2) {
-      const t = timesMap.get(grupoData.times[1].id);
-      if (t) classificados2[grupoLetter] = t;
-    }
-    if (grupoData.times.length >= 3) {
-      const t = timesMap.get(grupoData.times[2].id);
-      if (t) {
-        terceiros.push({
-          id: t.id,
-          nome: t.nome,
-          emoji: t.emoji,
-          grupo: t.grupo,
-          grupoLetter,
-          pontos: grupoData.times[2].pontos,
-          saldoGols: grupoData.times[2].saldoGols,
-          golsPro: grupoData.times[2].golsPro,
-        });
+    const completo = isGrupoCompleto(grupoNome);
+
+    if (completo) {
+      if (grupoData.times.length >= 1) {
+        const t = timesMap.get(grupoData.times[0].id);
+        if (t) classificados1[grupoLetter] = t;
       }
+      if (grupoData.times.length >= 2) {
+        const t = timesMap.get(grupoData.times[1].id);
+        if (t) classificados2[grupoLetter] = t;
+      }
+      if (grupoData.times.length >= 3) {
+        const t = timesMap.get(grupoData.times[2].id);
+        if (t) {
+          terceiros.push({
+            id: t.id,
+            nome: t.nome,
+            emoji: t.emoji,
+            grupo: t.grupo,
+            grupoLetter,
+            pontos: grupoData.times[2].pontos,
+            saldoGols: grupoData.times[2].saldoGols,
+            golsPro: grupoData.times[2].golsPro,
+          });
+        }
+      }
+    } else {
+      classificados1[grupoLetter] = {
+        id: '',
+        nome: `1º Grupo ${grupoLetter}`,
+        emoji: '⚽',
+        confederacao: '',
+        grupo: grupoNome,
+        dataCriacao: new Date(),
+      };
+      classificados2[grupoLetter] = {
+        id: '',
+        nome: `2º Grupo ${grupoLetter}`,
+        emoji: '⚽',
+        confederacao: '',
+        grupo: grupoNome,
+        dataCriacao: new Date(),
+      };
     }
   }
 
@@ -297,22 +330,33 @@ export async function obterGruposClassificados(): Promise<{
     { id: 'J80', allowed: ['E', 'H', 'I', 'J', 'K'] },
   ];
 
+  const todosGruposCompletos = Array.from(gruposMap.keys()).every((g) =>
+    isGrupoCompleto(g),
+  );
+
   const atribuidos = new Set<string>();
-  const terceirosAtribuidos: Record<string, (typeof melhoresTerceiros)[0]> = {};
+  const terceirosAtribuidos: Record<
+    string,
+    { nome: string; emoji: string; id: string }
+  > = {};
 
   for (const slot of slotsTerceiros) {
     const match = melhoresTerceiros.find(
       (t) => slot.allowed.includes(t.grupoLetter) && !atribuidos.has(t.id),
     );
-    if (match) {
-      terceirosAtribuidos[slot.id] = match;
+    if (match && todosGruposCompletos) {
+      terceirosAtribuidos[slot.id] = {
+        id: match.id,
+        nome: match.nome,
+        emoji: match.emoji,
+      };
       atribuidos.add(match.id);
     } else {
-      const fallback = melhoresTerceiros.find((t) => !atribuidos.has(t.id));
-      if (fallback) {
-        terceirosAtribuidos[slot.id] = fallback;
-        atribuidos.add(fallback.id);
-      }
+      terceirosAtribuidos[slot.id] = {
+        id: '',
+        nome: `3º ${slot.allowed.join('/')}`,
+        emoji: '⚽',
+      };
     }
   }
 
@@ -483,7 +527,7 @@ export async function obterGruposClassificados(): Promise<{
 
   const obterTimeVencedorR32 = (matchLabel: string) => {
     const match = r32MatchesList.find((m) => m.id.startsWith(matchLabel));
-    if (!match) return null;
+    if (!match || !match.vencedor) return null;
     const key = match.vencedor === 'A' ? match.timeA : match.timeB;
     const t = timesByName.get(key || '');
     if (!t) return null;
@@ -592,7 +636,7 @@ export async function obterGruposClassificados(): Promise<{
 
   const obterTimeVencedorOitavas = (matchLabel: string) => {
     const match = oitavasList.find((m) => m.id.startsWith(matchLabel));
-    if (!match) return null;
+    if (!match || !match.vencedor) return null;
     const key = match.vencedor === 'A' ? match.timeA : match.timeB;
     const t = timesByName.get(key || '');
     if (!t) return null;
@@ -657,7 +701,7 @@ export async function obterGruposClassificados(): Promise<{
 
   const obterTimeVencedorQuartas = (matchLabel: string) => {
     const match = quartasList.find((m) => m.id.startsWith(matchLabel));
-    if (!match) return null;
+    if (!match || !match.vencedor) return null;
     const key = match.vencedor === 'A' ? match.timeA : match.timeB;
     const t = timesByName.get(key || '');
     if (!t) return null;
@@ -720,7 +764,7 @@ export async function obterGruposClassificados(): Promise<{
 
   const obterTimeVencedorSemis = (matchLabel: string) => {
     const match = semisList.find((m) => m.id.startsWith(matchLabel));
-    if (!match) return null;
+    if (!match || !match.vencedor) return null;
     const key = match.vencedor === 'A' ? match.timeA : match.timeB;
     const t = timesByName.get(key || '');
     if (!t) return null;
