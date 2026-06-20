@@ -1,3 +1,10 @@
+## [1.16.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.16.0...v1.16.1) (2026-06-20)
+
+
+### Bug Fixes
+
+* **web:** reverter filtro de completude do grupo para preenchimento de 16 avos de final ([3e0662e](https://github.com/EoBryanDev/dev4-palpita-ai/commit/3e0662e6821b3d99242da73ce22c543195538001))
+
 # [1.16.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.15.1...v1.16.0) (2026-06-20)
 
 
