@@ -127,4 +127,53 @@ describe('ChavesPage', () => {
     expect(timesGrupoA[2].nome).toBe('Argentina');
     expect(timesGrupoA[2].pontos).toBe(3);
   });
+
+  it('deve retornar o chaveamento contendo a fase de 16 avos de final preenchida', async () => {
+    const { obterGruposClassificados } = await import(
+      '@/services/chaves.service'
+    );
+
+    const mockTimes = [
+      { id: 't-mexico', nome: 'México', emoji: '🇲🇽', grupo: 'Grupo A' },
+      { id: 't-africa', nome: 'África do Sul', emoji: '🇿🇦', grupo: 'Grupo A' },
+      { id: 't-coreia', nome: 'Coreia do Sul', emoji: '🇰🇷', grupo: 'Grupo A' },
+      {
+        id: 't-tcheca',
+        nome: 'República Tcheca',
+        emoji: '🇨🇿',
+        grupo: 'Grupo A',
+      },
+    ];
+
+    const mockPartidas = [
+      {
+        id: 'p1',
+        timeAId: 't-mexico',
+        timeBId: 't-africa',
+        golsTimeA: 2,
+        golsTimeB: 1,
+        status: 'FINALIZADO',
+      },
+    ];
+
+    const mockSelect = db.select as Mock;
+    mockSelect.mockImplementationOnce(() => ({
+      from: vi.fn(() => ({
+        orderBy: vi.fn(() => Promise.resolve(mockTimes)),
+      })),
+    }));
+    mockSelect.mockImplementationOnce(() => ({
+      from: vi.fn(() => ({
+        where: vi.fn(() => Promise.resolve(mockPartidas)),
+      })),
+    }));
+
+    const result = await obterGruposClassificados();
+
+    expect(result).toHaveProperty('grupos');
+    expect(result).toHaveProperty('bracket');
+    expect(result.bracket).toHaveProperty('dezesseisAvos');
+    expect(result.bracket.dezesseisAvos).toHaveLength(16);
+    expect(result.bracket.oitavas).toHaveLength(8);
+  });
 });
