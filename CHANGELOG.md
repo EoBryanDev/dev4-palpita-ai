@@ -1,3 +1,10 @@
+# [1.14.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.13.0...v1.14.0) (2026-06-20)
+
+
+### Features
+
+* **web:** adicionar busca por texto, filtro por status e paginacao na tela de feedback ([17a560a](https://github.com/EoBryanDev/dev4-palpita-ai/commit/17a560a78fd60226833ab0d40926830719cd2a9a))
+
 # [1.13.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.12.0...v1.13.0) (2026-06-20)
 
 
