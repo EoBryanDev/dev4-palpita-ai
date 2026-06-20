@@ -1,3 +1,10 @@
+## [1.15.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.15.0...v1.15.1) (2026-06-20)
+
+
+### Bug Fixes
+
+* **web:** corrigir clausula where na consulta de partidas para evitar erro de tipo uuid ([270e97e](https://github.com/EoBryanDev/dev4-palpita-ai/commit/270e97e631a7970161d83308264b3a3e693e8bbf))
+
 # [1.15.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.14.3...v1.15.0) (2026-06-20)
 
 
