@@ -59,14 +59,14 @@ export function LiveMarquee({
           ? `${g.minuto}'+${g.acrescimos}`
           : `${g.minuto}'`;
         const team = g.timeNome ? ` (${g.timeNome})` : '';
-        return `⚽ ${g.jogador}${team} ${min}`;
+        return `⚽  ${g.jogador}${team}  ${min}`;
       });
-      text += `  ${goalTexts.join('  ')}`;
+      text += `    ${goalTexts.join('    ')}`;
     }
     return text;
   });
 
-  const content = items.join('  ●  ');
+  const content = items.join('    ●    ');
 
   return (
     <div className="border-y border-red-500/20 bg-red-500/5 dark:border-red-500/10 dark:bg-red-950/10 backdrop-blur-sm text-xs font-bold h-9 flex items-center overflow-hidden">
@@ -80,15 +80,15 @@ export function LiveMarquee({
         </span>
       </div>
       <div className="flex-1 overflow-hidden">
-        <div className="marquee-content whitespace-nowrap will-change-transform text-zinc-700 dark:text-zinc-300">
+        <div className="marquee-content whitespace-nowrap will-change-transform text-zinc-700 dark:text-zinc-300 tracking-wide">
           {content}
         </div>
       </div>
       <style>{`
         .marquee-content {
           display: inline-block;
-          padding-left: 2rem;
-          animation: marquee 10s linear infinite;
+          padding-left: 3rem;
+          animation: marquee 25s linear infinite;
         }
         @keyframes marquee {
           0% { transform: translateX(100vw); }
