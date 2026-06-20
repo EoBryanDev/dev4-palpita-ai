@@ -29,8 +29,7 @@ export function LiveMarquee({
         const data = await res.json();
         const live = data.filter(
           (m: ILiveMatch) =>
-            m.status === 'EM_ANDAMENTO' ||
-            m.status === 'INICIADO',
+            m.status === 'EM_ANDAMENTO' || m.status === 'INICIADO',
         );
         setMatches(live);
       } catch {
@@ -46,8 +45,7 @@ export function LiveMarquee({
   if (matches.length === 0) return null;
 
   const items = matches.map(
-    (m) =>
-      `${m.timeA} ${m.golsTimeA ?? 0} x ${m.golsTimeB ?? 0} ${m.timeB}`,
+    (m) => `${m.timeA} ${m.golsTimeA ?? 0} x ${m.golsTimeB ?? 0} ${m.timeB}`,
   );
 
   const content = items.join(' ● ');
