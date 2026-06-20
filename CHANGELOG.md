@@ -1,3 +1,15 @@
+# [1.16.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.15.1...v1.16.0) (2026-06-20)
+
+
+### Bug Fixes
+
+* implementar preenchimento parcial de 16 avos e corrigir propagacao de vencedores ([9f85380](https://github.com/EoBryanDev/dev4-palpita-ai/commit/9f8538066d7ca2a8aba788cac0642c8a8d95f0ff))
+
+
+### Features
+
+* **web:** implementar preenchimento parcial de 16 avos e corrigir propagacao de vencedores ([8470cb8](https://github.com/EoBryanDev/dev4-palpita-ai/commit/8470cb892f77b99ae0e778b72465e18f09363804))
+
 ## [1.15.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.15.0...v1.15.1) (2026-06-20)
 
 
