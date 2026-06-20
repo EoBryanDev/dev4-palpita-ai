@@ -1,5 +1,5 @@
 import { db, partidas, times } from '@palpita/db';
-import { asc, ne } from 'drizzle-orm';
+import { asc, isNotNull } from 'drizzle-orm';
 
 export interface IGrupoClassificado {
   nome: string;
@@ -39,11 +39,11 @@ export async function obterGruposClassificados(): Promise<{
     .orderBy(asc(times.grupo), asc(times.nome));
 
   // 2. Buscar todas as partidas (para calcular grupos e mata-mata)
-  // Usamos ne(partidas.id, '') para compatibilidade com os mocks
+  // Usamos isNotNull(partidas.id) para compatibilidade com os mocks
   const dbPartidas = await db
     .select()
     .from(partidas)
-    .where(ne(partidas.id, ''));
+    .where(isNotNull(partidas.id));
 
   // 3. Inicializar mapa de estatísticas por time
   const statsTimes = new Map<
