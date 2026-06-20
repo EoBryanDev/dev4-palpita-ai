@@ -180,11 +180,14 @@ export async function obterGruposClassificados(): Promise<{
   // --- CÁLCULO DO CHAVEAMENTO (MATA-MATA) ---
 
   const isGrupoCompleto = (grupoNome: string) => {
-    const timesNoGrupo = dbTimes.filter((t) => t.grupo === grupoNome).map((t) => t.id);
+    const timesNoGrupo = dbTimes
+      .filter((t) => t.grupo === grupoNome)
+      .map((t) => t.id);
     if (timesNoGrupo.length === 0) return false;
 
     const partidasDoGrupo = dbPartidas.filter(
-      (p) => timesNoGrupo.includes(p.timeAId) && timesNoGrupo.includes(p.timeBId),
+      (p) =>
+        timesNoGrupo.includes(p.timeAId) && timesNoGrupo.includes(p.timeBId),
     );
 
     if (partidasDoGrupo.length === 0) return false;
