@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useQueryPalpitesStats } from '@/hooks/queries/useQueryPalpitesStats';
 import {
@@ -37,10 +37,6 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
     error,
     refetch,
   } = useQueryPalpitesStats();
-
-  useEffect(() => {
-    setVisibleLimit(6);
-  }, [search, statusFilter]);
 
   const sortedMatches = useMemo(() => {
     const active = matches.filter(
@@ -89,6 +85,16 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
   const visibleMatches = useMemo(() => {
     return filteredMatches.slice(0, visibleLimit);
   }, [filteredMatches, visibleLimit]);
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setVisibleLimit(6);
+  };
+
+  const handleStatusFilterChange = (filter: StatusFilter) => {
+    setStatusFilter(filter);
+    setVisibleLimit(6);
+  };
 
   const toggleExpand = (matchId: string) => {
     setExpandedMatchId((prev) => (prev === matchId ? null : matchId));
@@ -206,7 +212,7 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
             type="text"
             placeholder="Filtrar jogos pelo nome de uma seleção..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="w-full pl-10 pr-4 py-2 rounded-xl border border-zinc-200 bg-white text-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50"
           />
         </div>
@@ -217,7 +223,7 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
               <button
                 key={opt}
                 type="button"
-                onClick={() => setStatusFilter(opt)}
+                onClick={() => handleStatusFilterChange(opt)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   statusFilter === opt
                     ? 'bg-emerald-600 text-white dark:bg-emerald-500 dark:text-zinc-950'
@@ -483,13 +489,19 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
 
       {/* Modal de Votação */}
       {modalMatch && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+        <dialog
+          open
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200 open:flex"
           onClick={() => setModalMatch(null)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') setModalMatch(null);
+          }}
         >
           <div
+            role="document"
             className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl border border-zinc-200 dark:border-zinc-800 flex flex-col max-h-[80vh] overflow-hidden animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-800">
               <div>
@@ -548,7 +560,7 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
               {filteredVotes.length === 1 ? 'palpite' : 'palpites'}
             </div>
           </div>
-        </div>
+        </dialog>
       )}
     </div>
   );

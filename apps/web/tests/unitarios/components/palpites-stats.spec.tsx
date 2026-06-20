@@ -446,11 +446,12 @@ describe('PalpitesStats', () => {
       render(<PalpitesStats nomeUsuario={null} />);
 
       const botoesStats = screen.getAllByRole('button');
-      const btnVitoriaA = botoesStats.find(
-        (btn) =>
-          btn.closest('.flex.justify-between.text-xs')?.textContent?.includes('33%'),
-      )!;
-      fireEvent.click(btnVitoriaA);
+      const btnVitoriaA = botoesStats.find((btn) =>
+        btn
+          .closest('.flex.justify-between.text-xs')
+          ?.textContent?.includes('33%'),
+      );
+      if (btnVitoriaA) fireEvent.click(btnVitoriaA);
 
       expect(screen.getByText('Alice')).toBeDefined();
       expect(screen.queryByText('Bob')).toBeNull();
