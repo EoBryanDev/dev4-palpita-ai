@@ -2,6 +2,8 @@ export interface IGroupTeam {
   nome: string;
   emoji: string;
   pontos: number;
+  saldoGols: number;
+  golsPro: number;
 }
 
 export interface IGroup {
@@ -21,4 +23,11 @@ export interface IBracketMatch {
 
 export interface IChavesClientProps {
   grupos: IGroup[];
+  bracket: {
+    dezesseisAvos: IBracketMatch[];
+    oitavas: IBracketMatch[];
+    quartas: IBracketMatch[];
+    semis: IBracketMatch[];
+    final: IBracketMatch[];
+  };
 }
