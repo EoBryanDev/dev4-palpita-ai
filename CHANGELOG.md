@@ -1,3 +1,10 @@
+# [1.17.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.16.1...v1.17.0) (2026-06-20)
+
+
+### Features
+
+* **scraper:** implementar motor de scraper UOL Placar e configurar como padrao ([edfa54f](https://github.com/EoBryanDev/dev4-palpita-ai/commit/edfa54fca2502994666ad2aa5a5ce8409c6f6e46))
+
 ## [1.16.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.16.0...v1.16.1) (2026-06-20)
 
 
