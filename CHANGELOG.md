@@ -1,3 +1,10 @@
+## [1.17.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.17.0...v1.17.1) (2026-06-20)
+
+
+### Bug Fixes
+
+* **scraper:** aguardar hidratacao do placar do UOL para evitar leitura precoce ([e3ca67d](https://github.com/EoBryanDev/dev4-palpita-ai/commit/e3ca67d77d49a1fcc9fee1eaf9203f156592108e))
+
 # [1.17.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.16.1...v1.17.0) (2026-06-20)
 
 
