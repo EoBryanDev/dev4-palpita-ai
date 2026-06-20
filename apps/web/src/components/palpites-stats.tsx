@@ -17,7 +17,7 @@ import {
 
 import type { IPalpiteIndividual, IPartidaStats } from '@/interface/IPalpite';
 
-export function PalpitesStats() {
+export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
   const [search, setSearch] = useState('');
   const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
   const [visibleLimit, setVisibleLimit] = useState(10);
@@ -320,20 +320,36 @@ export function PalpitesStats() {
                                   </tr>
                                 </thead>
                                 <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                                  {match.palpitesIndividuais.map((palpite) => (
-                                    <tr
-                                      key={palpite.id}
-                                      className="hover:bg-zinc-100/30"
-                                    >
-                                      <td className="py-2.5 font-medium text-zinc-700 dark:text-zinc-300">
-                                        {palpite.usuarioNome}
-                                      </td>
-                                      <td className="py-2.5 text-right font-black text-emerald-600 dark:text-emerald-400 text-sm pr-4">
-                                        {palpite.golsTimeA} x{' '}
-                                        {palpite.golsTimeB}
-                                      </td>
-                                    </tr>
-                                  ))}
+                                  {[...match.palpitesIndividuais]
+                                    .sort((a, b) => {
+                                      if (a.usuarioNome === nomeUsuario)
+                                        return -1;
+                                      if (b.usuarioNome === nomeUsuario)
+                                        return 1;
+                                      return 0;
+                                    })
+                                    .map((palpite) => {
+                                      const isCurrentUser =
+                                        palpite.usuarioNome === nomeUsuario;
+                                      return (
+                                        <tr
+                                          key={palpite.id}
+                                          className={`${
+                                            isCurrentUser
+                                              ? 'bg-emerald-50 dark:bg-emerald-950/20 ring-1 ring-emerald-200 dark:ring-emerald-800'
+                                              : 'hover:bg-zinc-100/30'
+                                          }`}
+                                        >
+                                          <td className="py-2.5 font-medium text-zinc-700 dark:text-zinc-300">
+                                            {palpite.usuarioNome}
+                                          </td>
+                                          <td className="py-2.5 text-right font-black text-emerald-600 dark:text-emerald-400 text-sm pr-4">
+                                            {palpite.golsTimeA} x{' '}
+                                            {palpite.golsTimeB}
+                                          </td>
+                                        </tr>
+                                      );
+                                    })}
                                 </tbody>
                               </table>
                             </div>
