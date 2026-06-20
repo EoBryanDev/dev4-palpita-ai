@@ -54,7 +54,11 @@ describe('SyncService', () => {
 
     await syncOnce(mockEngine);
 
-    expect(mockEngine.scrapeMatch).toHaveBeenCalledWith('Brasil', 'Argentina');
+    expect(mockEngine.scrapeMatch).toHaveBeenCalledWith(
+      'Brasil',
+      'Argentina',
+      mockPartida.dataInicio,
+    );
     expect(logs.some((l) => l.includes('sync_updated'))).toBe(true);
     expect(queries.atualizarResultado).toHaveBeenCalledWith(
       'abc-123',
