@@ -1,3 +1,12 @@
+# [1.15.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.14.3...v1.15.0) (2026-06-20)
+
+
+### Features
+
+* **web:** adicionar tipos da fase de 16 avos de final no chaveamento ([7963e97](https://github.com/EoBryanDev/dev4-palpita-ai/commit/7963e97e48647ba21f6339042fc078c4e48ec35f))
+* **web:** exibir fase de 16 avos de final no chaveamento e sg nos grupos ([5e70a0d](https://github.com/EoBryanDev/dev4-palpita-ai/commit/5e70a0dca10375837bd63196515a2fbcaefdd9f7))
+* **web:** implementar logica de 16 avos no service de chaveamento ([4ecaa11](https://github.com/EoBryanDev/dev4-palpita-ai/commit/4ecaa1113389f349f66b1806a1c14d0246bdd90e))
+
 ## [1.14.3](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.14.2...v1.14.3) (2026-06-20)
 
 
