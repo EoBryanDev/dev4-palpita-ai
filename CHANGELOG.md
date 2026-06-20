@@ -1,3 +1,17 @@
+# [1.12.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.11.0...v1.12.0) (2026-06-20)
+
+
+### Bug Fixes
+
+* **web:** corrigir overflow de nomes de times no dashboard mobile EOB-188 ([ad2e532](https://github.com/EoBryanDev/dev4-palpita-ai/commit/ad2e5326bf22888e9145f4d57feb6b11232f3f33))
+* **web:** overflow de nomes de times no dashboard mobile EOB-188 ([807d8c7](https://github.com/EoBryanDev/dev4-palpita-ai/commit/807d8c7645ec15884f3e95404e194008e40cafc3))
+
+
+### Features
+
+* **web:** colocar proprio palpite em primeiro nos palpites coletivos EOB-187 ([4e77940](https://github.com/EoBryanDev/dev4-palpita-ai/commit/4e7794070d3e2b2d76150978f86a8f4b292cc47a))
+* **web:** proprio palpite em primeiro nos palpites coletivos EOB-187 ([5ecf9c2](https://github.com/EoBryanDev/dev4-palpita-ai/commit/5ecf9c2e5f2df80423d408556006020754efdb4f))
+
 # [1.11.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.10.0...v1.11.0) (2026-06-19)
 
 
