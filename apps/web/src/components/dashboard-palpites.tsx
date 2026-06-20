@@ -314,7 +314,7 @@ export function DashboardPalpites({
                   </div>
 
                   <div className="flex items-center justify-between gap-4 py-2">
-                    <div className="flex flex-1 items-center gap-3">
+                    <div className="flex flex-1 items-center gap-3 min-w-0">
                       <div className="h-10 w-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden border border-zinc-200 dark:border-zinc-700 select-none shrink-0">
                         {partida.timeAEmoji ? (
                           <FlagImage
@@ -333,7 +333,7 @@ export function DashboardPalpites({
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 shrink-0">
                       <span className="bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 rounded-xl font-black text-lg min-w-[36px] text-center border border-zinc-200 dark:border-zinc-800">
                         {partida.golsTimeA ?? 0}
                       </span>
@@ -345,7 +345,7 @@ export function DashboardPalpites({
                       </span>
                     </div>
 
-                    <div className="flex flex-1 items-center justify-end gap-3">
+                    <div className="flex flex-1 items-center justify-end gap-3 min-w-0">
                       <span className="text-sm font-bold truncate text-right">
                         {partida.timeB}
                       </span>
@@ -448,28 +448,28 @@ export function DashboardPalpites({
                                 <Clock className="h-3 w-3" />
                                 {formatarData(partida.dataInicio)}
                               </span>
-                              <div className="flex items-center gap-3 select-none">
+                              <div className="flex items-center gap-3 select-none min-w-0">
                                 {partida.timeAEmoji && (
                                   <FlagImage
                                     emoji={partida.timeAEmoji}
                                     alt={partida.timeA}
-                                    className="h-5 w-5"
+                                    className="h-5 w-5 shrink-0"
                                   />
                                 )}
-                                <span className="text-sm font-bold">
+                                <span className="text-sm font-bold truncate">
                                   {partida.timeA}
                                 </span>
-                                <span className="text-xs text-zinc-400 font-semibold">
+                                <span className="text-xs text-zinc-400 font-semibold shrink-0">
                                   vs
                                 </span>
                                 {partida.timeBEmoji && (
                                   <FlagImage
                                     emoji={partida.timeBEmoji}
                                     alt={partida.timeB}
-                                    className="h-5 w-5"
+                                    className="h-5 w-5 shrink-0"
                                   />
                                 )}
-                                <span className="text-sm font-bold">
+                                <span className="text-sm font-bold truncate">
                                   {partida.timeB}
                                 </span>
                               </div>
@@ -577,28 +577,28 @@ export function DashboardPalpites({
                               {partida.rodadaNome}
                             </span>
                           )}
-                          <div className="flex items-center gap-3 select-none">
+                          <div className="flex items-center gap-3 select-none min-w-0">
                             {partida.timeAEmoji && (
                               <FlagImage
                                 emoji={partida.timeAEmoji}
                                 alt={partida.timeA}
-                                className="h-5 w-5"
+                                className="h-5 w-5 shrink-0"
                               />
                             )}
-                            <span className="text-sm font-bold">
+                            <span className="text-sm font-bold truncate">
                               {partida.timeA}
                             </span>
-                            <span className="text-xs text-zinc-400 font-semibold">
+                            <span className="text-xs text-zinc-400 font-semibold shrink-0">
                               vs
                             </span>
                             {partida.timeBEmoji && (
                               <FlagImage
                                 emoji={partida.timeBEmoji}
                                 alt={partida.timeB}
-                                className="h-5 w-5"
+                                className="h-5 w-5 shrink-0"
                               />
                             )}
-                            <span className="text-sm font-bold">
+                            <span className="text-sm font-bold truncate">
                               {partida.timeB}
                             </span>
                           </div>
