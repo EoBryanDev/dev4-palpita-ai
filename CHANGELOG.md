@@ -1,3 +1,10 @@
+## [1.14.3](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.14.2...v1.14.3) (2026-06-20)
+
+
+### Bug Fixes
+
+* **web:** diminuir velocidade, aumentar tracking e espacamento na marquee ([75e3bac](https://github.com/EoBryanDev/dev4-palpita-ai/commit/75e3baca7035689e065774dea1c51f396d5ebceb))
+
 ## [1.14.2](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.14.1...v1.14.2) (2026-06-20)
 
 
