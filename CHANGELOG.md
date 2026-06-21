@@ -1,3 +1,10 @@
+# [1.18.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.17.2...v1.18.0) (2026-06-21)
+
+
+### Features
+
+* **times:** adicionar idioma oficial dos países ([b2ac395](https://github.com/EoBryanDev/dev4-palpita-ai/commit/b2ac39589bc9a9bd893110fafbca638fcba42f42))
+
 ## [1.17.2](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.17.1...v1.17.2) (2026-06-21)
 
 
