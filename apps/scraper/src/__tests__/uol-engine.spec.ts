@@ -58,6 +58,13 @@ describe('UolEngine', () => {
     expect(url).toBe(
       'https://placar.uol.com.br/esporte/futebol/copa-do-mundo/2026/06/20/alemanha-x-costa-do-marfim.htm',
     );
+
+    // Test UTC date that is the next day in UTC but still previous day in Sao Paulo (-3)
+    const testDateSaoPauloEdge = new Date('2026-06-21T00:00:00.000Z');
+    const urlEdge = getUrl('Equador', 'Curaçao', testDateSaoPauloEdge);
+    expect(urlEdge).toBe(
+      'https://placar.uol.com.br/esporte/futebol/copa-do-mundo/2026/06/20/equador-x-curacao.htm',
+    );
   });
 
   it('should launch playwright, navigate and return parsed results', async () => {

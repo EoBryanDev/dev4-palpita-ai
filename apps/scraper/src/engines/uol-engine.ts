@@ -21,9 +21,22 @@ export class UolEngine implements IScraperEngine {
     date?: Date,
   ): string | null {
     const matchDate = date || new Date();
-    const year = matchDate.getFullYear();
-    const month = String(matchDate.getMonth() + 1).padStart(2, '0');
-    const day = String(matchDate.getDate()).padStart(2, '0');
+    const formatter = new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    const parts = formatter.formatToParts(matchDate);
+    const year =
+      parts.find((p) => p.type === 'year')?.value ||
+      String(matchDate.getFullYear());
+    const month =
+      parts.find((p) => p.type === 'month')?.value ||
+      String(matchDate.getMonth() + 1).padStart(2, '0');
+    const day =
+      parts.find((p) => p.type === 'day')?.value ||
+      String(matchDate.getDate()).padStart(2, '0');
 
     const normA = this.normalizeTeamName(timeA);
     const normB = this.normalizeTeamName(timeB);
