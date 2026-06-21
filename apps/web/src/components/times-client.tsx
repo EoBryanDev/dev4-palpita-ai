@@ -2,7 +2,7 @@
 
 import { FlagImage } from '@/components/ui/flag-image';
 import { PageHeader } from '@/components/ui/page-header';
-import { Filter, Globe, Search, Trophy } from 'lucide-react';
+import { Filter, Globe, Languages, Search, Trophy } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
 import type { ITimesClientProps } from '@/interface/ITimes';
@@ -214,6 +214,11 @@ export default function TimesClient({ initialTimes }: ITimesClientProps) {
               {/* Titulo */}
               <h2 className="text-xl font-bold mt-4 tracking-tight group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                 {selecao.nome}
+                {selecao.idioma && (
+                  <span className="ml-1.5 text-sm font-normal text-zinc-400 dark:text-zinc-500">
+                    ({selecao.idioma})
+                  </span>
+                )}
               </h2>
 
               {/* Detalhes */}
@@ -222,6 +227,17 @@ export default function TimesClient({ initialTimes }: ITimesClientProps) {
                   <span className="text-zinc-400">Confederação</span>
                   <span className="font-semibold">{selecao.confederacao}</span>
                 </div>
+                {selecao.idioma && (
+                  <div className="flex justify-between items-center gap-2">
+                    <span className="text-zinc-400 flex items-center gap-1">
+                      <Languages className="h-3 w-3" />
+                      Idioma Oficial
+                    </span>
+                    <span className="font-semibold text-right">
+                      {selecao.idioma}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-zinc-400">Ranking FIFA</span>
                   <span className="font-semibold">#{selecao.rankingFifa}</span>

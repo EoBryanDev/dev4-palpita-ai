@@ -7,6 +7,7 @@ export interface ITimesServiceResponse {
   emoji: string;
   confederacao: string;
   grupo: string;
+  idioma?: string | null;
 }
 
 export async function obterTimes(): Promise<ITimesServiceResponse[]> {
@@ -18,5 +19,6 @@ export async function obterTimes(): Promise<ITimesServiceResponse[]> {
     emoji: t.emoji,
     confederacao: t.confederacao,
     grupo: t.grupo,
+    idioma: t.idioma,
   }));
 }

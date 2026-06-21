@@ -42,6 +42,7 @@ export const times = pgTable('times', {
   emoji: varchar('emoji', { length: 10 }).notNull(),
   confederacao: varchar('confederacao', { length: 50 }).notNull(),
   grupo: varchar('grupo', { length: 10 }).notNull(),
+  idioma: varchar('idioma', { length: 100 }),
   dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
 });
 

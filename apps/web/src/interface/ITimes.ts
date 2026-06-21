@@ -4,6 +4,7 @@ export interface IDbTime {
   emoji: string;
   confederacao: string;
   grupo: string;
+  idioma?: string | null;
 }
 
 export interface ITimesClientProps {
