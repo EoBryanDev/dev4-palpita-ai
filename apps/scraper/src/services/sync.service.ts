@@ -45,10 +45,32 @@ export async function syncOnce(engine: IScraperEngine): Promise<void> {
       );
 
       if (!resultado) {
-        log('sync_skip', {
-          matchId: partida.id,
-          reason: 'no data from engine',
-        });
+        // Mesmo sem dados do engine, se o horário de início já passou
+        // e o status ainda é AGENDADO, promove para EM_ANDAMENTO
+        const agora = new Date();
+        const jaDeveriaEstarEmAndamento =
+          partida.dataInicio <= agora &&
+          (partida.status === 'AGENDADO' || partida.status === 'AGENDADA');
+
+        if (jaDeveriaEstarEmAndamento) {
+          await atualizarResultado(
+            partida.id,
+            partida.golsTimeA ?? 0,
+            partida.golsTimeB ?? 0,
+            'EM_ANDAMENTO',
+          );
+          log('sync_promoted', {
+            matchId: partida.id,
+            timeA: partida.timeANome,
+            timeB: partida.timeBNome,
+            reason: 'match started but engine returned no data',
+          });
+        } else {
+          log('sync_skip', {
+            matchId: partida.id,
+            reason: 'no data from engine',
+          });
+        }
         continue;
       }
 
@@ -56,6 +78,13 @@ export async function syncOnce(engine: IScraperEngine): Promise<void> {
 
       const oldScore = `${partida.golsTimeA ?? '?'}x${partida.golsTimeB ?? '?'}`;
       const newScore = `${parsed.golsTimeA}x${parsed.golsTimeB}`;
+
+      // Se o engine retornou AGENDADO mas o horário já passou,
+      // promove automaticamente para EM_ANDAMENTO
+      const agora = new Date();
+      if (parsed.status === 'AGENDADO' && partida.dataInicio <= agora) {
+        parsed.status = 'EM_ANDAMENTO';
+      }
 
       const scoreOrStatusChanged =
         partida.golsTimeA !== parsed.golsTimeA ||
