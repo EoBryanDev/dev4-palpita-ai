@@ -1,3 +1,10 @@
+## [1.18.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.18.0...v1.18.1) (2026-06-21)
+
+
+### Bug Fixes
+
+* **scraper:** promover automaticamente status para EM_ANDAMENTO quando jogo iniciar ([7e01c01](https://github.com/EoBryanDev/dev4-palpita-ai/commit/7e01c01644908e20cdb3cf3ca784acdb60d84d1f))
+
 # [1.18.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.17.2...v1.18.0) (2026-06-21)
 
 
