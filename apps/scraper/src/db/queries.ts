@@ -21,7 +21,6 @@ export interface IPartidaPendente {
 
 export async function buscarPartidasPendentes(): Promise<IPartidaPendente[]> {
   const agora = new Date();
-  const tresHorasAtras = new Date(agora.getTime() - 3 * 60 * 60 * 1000);
   const rows = await db
     .select({
       id: partidas.id,
@@ -43,13 +42,8 @@ export async function buscarPartidasPendentes(): Promise<IPartidaPendente[]> {
         lte(partidas.dataInicio, agora),
         or(
           eq(partidas.status, 'EM_ANDAMENTO'),
-          and(
-            or(
-              eq(partidas.status, 'AGENDADO'),
-              eq(partidas.status, 'AGENDADA'),
-            ),
-            gte(partidas.dataInicio, tresHorasAtras),
-          ),
+          eq(partidas.status, 'AGENDADO'),
+          eq(partidas.status, 'AGENDADA'),
         ),
       ),
     )
