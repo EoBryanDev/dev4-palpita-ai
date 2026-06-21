@@ -1,3 +1,10 @@
+## [1.18.2](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.18.1...v1.18.2) (2026-06-21)
+
+
+### Bug Fixes
+
+* **scraper:** simplificar query de buscarPartidasPendentes ([4953ddc](https://github.com/EoBryanDev/dev4-palpita-ai/commit/4953ddc17233ffba704fed14975698a195a32cd6))
+
 ## [1.18.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.18.0...v1.18.1) (2026-06-21)
 
 
