@@ -1,3 +1,10 @@
+## [1.17.2](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.17.1...v1.17.2) (2026-06-21)
+
+
+### Bug Fixes
+
+* **scraper:** ajustando timezone ([67e141e](https://github.com/EoBryanDev/dev4-palpita-ai/commit/67e141e2e8fe48678055ee078ef312820901f938))
+
 ## [1.17.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.17.0...v1.17.1) (2026-06-20)
 
 
