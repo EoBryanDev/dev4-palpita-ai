@@ -328,19 +328,18 @@ export class UolEngine implements IScraperEngine {
           const tA = args.timeANome;
           const tB = args.timeBNome;
 
-          const normalize = (name: string) => {
-            return (
-              name
-                .normalize('NFD')
-                // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics removal range
-                .replace(/[\u0300-\u036f]/g, '')
-                .toLowerCase()
-                .trim()
-            );
-          };
-
-          const normA = normalize(tA);
-          const normB = normalize(tB);
+          const normA = tA
+            .normalize('NFD')
+            // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics removal range
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
+          const normB = tB
+            .normalize('NFD')
+            // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics removal range
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
 
           // Find the best match container
           let container: Element | null = null;
@@ -351,11 +350,21 @@ export class UolEngine implements IScraperEngine {
               ['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE'].includes(el.tagName)
             )
               continue;
-            const text = normalize(el.textContent || '');
+            const text = (el.textContent || '')
+              .normalize('NFD')
+              // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics removal range
+              .replace(/[\u0300-\u036f]/g, '')
+              .toLowerCase()
+              .trim();
             if (text.includes(normA) && text.includes(normB)) {
               let childContainsBoth = false;
               for (let i = 0; i < el.children.length; i++) {
-                const childText = normalize(el.children[i].textContent || '');
+                const childText = (el.children[i].textContent || '')
+                  .normalize('NFD')
+                  // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics removal range
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .toLowerCase()
+                  .trim();
                 if (childText.includes(normA) && childText.includes(normB)) {
                   childContainsBoth = true;
                   break;

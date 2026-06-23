@@ -61,19 +61,18 @@ export class PlaywrightEngine implements IScraperEngine {
 
       const googleData = await page.evaluate(
         (args: { tA: string; tB: string }) => {
-          const normalize = (name: string) => {
-            return (
-              name
-                .normalize('NFD')
-                // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics removal range
-                .replace(/[\u0300-\u036f]/g, '')
-                .toLowerCase()
-                .trim()
-            );
-          };
-
-          const normA = normalize(args.tA);
-          const normB = normalize(args.tB);
+          const normA = args.tA
+            .normalize('NFD')
+            // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics range
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
+          const normB = args.tB
+            .normalize('NFD')
+            // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics range
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
 
           // Find the best match container
           let container: Element | null = null;
@@ -86,7 +85,12 @@ export class PlaywrightEngine implements IScraperEngine {
             let parent = leftScore.parentElement;
             while (parent) {
               if (parent.querySelector('[class*="imso_mh__r-tm-sc"]')) {
-                const text = normalize(parent.textContent || '');
+                const text = (parent.textContent || '')
+                  .normalize('NFD')
+                  // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics range
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .toLowerCase()
+                  .trim();
                 if (text.includes(normA) && text.includes(normB)) {
                   container = parent;
                   break;
@@ -107,11 +111,21 @@ export class PlaywrightEngine implements IScraperEngine {
                 ['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE'].includes(el.tagName)
               )
                 continue;
-              const text = normalize(el.textContent || '');
+              const text = (el.textContent || '')
+                .normalize('NFD')
+                // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics range
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .trim();
               if (text.includes(normA) && text.includes(normB)) {
                 let childContainsBoth = false;
                 for (let i = 0; i < el.children.length; i++) {
-                  const childText = normalize(el.children[i].textContent || '');
+                  const childText = (el.children[i].textContent || '')
+                    .normalize('NFD')
+                    // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics range
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .toLowerCase()
+                    .trim();
                   if (childText.includes(normA) && childText.includes(normB)) {
                     childContainsBoth = true;
                     break;
@@ -139,58 +153,89 @@ export class PlaywrightEngine implements IScraperEngine {
           // If no container found, fall back to document body
           const searchScope = container || document.body;
 
-          // Extract score helper
-          const getScore = (scope: Element, side: 'l' | 'r'): number | null => {
-            const selectors = [
-              `.imso_mh__${side}-tm-sc`,
-              `[class*="imso_mh__${side}-tm-sc"]`,
-            ];
-            for (const sel of selectors) {
-              const el = scope.querySelector(sel);
-              if (el) {
-                const n = Number.parseInt(el.textContent?.trim() || '', 10);
-                if (!Number.isNaN(n)) return n;
+          // 1. Extract score for side 'l' (golsA)
+          let golsA: number | null = null;
+          const selectorsA = [
+            '.imso_mh__l-tm-sc',
+            '[class*="imso_mh__l-tm-sc"]',
+          ];
+          for (const sel of selectorsA) {
+            const el = searchScope.querySelector(sel);
+            if (el) {
+              const n = Number.parseInt(el.textContent?.trim() || '', 10);
+              if (!Number.isNaN(n)) {
+                golsA = n;
+                break;
               }
             }
-            const sep = scope.querySelector(
+          }
+          if (golsA === null) {
+            const sep = searchScope.querySelector(
               '[class*="imso_mh__scr-sep"], [class*="imso_mh__ma-sc-cont"]',
             );
             if (sep) {
               const text = sep.textContent?.trim() || '';
               const m = text.match(/(\d+)\s*[×x]\s*(\d+)/);
               if (m) {
-                return side === 'l'
-                  ? Number.parseInt(m[1], 10)
-                  : Number.parseInt(m[2], 10);
+                golsA = Number.parseInt(m[1], 10);
               }
             }
-            return null;
-          };
+          }
 
-          // Extract status helper
-          const getStatus = (scope: Element): string => {
-            const selectors = [
-              '.imso_mh__ft-mtch',
-              '[class*="imso_mh__ft-mtch"]',
-              '[class*="imso_mh__m-st"]',
-            ];
-            for (const sel of selectors) {
-              const el = scope.querySelector(sel);
-              if (el) {
-                const text = el.textContent?.trim().toLowerCase() || '';
-                if (text.includes('encerrado') || text.includes('final'))
-                  return 'FINALIZADO';
-                if (text.includes('ao vivo') || text.includes('andamento'))
-                  return 'EM_ANDAMENTO';
-                if (text.includes('agendado')) return 'AGENDADO';
+          // 2. Extract score for side 'r' (golsB)
+          let golsB: number | null = null;
+          const selectorsB = [
+            '.imso_mh__r-tm-sc',
+            '[class*="imso_mh__r-tm-sc"]',
+          ];
+          for (const sel of selectorsB) {
+            const el = searchScope.querySelector(sel);
+            if (el) {
+              const n = Number.parseInt(el.textContent?.trim() || '', 10);
+              if (!Number.isNaN(n)) {
+                golsB = n;
+                break;
               }
             }
-            return 'EM_ANDAMENTO';
-          };
+          }
+          if (golsB === null) {
+            const sep = searchScope.querySelector(
+              '[class*="imso_mh__scr-sep"], [class*="imso_mh__ma-sc-cont"]',
+            );
+            if (sep) {
+              const text = sep.textContent?.trim() || '';
+              const m = text.match(/(\d+)\s*[×x]\s*(\d+)/);
+              if (m) {
+                golsB = Number.parseInt(m[2], 10);
+              }
+            }
+          }
 
-          const golsA = getScore(searchScope, 'l');
-          const golsB = getScore(searchScope, 'r');
-          const status = getStatus(searchScope);
+          // 3. Extract status
+          let status = 'EM_ANDAMENTO';
+          const statusSelectors = [
+            '.imso_mh__ft-mtch',
+            '[class*="imso_mh__ft-mtch"]',
+            '[class*="imso_mh__m-st"]',
+          ];
+          for (const sel of statusSelectors) {
+            const el = searchScope.querySelector(sel);
+            if (el) {
+              const text = el.textContent?.trim().toLowerCase() || '';
+              if (text.includes('encerrado') || text.includes('final')) {
+                status = 'FINALIZADO';
+                break;
+              }
+              if (text.includes('ao vivo') || text.includes('andamento')) {
+                status = 'EM_ANDAMENTO';
+                break;
+              }
+              if (text.includes('agendado')) {
+                status = 'AGENDADO';
+                break;
+              }
+            }
+          }
 
           // Extract goals
           const results: Array<{
