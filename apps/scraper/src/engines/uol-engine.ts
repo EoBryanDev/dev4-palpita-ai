@@ -274,9 +274,86 @@ export class UolEngine implements IScraperEngine {
       // Aguarda a hidratação do placar: se houver gols no minuto a minuto, espera até que o placar não seja 0x0
       try {
         await page.waitForFunction(
-          () => {
-            const scoreAEl = document.querySelector('.team-one .team-score');
-            const scoreBEl = document.querySelector('.team-two .team-score');
+          (args: { tA: string; tB: string }) => {
+            const normA = args.tA
+              .normalize('NFD')
+              // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics range
+              .replace(/[\u0300-\u036f]/g, '')
+              .toLowerCase()
+              .trim();
+            const normB = args.tB
+              .normalize('NFD')
+              // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics range
+              .replace(/[\u0300-\u036f]/g, '')
+              .toLowerCase()
+              .trim();
+
+            let container: Element | null = null;
+            const allElements = Array.from(
+              (document.body || document).querySelectorAll('*'),
+            );
+            const candidateContainers: Element[] = [];
+            for (const el of allElements) {
+              if (
+                ['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE'].includes(el.tagName)
+              )
+                continue;
+              if (!el.querySelector('.team-score, [class*="team-score"]'))
+                continue;
+
+              const text = (el.textContent || '')
+                .normalize('NFD')
+                // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics range
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .trim();
+              if (text.includes(normA) && text.includes(normB)) {
+                let childContainsBoth = false;
+                for (let i = 0; i < el.children.length; i++) {
+                  const child = el.children[i];
+                  if (
+                    !child.querySelector('.team-score, [class*="team-score"]')
+                  )
+                    continue;
+                  const childText = (child.textContent || '')
+                    .normalize('NFD')
+                    // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics range
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .toLowerCase()
+                    .trim();
+                  if (childText.includes(normA) && childText.includes(normB)) {
+                    childContainsBoth = true;
+                    break;
+                  }
+                }
+                if (!childContainsBoth) {
+                  candidateContainers.push(el);
+                }
+              }
+            }
+
+            if (candidateContainers.length > 0) {
+              const prioritized = candidateContainers.find((el) => {
+                const className = (el.className || '').toString().toLowerCase();
+                return (
+                  className.includes('team') ||
+                  className.includes('match') ||
+                  className.includes('placar') ||
+                  className.includes('jogo') ||
+                  className.includes('scoreboard') ||
+                  className.includes('score')
+                );
+              });
+              container = prioritized || candidateContainers[0];
+            }
+
+            const scope = container || document;
+            const scoreAEl = scope.querySelector(
+              '.team-one .team-score, .team-one [class*="team-score"]',
+            );
+            const scoreBEl = scope.querySelector(
+              '.team-two .team-score, .team-two [class*="team-score"]',
+            );
             if (!scoreAEl || !scoreBEl) return false;
 
             const scoreAText = scoreAEl.textContent?.trim() || '';
@@ -290,7 +367,7 @@ export class UolEngine implements IScraperEngine {
             // Se o placar já for diferente de 0x0, já está hidratado
             if (golsA > 0 || golsB > 0) return true;
 
-            // Se o placar for 0x0, verifica se há gols nos cards do minuto a minuto
+            // Se o placar for 0x0, verifica se há gols nos lances do minuto a minuto
             const cards = Array.from(
               document.querySelectorAll('.solar-card.live-post'),
             );
@@ -311,6 +388,7 @@ export class UolEngine implements IScraperEngine {
             // Se não houver gols nos lances e o placar for 0x0, consideramos hidratado (ou jogo não iniciado).
             return !hasGoalInTimeline;
           },
+          { tA: timeA, tB: timeB },
           { timeout: 6000 },
         );
       } catch {
@@ -406,10 +484,10 @@ export class UolEngine implements IScraperEngine {
 
           // 1. Extração dos gols de cada time
           const scoreAEl = scope.querySelector(
-            '.team-one .team-score, [class*="team-score"]',
+            '.team-one .team-score, .team-one [class*="team-score"]',
           );
           const scoreBEl = scope.querySelector(
-            '.team-two .team-score, [class*="team-score"]',
+            '.team-two .team-score, .team-two [class*="team-score"]',
           );
 
           if (!scoreAEl || !scoreBEl) {
@@ -506,13 +584,60 @@ export class UolEngine implements IScraperEngine {
               bodyText.toLowerCase().includes('gol!');
 
             if (isGol) {
-              // Determina qual time fez o gol pesquisando nomes na descrição do gol
+              // Determina qual time fez o gol pesquisando o sufix-image e a descrição
               let timeNome: string | undefined = undefined;
-              const normalizedBody = bodyText.toLowerCase();
-              if (normalizedBody.includes(tA.toLowerCase())) {
-                timeNome = tA;
-              } else if (normalizedBody.includes(tB.toLowerCase())) {
-                timeNome = tB;
+              const sufixImg = card.querySelector('.sufix-image');
+              if (sufixImg) {
+                const imgUrl = (sufixImg as HTMLImageElement).src.toLowerCase();
+                const normSlugA = tA
+                  .normalize('NFD')
+                  // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics range
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .toLowerCase()
+                  .replace(/[^a-z0-9]/g, '');
+                const normSlugB = tB
+                  .normalize('NFD')
+                  // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics range
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .toLowerCase()
+                  .replace(/[^a-z0-9]/g, '');
+                if (imgUrl.includes(normSlugA)) {
+                  timeNome = tA;
+                } else if (imgUrl.includes(normSlugB)) {
+                  timeNome = tB;
+                }
+              }
+
+              if (!timeNome) {
+                const normalizedBody = bodyText.toLowerCase();
+                const cleanA = tA
+                  .normalize('NFD')
+                  // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics range
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .toLowerCase();
+                const cleanB = tB
+                  .normalize('NFD')
+                  // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics range
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .toLowerCase();
+                if (normalizedBody.includes(cleanA)) {
+                  timeNome = tA;
+                } else if (normalizedBody.includes(cleanB)) {
+                  timeNome = tB;
+                } else {
+                  const prefA = cleanA.slice(0, 4);
+                  const prefB = cleanB.slice(0, 4);
+                  if (prefA !== prefB) {
+                    if (cleanA.length >= 4 && normalizedBody.includes(prefA)) {
+                      timeNome = tA;
+                    } else if (
+                      cleanB.length >= 4 &&
+                      normalizedBody.includes(prefB)
+                    ) {
+                      timeNome = tB;
+                    }
+                  }
+                }
               }
 
               rawEvents.push({
@@ -534,11 +659,35 @@ export class UolEngine implements IScraperEngine {
               const jogadorEntra = subMatch[1].trim();
               const jogadorSai = subMatch[2].trim();
 
+              let timeNome: string | undefined = undefined;
+              const sufixImg = card.querySelector('.sufix-image');
+              if (sufixImg) {
+                const imgUrl = (sufixImg as HTMLImageElement).src.toLowerCase();
+                const normSlugA = tA
+                  .normalize('NFD')
+                  // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics range
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .toLowerCase()
+                  .replace(/[^a-z0-9]/g, '');
+                const normSlugB = tB
+                  .normalize('NFD')
+                  // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics range
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .toLowerCase()
+                  .replace(/[^a-z0-9]/g, '');
+                if (imgUrl.includes(normSlugA)) {
+                  timeNome = tA;
+                } else if (imgUrl.includes(normSlugB)) {
+                  timeNome = tB;
+                }
+              }
+
               rawEvents.push({
                 tipo: 'SUBSTITUICAO',
                 jogador: jogadorEntra,
                 minuto,
                 acrescimos: acrescimo,
+                timeNome,
                 info: `Entra: ${jogadorEntra} | Sai: ${jogadorSai}`,
               });
               continue;
@@ -550,11 +699,35 @@ export class UolEngine implements IScraperEngine {
             if (hasYC || hasRC) {
               const tipo = hasYC ? 'CARTAO_AMARELO' : 'CARTAO_VERMELHO';
 
+              let timeNome: string | undefined = undefined;
+              const sufixImg = card.querySelector('.sufix-image');
+              if (sufixImg) {
+                const imgUrl = (sufixImg as HTMLImageElement).src.toLowerCase();
+                const normSlugA = tA
+                  .normalize('NFD')
+                  // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics range
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .toLowerCase()
+                  .replace(/[^a-z0-9]/g, '');
+                const normSlugB = tB
+                  .normalize('NFD')
+                  // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics range
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .toLowerCase()
+                  .replace(/[^a-z0-9]/g, '');
+                if (imgUrl.includes(normSlugA)) {
+                  timeNome = tA;
+                } else if (imgUrl.includes(normSlugB)) {
+                  timeNome = tB;
+                }
+              }
+
               rawEvents.push({
                 tipo,
                 jogador: 'Desconhecido',
                 minuto,
                 acrescimos: acrescimo,
+                timeNome,
                 info: bodyText,
               });
             }
@@ -579,10 +752,43 @@ export class UolEngine implements IScraperEngine {
         return null;
       }
 
+      // Fallback: se o placar retornou 0x0 mas existem gols nos eventos, calcula com base nos eventos de gol
+      let finalGolsA = result.golsTimeA;
+      let finalGolsB = result.golsTimeB;
+
+      const eventosDeGol =
+        result.eventos?.filter((evt) => evt.tipo === 'GOL') || [];
+      const hasGolsNoMinutoAMinuto = eventosDeGol.length > 0;
+
+      if (finalGolsA === 0 && finalGolsB === 0 && hasGolsNoMinutoAMinuto) {
+        let countA = 0;
+        let countB = 0;
+        for (const evt of eventosDeGol) {
+          if (evt.timeNome === timeA) {
+            countA++;
+          } else if (evt.timeNome === timeB) {
+            countB++;
+          } else {
+            // Fallback para caso o timeNome seja indefinido por outro motivo
+            const infoLower = (evt.info || '').toLowerCase();
+            if (infoLower.includes(timeA.toLowerCase())) {
+              countA++;
+            } else if (infoLower.includes(timeB.toLowerCase())) {
+              countB++;
+            }
+          }
+        }
+        finalGolsA = countA;
+        finalGolsB = countB;
+        console.log(
+          `[UolEngine] Placar do topo estava 0x0 mas foram encontrados gols nos eventos. Corrigido para: A=${finalGolsA}, B=${finalGolsB}`,
+        );
+      }
+
       // Tipar corretamente o resultado final para compatibilidade externa e extrair o jogador
       return {
-        golsTimeA: result.golsTimeA,
-        golsTimeB: result.golsTimeB,
+        golsTimeA: finalGolsA,
+        golsTimeB: finalGolsB,
         status: result.status,
         eventos: result.eventos?.map((evt) => {
           const jogador =
