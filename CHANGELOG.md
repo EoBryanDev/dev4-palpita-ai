@@ -1,3 +1,10 @@
+## [1.18.7](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.18.6...v1.18.7) (2026-06-23)
+
+
+### Bug Fixes
+
+* **scraper:** handle typo in team names and refine score counting ([5932dc8](https://github.com/EoBryanDev/dev4-palpita-ai/commit/5932dc8eaf73247e62e0d1300a8fb97ee5688090))
+
 ## [1.18.6](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.18.5...v1.18.6) (2026-06-23)
 
 
