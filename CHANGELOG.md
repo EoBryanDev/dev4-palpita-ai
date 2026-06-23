@@ -1,3 +1,10 @@
+## [1.18.5](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.18.4...v1.18.5) (2026-06-23)
+
+
+### Bug Fixes
+
+* **scraper:** inline helper functions inside playwright page.evaluate ([7290d45](https://github.com/EoBryanDev/dev4-palpita-ai/commit/7290d459f3c704b15607b7652bb88b746a60a8b4))
+
 ## [1.18.4](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.18.3...v1.18.4) (2026-06-23)
 
 
