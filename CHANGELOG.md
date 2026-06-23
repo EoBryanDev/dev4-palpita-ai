@@ -1,3 +1,10 @@
+## [1.18.3](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.18.2...v1.18.3) (2026-06-23)
+
+
+### Bug Fixes
+
+* **scraper:** jogos simultaneo scrapper ([826f9da](https://github.com/EoBryanDev/dev4-palpita-ai/commit/826f9da22689cd82cca7a04a4d6d028feecad7bc))
+
 ## [1.18.2](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.18.1...v1.18.2) (2026-06-21)
 
 
