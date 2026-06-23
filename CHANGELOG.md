@@ -1,3 +1,10 @@
+## [1.18.4](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.18.3...v1.18.4) (2026-06-23)
+
+
+### Bug Fixes
+
+* **scraper:** jogos simultaneo scrapper reference error ([913cb11](https://github.com/EoBryanDev/dev4-palpita-ai/commit/913cb1118a875a3c53196970b92aa90ee09a23c2))
+
 ## [1.18.3](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.18.2...v1.18.3) (2026-06-23)
 
 
