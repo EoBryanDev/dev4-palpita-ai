@@ -1,3 +1,10 @@
+## [1.18.6](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.18.5...v1.18.6) (2026-06-23)
+
+
+### Bug Fixes
+
+* **scraper:** check for scoreboard elements when finding match container ([498aab4](https://github.com/EoBryanDev/dev4-palpita-ai/commit/498aab46ab24f08213b502521dfc8969e77debe7))
+
 ## [1.18.5](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.18.4...v1.18.5) (2026-06-23)
 
 
