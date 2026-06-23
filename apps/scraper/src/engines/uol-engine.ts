@@ -324,11 +324,7 @@ export class UolEngine implements IScraperEngine {
 
       // Executa o script de parsing no contexto da página
       const result = await page.evaluate(
-        (args: {
-          timeANome: string;
-          timeBNome: string;
-          extrairJogadorFnStr: string;
-        }) => {
+        (args: { timeANome: string; timeBNome: string }) => {
           const tA = args.timeANome;
           const tB = args.timeBNome;
 
@@ -452,10 +448,6 @@ export class UolEngine implements IScraperEngine {
             status = 'AGENDADO';
           }
 
-          const extrairJogadorUol = new Function(
-            `return ${args.extrairJogadorFnStr}`,
-          )();
-
           // 3. Extração dos eventos estruturados do minuto a minuto
           const rawEvents: Array<{
             tipo: 'GOL' | 'CARTAO_AMARELO' | 'CARTAO_VERMELHO' | 'SUBSTITUICAO';
@@ -501,11 +493,9 @@ export class UolEngine implements IScraperEngine {
                 timeNome = tB;
               }
 
-              const jogador = extrairJogadorUol(bodyText, 'GOL');
-
               rawEvents.push({
                 tipo: 'GOL',
-                jogador,
+                jogador: 'Desconhecido',
                 minuto,
                 acrescimos: acrescimo,
                 timeNome,
@@ -537,11 +527,10 @@ export class UolEngine implements IScraperEngine {
             const hasRC = card.querySelector('.card-rect.rc') !== null;
             if (hasYC || hasRC) {
               const tipo = hasYC ? 'CARTAO_AMARELO' : 'CARTAO_VERMELHO';
-              const jogador = extrairJogadorUol(bodyText, tipo);
 
               rawEvents.push({
                 tipo,
-                jogador,
+                jogador: 'Desconhecido',
                 minuto,
                 acrescimos: acrescimo,
                 info: bodyText,
@@ -559,7 +548,6 @@ export class UolEngine implements IScraperEngine {
         {
           timeANome: timeA,
           timeBNome: timeB,
-          extrairJogadorFnStr: extrairJogadorUol.toString(),
         },
       );
 
@@ -569,19 +557,26 @@ export class UolEngine implements IScraperEngine {
         return null;
       }
 
-      // Tipar corretamente o resultado final para compatibilidade externa
+      // Tipar corretamente o resultado final para compatibilidade externa e extrair o jogador
       return {
         golsTimeA: result.golsTimeA,
         golsTimeB: result.golsTimeB,
         status: result.status,
-        eventos: result.eventos?.map((evt) => ({
-          tipo: evt.tipo,
-          jogador: evt.jogador,
-          minuto: evt.minuto,
-          acrescimos: evt.acrescimos,
-          info: evt.info,
-          timeNome: evt.timeNome,
-        })),
+        eventos: result.eventos?.map((evt) => {
+          const jogador =
+            evt.tipo === 'SUBSTITUICAO' ||
+            (evt.jogador && evt.jogador !== 'Desconhecido')
+              ? evt.jogador
+              : extrairJogadorUol(evt.info || '', evt.tipo, timeA, timeB);
+          return {
+            tipo: evt.tipo,
+            jogador,
+            minuto: evt.minuto,
+            acrescimos: evt.acrescimos,
+            info: evt.info,
+            timeNome: evt.timeNome,
+          };
+        }),
       };
     } catch (error) {
       await browser.close();
