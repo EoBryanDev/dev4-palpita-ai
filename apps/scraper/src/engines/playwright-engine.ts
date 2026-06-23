@@ -104,13 +104,20 @@ export class PlaywrightEngine implements IScraperEngine {
 
           // 2. Fallback to deepest element containing both team names
           if (!container) {
-            const allElements = Array.from(document.querySelectorAll('*'));
+            const allElements = Array.from(
+              (document.body || document).querySelectorAll('*'),
+            );
             const candidateContainers: Element[] = [];
             for (const el of allElements) {
               if (
                 ['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE'].includes(el.tagName)
               )
                 continue;
+
+              // Ensure the container actually contains score elements
+              if (!el.querySelector('[class*="-tm-sc"], [class*="score"]'))
+                continue;
+
               const text = (el.textContent || '')
                 .normalize('NFD')
                 // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics range
@@ -120,7 +127,13 @@ export class PlaywrightEngine implements IScraperEngine {
               if (text.includes(normA) && text.includes(normB)) {
                 let childContainsBoth = false;
                 for (let i = 0; i < el.children.length; i++) {
-                  const childText = (el.children[i].textContent || '')
+                  const child = el.children[i];
+                  if (
+                    !child.querySelector('[class*="-tm-sc"], [class*="score"]')
+                  )
+                    continue;
+
+                  const childText = (child.textContent || '')
                     .normalize('NFD')
                     // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics range
                     .replace(/[\u0300-\u036f]/g, '')
@@ -143,7 +156,8 @@ export class PlaywrightEngine implements IScraperEngine {
                 return (
                   className.includes('imso') ||
                   className.includes('match') ||
-                  className.includes('sport')
+                  className.includes('sport') ||
+                  className.includes('score')
                 );
               });
               container = prioritized || candidateContainers[0];

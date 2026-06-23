@@ -343,13 +343,20 @@ export class UolEngine implements IScraperEngine {
 
           // Find the best match container
           let container: Element | null = null;
-          const allElements = Array.from(document.querySelectorAll('*'));
+          const allElements = Array.from(
+            (document.body || document).querySelectorAll('*'),
+          );
           const candidateContainers: Element[] = [];
           for (const el of allElements) {
             if (
               ['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE'].includes(el.tagName)
             )
               continue;
+
+            // Ensure the container actually contains score elements
+            if (!el.querySelector('.team-score, [class*="team-score"]'))
+              continue;
+
             const text = (el.textContent || '')
               .normalize('NFD')
               // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics removal range
@@ -359,7 +366,11 @@ export class UolEngine implements IScraperEngine {
             if (text.includes(normA) && text.includes(normB)) {
               let childContainsBoth = false;
               for (let i = 0; i < el.children.length; i++) {
-                const childText = (el.children[i].textContent || '')
+                const child = el.children[i];
+                if (!child.querySelector('.team-score, [class*="team-score"]'))
+                  continue;
+
+                const childText = (child.textContent || '')
                   .normalize('NFD')
                   // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics removal range
                   .replace(/[\u0300-\u036f]/g, '')
@@ -383,7 +394,9 @@ export class UolEngine implements IScraperEngine {
                 className.includes('team') ||
                 className.includes('match') ||
                 className.includes('placar') ||
-                className.includes('jogo')
+                className.includes('jogo') ||
+                className.includes('scoreboard') ||
+                className.includes('score')
               );
             });
             container = prioritized || candidateContainers[0];
