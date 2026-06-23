@@ -59,141 +59,142 @@ export class PlaywrightEngine implements IScraperEngine {
         /* ignore */
       }
 
-      const golsA = await this.extractScore(page, 'l');
-      const golsB = await this.extractScore(page, 'r');
-      console.log(`[PlaywrightEngine] Score: A=${golsA}, B=${golsB}`);
-
-      if (golsA === null || golsB === null) {
-        await browser.close();
-        return null;
-      }
-
-      const status = await this.extractStatus(page);
-      console.log(`[PlaywrightEngine] Status: ${status}`);
-
-      // ─── Step 2: Google goals summary ────────────────────────────────
-      const goalEvents = await this.extractGoals(page, timeA, timeB);
-      console.log(`[PlaywrightEngine] Goals from Google: ${goalEvents.length}`);
-
-      // ─── Step 3: Ogol → substituições, cartões e demais eventos ─────
-      let ogolEvents: IScrapeEvent[] = [];
-      try {
-        ogolEvents = await this.scrapeOgolEvents(page, timeA, timeB);
-        console.log(
-          `[PlaywrightEngine] Events from Ogol: ${ogolEvents.length}`,
-        );
-      } catch (e) {
-        console.warn(
-          '[PlaywrightEngine] Ogol scrape failed:',
-          (e as Error).message,
-        );
-      }
-
-      await browser.close();
-
-      // Merge: use Google goals as authoritative + Ogol non-goal events
-      const merged = this.mergeEvents(goalEvents, ogolEvents);
-
-      return {
-        golsTimeA: golsA,
-        golsTimeB: golsB,
-        status: status as IScrapeResult['status'],
-        eventos: merged.length > 0 ? merged : undefined,
-      };
-    } catch (error) {
-      await browser.close();
-      console.warn(
-        `[PlaywrightEngine] Error scraping ${timeA} x ${timeB}:`,
-        (error as Error).message,
-      );
-      return null;
-    }
-  }
-
-  // ─── Score ────────────────────────────────────────────────────────────
-  private async extractScore(
-    page: Page,
-    side: 'l' | 'r',
-  ): Promise<number | null> {
-    const selectors = [
-      `.imso_mh__${side}-tm-sc`,
-      `[class*="imso_mh__${side}-tm-sc"]`,
-    ];
-
-    for (const sel of selectors) {
-      try {
-        const el = await page.$(sel);
-        if (!el) continue;
-        const text = await el.textContent();
-        if (!text) continue;
-        const n = Number.parseInt(text.trim(), 10);
-        if (!Number.isNaN(n)) return n;
-      } catch {
-        /* empty */
-      }
-    }
-
-    // Fallback: score separator "3×0"
-    try {
-      const sep = await page.$(
-        '[class*="imso_mh__scr-sep"], [class*="imso_mh__ma-sc-cont"]',
-      );
-      if (sep) {
-        const text = (await sep.textContent())?.trim() || '';
-        const m = text.match(/(\d+)\s*[×x]\s*(\d+)/);
-        if (m) {
-          return side === 'l'
-            ? Number.parseInt(m[1], 10)
-            : Number.parseInt(m[2], 10);
-        }
-      }
-    } catch {
-      /* empty */
-    }
-
-    return null;
-  }
-
-  // ─── Status ───────────────────────────────────────────────────────────
-  private async extractStatus(page: Page): Promise<string> {
-    const selectors = [
-      '.imso_mh__ft-mtch',
-      '[class*="imso_mh__ft-mtch"]',
-      '[class*="imso_mh__m-st"]',
-    ];
-
-    for (const sel of selectors) {
-      try {
-        const el = await page.$(sel);
-        if (!el) continue;
-        const text = (await el.textContent())?.trim().toLowerCase();
-        if (!text) continue;
-        if (text.includes('encerrado') || text.includes('final'))
-          return 'FINALIZADO';
-        if (text.includes('ao vivo') || text.includes('andamento'))
-          return 'EM_ANDAMENTO';
-        if (text.includes('agendado')) return 'AGENDADO';
-      } catch {
-        /* empty */
-      }
-    }
-
-    return 'EM_ANDAMENTO';
-  }
-
-  // ─── Goals from Google goal summary ──────────────────────────────────
-  private async extractGoals(
-    page: Page,
-    timeA: string,
-    timeB: string,
-  ): Promise<IScrapeEvent[]> {
-    try {
-      const raw = await page.evaluate(
+      const googleData = await page.evaluate(
         (args: { tA: string; tB: string }) => {
-          const tA = args.tA;
-          const tB = args.tB;
+          const normalize = (name: string) => {
+            return (
+              name
+                .normalize('NFD')
+                // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics removal range
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .trim()
+            );
+          };
+
+          const normA = normalize(args.tA);
+          const normB = normalize(args.tB);
+
+          // Find the best match container
+          let container: Element | null = null;
+
+          // 1. Try to find container using score elements
+          const leftScores = Array.from(
+            document.querySelectorAll('[class*="imso_mh__l-tm-sc"]'),
+          );
+          for (const leftScore of leftScores) {
+            let parent = leftScore.parentElement;
+            while (parent) {
+              if (parent.querySelector('[class*="imso_mh__r-tm-sc"]')) {
+                const text = normalize(parent.textContent || '');
+                if (text.includes(normA) && text.includes(normB)) {
+                  container = parent;
+                  break;
+                }
+                break;
+              }
+              parent = parent.parentElement;
+            }
+            if (container) break;
+          }
+
+          // 2. Fallback to deepest element containing both team names
+          if (!container) {
+            const allElements = Array.from(document.querySelectorAll('*'));
+            const candidateContainers: Element[] = [];
+            for (const el of allElements) {
+              if (
+                ['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE'].includes(el.tagName)
+              )
+                continue;
+              const text = normalize(el.textContent || '');
+              if (text.includes(normA) && text.includes(normB)) {
+                let childContainsBoth = false;
+                for (let i = 0; i < el.children.length; i++) {
+                  const childText = normalize(el.children[i].textContent || '');
+                  if (childText.includes(normA) && childText.includes(normB)) {
+                    childContainsBoth = true;
+                    break;
+                  }
+                }
+                if (!childContainsBoth) {
+                  candidateContainers.push(el);
+                }
+              }
+            }
+
+            if (candidateContainers.length > 0) {
+              const prioritized = candidateContainers.find((el) => {
+                const className = (el.className || '').toString().toLowerCase();
+                return (
+                  className.includes('imso') ||
+                  className.includes('match') ||
+                  className.includes('sport')
+                );
+              });
+              container = prioritized || candidateContainers[0];
+            }
+          }
+
+          // If no container found, fall back to document body
+          const searchScope = container || document.body;
+
+          // Extract score helper
+          const getScore = (scope: Element, side: 'l' | 'r'): number | null => {
+            const selectors = [
+              `.imso_mh__${side}-tm-sc`,
+              `[class*="imso_mh__${side}-tm-sc"]`,
+            ];
+            for (const sel of selectors) {
+              const el = scope.querySelector(sel);
+              if (el) {
+                const n = Number.parseInt(el.textContent?.trim() || '', 10);
+                if (!Number.isNaN(n)) return n;
+              }
+            }
+            const sep = scope.querySelector(
+              '[class*="imso_mh__scr-sep"], [class*="imso_mh__ma-sc-cont"]',
+            );
+            if (sep) {
+              const text = sep.textContent?.trim() || '';
+              const m = text.match(/(\d+)\s*[×x]\s*(\d+)/);
+              if (m) {
+                return side === 'l'
+                  ? Number.parseInt(m[1], 10)
+                  : Number.parseInt(m[2], 10);
+              }
+            }
+            return null;
+          };
+
+          // Extract status helper
+          const getStatus = (scope: Element): string => {
+            const selectors = [
+              '.imso_mh__ft-mtch',
+              '[class*="imso_mh__ft-mtch"]',
+              '[class*="imso_mh__m-st"]',
+            ];
+            for (const sel of selectors) {
+              const el = scope.querySelector(sel);
+              if (el) {
+                const text = el.textContent?.trim().toLowerCase() || '';
+                if (text.includes('encerrado') || text.includes('final'))
+                  return 'FINALIZADO';
+                if (text.includes('ao vivo') || text.includes('andamento'))
+                  return 'EM_ANDAMENTO';
+                if (text.includes('agendado')) return 'AGENDADO';
+              }
+            }
+            return 'EM_ANDAMENTO';
+          };
+
+          const golsA = getScore(searchScope, 'l');
+          const golsB = getScore(searchScope, 'r');
+          const status = getStatus(searchScope);
+
+          // Extract goals
           const results: Array<{
-            tipo: string;
+            tipo: 'GOL';
             jogador: string;
             minuto: number;
             acrescimos: number | undefined;
@@ -201,24 +202,28 @@ export class PlaywrightEngine implements IScraperEngine {
           }> = [];
 
           const sides = [
-            { suffix: 'imso_gs__left-team', team: tA },
-            { suffix: 'imso_gs__right-team', team: tB },
+            { suffix: 'imso_gs__left-team', team: args.tA },
+            { suffix: 'imso_gs__right-team', team: args.tB },
           ];
 
           for (let si = 0; si < sides.length; si++) {
             const selectorSuffix = sides[si].suffix;
             const teamName = sides[si].team;
-            const allTgs = document.querySelectorAll('[class*="imso_gs__tgs"]');
-            let container: Element | null = null;
+            const allTgs = searchScope.querySelectorAll(
+              '[class*="imso_gs__tgs"]',
+            );
+            let goalsContainer: Element | null = null;
             for (let i = 0; i < allTgs.length; i++) {
               if (allTgs[i].className.indexOf(selectorSuffix) >= 0) {
-                container = allTgs[i];
+                goalsContainer = allTgs[i];
                 break;
               }
             }
-            if (!container) continue;
+            if (!goalsContainer) continue;
 
-            const rows = container.querySelectorAll('[class*="imso_gs__gs-r"]');
+            const rows = goalsContainer.querySelectorAll(
+              '[class*="imso_gs__gs-r"]',
+            );
             for (let ri = 0; ri < rows.length; ri++) {
               const row = rows[ri];
               const fullText = row.textContent ? row.textContent.trim() : '';
@@ -246,7 +251,7 @@ export class PlaywrightEngine implements IScraperEngine {
               if (minuteEls.length > 0) {
                 for (let mi = 0; mi < minuteEls.length; mi++) {
                   const t = minuteEls[mi].textContent
-                    ? minuteEls[mi].textContent?.trim().replace(/[',\s]/g, '')
+                    ? minuteEls[mi].textContent.trim().replace(/[',\s]/g, '')
                     : '';
                   const m = t.match(/^(\d+)(\+(\d+))?/);
                   if (!m) continue;
@@ -291,24 +296,66 @@ export class PlaywrightEngine implements IScraperEngine {
             (a, b) =>
               a.minuto + (a.acrescimos || 0) - (b.minuto + (b.acrescimos || 0)),
           );
-          return results;
+
+          return { golsA, golsB, status, goalEvents: results };
         },
         { tA: timeA, tB: timeB },
       );
 
-      return raw.map((e) => ({
+      const golsA = googleData.golsA;
+      const golsB = googleData.golsB;
+      console.log(`[PlaywrightEngine] Score: A=${golsA}, B=${golsB}`);
+
+      if (golsA === null || golsB === null) {
+        await browser.close();
+        return null;
+      }
+
+      const status = googleData.status;
+      console.log(`[PlaywrightEngine] Status: ${status}`);
+
+      // ─── Step 2: Google goals summary ────────────────────────────────
+      const goalEvents = googleData.goalEvents.map((e) => ({
         tipo: e.tipo as IScrapeEvent['tipo'],
         jogador: e.jogador,
         minuto: e.minuto,
         acrescimos: e.acrescimos,
         timeNome: e.timeNome,
       }));
-    } catch (err) {
+      console.log(`[PlaywrightEngine] Goals from Google: ${goalEvents.length}`);
+
+      // ─── Step 3: Ogol → substituições, cartões e demais eventos ─────
+      let ogolEvents: IScrapeEvent[] = [];
+      try {
+        ogolEvents = await this.scrapeOgolEvents(page, timeA, timeB);
+        console.log(
+          `[PlaywrightEngine] Events from Ogol: ${ogolEvents.length}`,
+        );
+      } catch (e) {
+        console.warn(
+          '[PlaywrightEngine] Ogol scrape failed:',
+          (e as Error).message,
+        );
+      }
+
+      await browser.close();
+
+      // Merge: use Google goals as authoritative + Ogol non-goal events
+      const merged = this.mergeEvents(goalEvents, ogolEvents);
+
+      return {
+        golsTimeA: golsA,
+        golsTimeB: golsB,
+        status: status as IScrapeResult['status'],
+        eventos: merged.length > 0 ? merged : undefined,
+      };
+    } catch (error) {
+      await browser.close();
       console.warn(
-        '[PlaywrightEngine] Goals extraction failed:',
-        (err as Error).message,
+        `[PlaywrightEngine] Error scraping ${timeA} x ${timeB}:`,
+        (error as Error).message,
       );
-      return [];
+      return null;
     }
   }
 

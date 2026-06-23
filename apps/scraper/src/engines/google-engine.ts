@@ -32,8 +32,80 @@ function sanitizarQuery(texto: string): string {
     .trim();
 }
 
+function findMatchContainer(
+  $: cheerio.CheerioAPI,
+  timeA: string,
+  timeB: string,
+): ReturnType<cheerio.CheerioAPI> | null {
+  const normalize = (name: string) => {
+    return name.normalize('NFD').replace(ACCENTS_RE, '').toLowerCase().trim();
+  };
+
+  const normA = normalize(timeA);
+  const normB = normalize(timeB);
+
+  // 1. Try to find using score selectors
+  let matchContainer: ReturnType<cheerio.CheerioAPI> | null = null;
+  $('[class*="imso_mh__l-tm-sc"]').each((_, el) => {
+    let parent = $(el).parent();
+    while (parent.length > 0) {
+      if (parent.find('[class*="imso_mh__r-tm-sc"]').length > 0) {
+        const text = normalize(parent.text() || '');
+        if (text.includes(normA) && text.includes(normB)) {
+          matchContainer = parent;
+          return false; // break each
+        }
+        break;
+      }
+      parent = parent.parent();
+    }
+  });
+
+  if (matchContainer) return matchContainer;
+
+  // 2. Fallback to deepest element containing both team names
+  const candidates: ReturnType<cheerio.CheerioAPI>[] = [];
+  $('*').each((_, el) => {
+    if (!('name' in el) || typeof el.name !== 'string') return;
+    const tagName = el.name.toLowerCase();
+    if (['script', 'style', 'noscript', 'template'].includes(tagName)) return;
+
+    const text = normalize($(el).text() || '');
+    if (text.includes(normA) && text.includes(normB)) {
+      let childContainsBoth = false;
+      $(el)
+        .children()
+        .each((_, child) => {
+          const childText = normalize($(child).text() || '');
+          if (childText.includes(normA) && childText.includes(normB)) {
+            childContainsBoth = true;
+            return false;
+          }
+        });
+      if (!childContainsBoth) {
+        candidates.push($(el));
+      }
+    }
+  });
+
+  if (candidates.length > 0) {
+    const prioritized = candidates.find((c) => {
+      const className = (c.attr('class') || '').toLowerCase();
+      return (
+        className.includes('imso') ||
+        className.includes('match') ||
+        className.includes('sport')
+      );
+    });
+    return prioritized || candidates[0];
+  }
+
+  return null;
+}
+
 function parsePlacar(
   $: cheerio.CheerioAPI,
+  context: ReturnType<cheerio.CheerioAPI>,
 ): { golsA: number; golsB: number } | null {
   const scoreSelectors = [
     '[class*="imso_mh__l-tm-sc"], [class*="imso_mh__r-tm-sc"]',
@@ -44,7 +116,7 @@ function parsePlacar(
 
   for (const sel of scoreSelectors) {
     const texts: string[] = [];
-    $(sel).each((_, el) => {
+    context.find(sel).each((_, el) => {
       const t = $(el).text().trim();
       const n = Number.parseInt(t, 10);
       if (!Number.isNaN(n)) texts.push(t);
@@ -59,7 +131,10 @@ function parsePlacar(
   return null;
 }
 
-function parseStatus($: cheerio.CheerioAPI): string {
+function parseStatus(
+  $: cheerio.CheerioAPI,
+  context: ReturnType<cheerio.CheerioAPI>,
+): string {
   const statusSelectors = [
     '[class*="imso_mh__m-st"]',
     '.imso_mh__m-st',
@@ -67,7 +142,7 @@ function parseStatus($: cheerio.CheerioAPI): string {
   ];
 
   for (const sel of statusSelectors) {
-    const text = $(sel).first().text().trim().toLowerCase();
+    const text = context.find(sel).first().text().trim().toLowerCase();
     if (text.includes('final')) return 'FINALIZADO';
     if (text.includes('ao vivo') || text.includes('andamento'))
       return 'EM_ANDAMENTO';
@@ -77,7 +152,10 @@ function parseStatus($: cheerio.CheerioAPI): string {
   return 'EM_ANDAMENTO';
 }
 
-function parseEventos($: cheerio.CheerioAPI): IScrapeEvent[] {
+function parseEventos(
+  $: cheerio.CheerioAPI,
+  context: ReturnType<cheerio.CheerioAPI>,
+): IScrapeEvent[] {
   const eventos: IScrapeEvent[] = [];
   const eventSelectors = [
     '[class*="imso_mh__e-tx"]',
@@ -86,7 +164,7 @@ function parseEventos($: cheerio.CheerioAPI): IScrapeEvent[] {
   ];
 
   for (const sel of eventSelectors) {
-    $(sel).each((_, el) => {
+    context.find(sel).each((_, el) => {
       const text = $(el).text().trim();
       if (!text) return;
 
@@ -147,11 +225,14 @@ export class GoogleEngine implements IScraperEngine {
     const html = await response.text();
     const $ = cheerio.load(html);
 
-    const placar = parsePlacar($);
+    const container = findMatchContainer($, timeA, timeB);
+    const context = container || $('body');
+
+    const placar = parsePlacar($, context);
     if (!placar) return null;
 
-    const status = parseStatus($);
-    const eventos = parseEventos($);
+    const status = parseStatus($, context);
+    const eventos = parseEventos($, context);
 
     return {
       golsTimeA: placar.golsA,

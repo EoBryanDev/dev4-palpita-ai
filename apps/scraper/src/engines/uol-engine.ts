@@ -1,6 +1,198 @@
 import { type Page, chromium } from 'playwright';
 import type { IScrapeEvent, IScrapeResult, IScraperEngine } from '../types.js';
 
+export function extrairJogadorUol(
+  text: string,
+  tipo: 'GOL' | 'CARTAO_AMARELO' | 'CARTAO_VERMELHO',
+  tA: string,
+  tB: string,
+): string {
+  const normalize = (name: string) => {
+    return (
+      name
+        .normalize('NFD')
+        // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics removal range
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim()
+    );
+  };
+
+  const cleanText = text.replace(/\s+/g, ' ').trim();
+
+  const stopWords = new Set([
+    'goool',
+    'goooooool',
+    'gol',
+    'da',
+    'do',
+    'de',
+    'para',
+    'os',
+    'o',
+    'a',
+    'um',
+    'uma',
+    'no',
+    'na',
+    'em',
+    'dos',
+    'das',
+    'com',
+    'por',
+    'se',
+    'ao',
+    'aos',
+    'amplia',
+    'marca',
+    'abre',
+    'faz',
+    'bate',
+    'chuta',
+    'desvia',
+    'finaliza',
+    'escora',
+    'completa',
+    'anota',
+    'coloca',
+    'empata',
+    'diminui',
+    'converte',
+    'cabeceia',
+    'soma',
+    'garante',
+    'marcou',
+    'ampliou',
+    'empatou',
+    'diminuiu',
+    'fez',
+    'converteu',
+    'chutou',
+    'cabeceou',
+    'bateu',
+    'contra',
+    'e',
+    'mais',
+    'outro',
+    'novamente',
+    'placar',
+    'amarelo',
+    'vermelho',
+    'cartao',
+    'cartão',
+  ]);
+
+  const teamNames = new Set([
+    tA.toLowerCase(),
+    tB.toLowerCase(),
+    normalize(tA),
+    normalize(tB),
+  ]);
+
+  // If it's a card, try to extract using card-specific patterns first
+  if (tipo === 'CARTAO_AMARELO' || tipo === 'CARTAO_VERMELHO') {
+    // Pattern 1: "para [Jogador]"
+    const paraMatch = cleanText.match(/para\s+([A-Z\xc0-\xffa-z\s-]+)/i);
+    if (paraMatch) {
+      const candidate = paraMatch[1].trim();
+      if (candidate.length > 2) return candidate;
+    }
+
+    // Pattern 2: "[Jogador] recebeu"
+    const recebeuMatch = cleanText.match(/([A-Z\xc0-\xffa-z\s-]+)\s+recebeu/i);
+    if (recebeuMatch) {
+      const candidate = recebeuMatch[1].trim();
+      if (candidate.length > 2) return candidate;
+    }
+  }
+
+  // Split by punctuation marks
+  const parts = cleanText
+    .split(/[!.?,;-]/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  for (const part of parts) {
+    const partLower = part.toLowerCase();
+
+    if (partLower.startsWith('gol') || partLower.startsWith('goo')) {
+      const deMatch = part.match(
+        /gol\s+(?:de|do|da)\s+([A-Z\xc0-\xffa-z\s-]+)/i,
+      );
+      if (deMatch) {
+        const candidate = deMatch[1].trim();
+        const candidateLower = candidate.toLowerCase();
+        if (
+          !teamNames.has(candidateLower) &&
+          !stopWords.has(candidateLower) &&
+          candidate.length > 2
+        ) {
+          const words = candidate.split(/\s+/);
+          const cleanWords = [];
+          for (const w of words) {
+            if (stopWords.has(w.toLowerCase())) break;
+            cleanWords.push(w);
+          }
+          if (cleanWords.length > 0) {
+            return cleanWords.join(' ');
+          }
+        }
+      }
+      continue;
+    }
+
+    const words = part.split(/\s+/);
+    const candidateWords = [];
+    for (const word of words) {
+      const wordLower = word.toLowerCase();
+      if (stopWords.has(wordLower)) {
+        if (candidateWords.length > 0) {
+          break;
+        }
+        continue;
+      }
+
+      if (teamNames.has(wordLower)) {
+        continue;
+      }
+
+      const isCapitalized = /^[A-Z\xc0-\xff]/.test(word);
+      if (isCapitalized && word.length > 1) {
+        candidateWords.push(word);
+      } else if (candidateWords.length > 0) {
+        break;
+      }
+    }
+
+    if (candidateWords.length > 0) {
+      return candidateWords.join(' ');
+    }
+  }
+
+  // Fallbacks
+  const fallbackMatch = cleanText.match(
+    /([A-Z\xc0-\xff][A-Za-z\xc0-\xff-]+(?:\s+[A-Z\xc0-\xff][A-Za-z\xc0-\xff-]+)+)/,
+  );
+  if (fallbackMatch) {
+    return fallbackMatch[1].trim();
+  }
+
+  const fallbackSingleWord = cleanText.match(
+    /([A-Z\xc0-\xff][A-Za-z\xc0-\xff-]+)/,
+  );
+  if (fallbackSingleWord) {
+    const word = fallbackSingleWord[1].trim();
+    if (
+      !stopWords.has(word.toLowerCase()) &&
+      !teamNames.has(word.toLowerCase())
+    ) {
+      return word;
+    }
+  }
+
+  return 'Desconhecido';
+}
+
 export class UolEngine implements IScraperEngine {
   private normalizeTeamName(name: string): string {
     return (
@@ -132,13 +324,75 @@ export class UolEngine implements IScraperEngine {
 
       // Executa o script de parsing no contexto da página
       const result = await page.evaluate(
-        (args: { timeANome: string; timeBNome: string }) => {
+        (args: {
+          timeANome: string;
+          timeBNome: string;
+          extrairJogadorFnStr: string;
+        }) => {
           const tA = args.timeANome;
           const tB = args.timeBNome;
 
+          const normalize = (name: string) => {
+            return (
+              name
+                .normalize('NFD')
+                // biome-ignore lint/suspicious/noMisleadingCharacterClass: standard diacritics removal range
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .trim()
+            );
+          };
+
+          const normA = normalize(tA);
+          const normB = normalize(tB);
+
+          // Find the best match container
+          let container: Element | null = null;
+          const allElements = Array.from(document.querySelectorAll('*'));
+          const candidateContainers: Element[] = [];
+          for (const el of allElements) {
+            if (
+              ['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE'].includes(el.tagName)
+            )
+              continue;
+            const text = normalize(el.textContent || '');
+            if (text.includes(normA) && text.includes(normB)) {
+              let childContainsBoth = false;
+              for (let i = 0; i < el.children.length; i++) {
+                const childText = normalize(el.children[i].textContent || '');
+                if (childText.includes(normA) && childText.includes(normB)) {
+                  childContainsBoth = true;
+                  break;
+                }
+              }
+              if (!childContainsBoth) {
+                candidateContainers.push(el);
+              }
+            }
+          }
+
+          if (candidateContainers.length > 0) {
+            const prioritized = candidateContainers.find((el) => {
+              const className = (el.className || '').toString().toLowerCase();
+              return (
+                className.includes('team') ||
+                className.includes('match') ||
+                className.includes('placar') ||
+                className.includes('jogo')
+              );
+            });
+            container = prioritized || candidateContainers[0];
+          }
+
+          const scope = container || document;
+
           // 1. Extração dos gols de cada time
-          const scoreAEl = document.querySelector('.team-one .team-score');
-          const scoreBEl = document.querySelector('.team-two .team-score');
+          const scoreAEl = scope.querySelector(
+            '.team-one .team-score, [class*="team-score"]',
+          );
+          const scoreBEl = scope.querySelector(
+            '.team-two .team-score, [class*="team-score"]',
+          );
 
           if (!scoreAEl || !scoreBEl) {
             return null; // Caso não encontre os placares, a página não é válida
@@ -158,8 +412,12 @@ export class UolEngine implements IScraperEngine {
           }
 
           // 2. Extração do status do jogo
-          const liveEl = document.querySelector('.bold-text2.live');
-          const timeEl = document.querySelector('.time.regular-text2');
+          const liveEl = scope.querySelector(
+            '.bold-text2.live, [class*="live"]',
+          );
+          const timeEl = scope.querySelector(
+            '.time.regular-text2, [class*="time"]',
+          );
           const statusText = (timeEl?.textContent?.trim() || '').toLowerCase();
           const cards = Array.from(
             document.querySelectorAll('.solar-card.live-post'),
@@ -193,6 +451,10 @@ export class UolEngine implements IScraperEngine {
           } else {
             status = 'AGENDADO';
           }
+
+          const extrairJogadorUol = new Function(
+            `return ${args.extrairJogadorFnStr}`,
+          )();
 
           // 3. Extração dos eventos estruturados do minuto a minuto
           const rawEvents: Array<{
@@ -239,22 +501,7 @@ export class UolEngine implements IScraperEngine {
                 timeNome = tB;
               }
 
-              // Tenta descobrir o nome do jogador (maiusculas no texto ou regex antes do texto de exultação)
-              let jogador = 'Desconhecido';
-              const playerMatch = bodyText.match(
-                /(?:gol!|goooooool da \S+|goooooool do \S+)\s*!\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/i,
-              );
-              if (playerMatch) {
-                jogador = playerMatch[1].trim();
-              } else {
-                // Fallback: tenta pegar a primeira frase ou nome próprio
-                const matchName = bodyText.match(
-                  /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/,
-                );
-                if (matchName) {
-                  jogador = matchName[1].trim();
-                }
-              }
+              const jogador = extrairJogadorUol(bodyText, 'GOL');
 
               rawEvents.push({
                 tipo: 'GOL',
@@ -289,16 +536,11 @@ export class UolEngine implements IScraperEngine {
             const hasYC = card.querySelector('.card-rect.yc') !== null;
             const hasRC = card.querySelector('.card-rect.rc') !== null;
             if (hasYC || hasRC) {
-              let jogador = 'Desconhecido';
-              const matchName = bodyText.match(
-                /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/,
-              );
-              if (matchName) {
-                jogador = matchName[1].trim();
-              }
+              const tipo = hasYC ? 'CARTAO_AMARELO' : 'CARTAO_VERMELHO';
+              const jogador = extrairJogadorUol(bodyText, tipo);
 
               rawEvents.push({
-                tipo: hasYC ? 'CARTAO_AMARELO' : 'CARTAO_VERMELHO',
+                tipo,
                 jogador,
                 minuto,
                 acrescimos: acrescimo,
@@ -314,7 +556,11 @@ export class UolEngine implements IScraperEngine {
             eventos: rawEvents,
           };
         },
-        { timeANome: timeA, timeBNome: timeB },
+        {
+          timeANome: timeA,
+          timeBNome: timeB,
+          extrairJogadorFnStr: extrairJogadorUol.toString(),
+        },
       );
 
       await browser.close();

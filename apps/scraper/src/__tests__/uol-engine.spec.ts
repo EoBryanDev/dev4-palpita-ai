@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 import { describe, expect, it, vi } from 'vitest';
-import { UolEngine } from '../engines/uol-engine.js';
+import { UolEngine, extrairJogadorUol } from '../engines/uol-engine.js';
 
 vi.mock('playwright', () => {
   const mockPage = {
@@ -109,5 +109,37 @@ describe('UolEngine', () => {
     expect(result?.status).toBe('EM_ANDAMENTO');
     expect(result?.eventos).toHaveLength(1);
     expect(result?.eventos?.[0].jogador).toBe('Deniz Undav');
+  });
+});
+
+describe('extrairJogadorUol', () => {
+  it('should extract capitalized player name in mixed case or ALL CAPS', () => {
+    const goalText1 =
+      'GOOOL!GOOOOOOOOL DA FRANÇA! MBAPPÉ AMPLIA PARA OS BLUES!';
+    expect(extrairJogadorUol(goalText1, 'GOL', 'França', 'Iraque')).toBe(
+      'MBAPPÉ',
+    );
+
+    const goalText2 = 'GOOOL!GOOOOOOOOL DO BRASIL! Vini Jr marca o primeiro!';
+    expect(extrairJogadorUol(goalText2, 'GOL', 'Brasil', 'Argentina')).toBe(
+      'Vini Jr',
+    );
+
+    const goalText3 = 'GOOOL! GOL DO BRASIL! NEYMAR JR MARCA!';
+    expect(extrairJogadorUol(goalText3, 'GOL', 'Brasil', 'Argentina')).toBe(
+      'NEYMAR JR',
+    );
+  });
+
+  it('should handle card description and extract hyphenated player name correctly', () => {
+    const cardText1 = 'Amir Al-AmmariCartão amarelo para Amir Al-Ammari.';
+    expect(
+      extrairJogadorUol(cardText1, 'CARTAO_AMARELO', 'França', 'Iraque'),
+    ).toBe('Amir Al-Ammari');
+
+    const cardText2 = 'Cartão amarelo para Lee Kang-in (Coreia do Sul)';
+    expect(
+      extrairJogadorUol(cardText2, 'CARTAO_AMARELO', 'México', 'Coreia do Sul'),
+    ).toBe('Lee Kang-in');
   });
 });
