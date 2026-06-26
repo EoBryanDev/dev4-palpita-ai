@@ -321,6 +321,56 @@ describe('PalpitesStats', () => {
         screen.getByRole('button', { name: /Visualizar mais/i }),
       ).toBeDefined();
     });
+
+    it('deve alternar a ordenação entre crescente e decrescente quando clicado nos botões de filtro', () => {
+      (useQuery as Mock).mockReturnValue({
+        isLoading: false,
+        isError: false,
+        data: [
+          makeMatch({
+            id: 'm-earlier',
+            timeA: 'Brasil',
+            timeB: 'Uruguai',
+            dataInicio: '2026-06-10T18:00:00Z',
+            status: 'FINALIZADO',
+          }),
+          makeMatch({
+            id: 'm-later',
+            timeA: 'Argentina',
+            timeB: 'França',
+            dataInicio: '2026-06-14T18:00:00Z',
+            status: 'FINALIZADO',
+          }),
+        ],
+      });
+
+      render(<PalpitesStats nomeUsuario={null} />);
+      // Clicar em "Todos" para exibir os jogos finalizados também
+      fireEvent.click(screen.getByText('Todos'));
+
+      // Por padrão, sortOrder é 'ASC' (crescente), então 'Brasil' (10/06) deve vir antes de 'Argentina' (14/06)
+      let elEarlier = screen.getByText('Brasil');
+      let elLater = screen.getByText('Argentina');
+      expect(elEarlier.compareDocumentPosition(elLater) & 4).toBe(4);
+
+      // Clicar em "Decrescente"
+      const descBtn = screen.getByRole('button', { name: 'Decrescente' });
+      fireEvent.click(descBtn);
+
+      // Agora, 'Argentina' (14/06) deve vir antes de 'Brasil' (10/06)
+      elEarlier = screen.getByText('Brasil');
+      elLater = screen.getByText('Argentina');
+      expect(elLater.compareDocumentPosition(elEarlier) & 4).toBe(4);
+
+      // Clicar em "Crescente"
+      const ascBtn = screen.getByRole('button', { name: 'Crescente' });
+      fireEvent.click(ascBtn);
+
+      // Voltar ao padrão
+      elEarlier = screen.getByText('Brasil');
+      elLater = screen.getByText('Argentina');
+      expect(elEarlier.compareDocumentPosition(elLater) & 4).toBe(4);
+    });
   });
 
   describe('Filtro de Status', () => {

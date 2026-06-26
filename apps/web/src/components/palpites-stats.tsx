@@ -26,6 +26,7 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
   const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('PENDENTES');
   const [visibleLimit, setVisibleLimit] = useState(6);
+  const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('ASC');
 
   const [modalMatch, setModalMatch] = useState<IPartidaStats | null>(null);
   const [modalFilter, setModalFilter] = useState<VotoFilter>('TOTAL');
@@ -39,24 +40,12 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
   } = useQueryPalpitesStats();
 
   const sortedMatches = useMemo(() => {
-    const active = matches.filter(
-      (m) => m.status !== 'FINALIZADO' && m.status !== 'FINALIZADA',
-    );
-    const completed = matches.filter(
-      (m) => m.status === 'FINALIZADO' || m.status === 'FINALIZADA',
-    );
-
-    active.sort(
-      (a, b) =>
-        new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime(),
-    );
-    completed.sort(
-      (a, b) =>
-        new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime(),
-    );
-
-    return [...active, ...completed];
-  }, [matches]);
+    return [...matches].sort((a, b) => {
+      const dateA = new Date(a.dataInicio).getTime();
+      const dateB = new Date(b.dataInicio).getTime();
+      return sortOrder === 'ASC' ? dateA - dateB : dateB - dateA;
+    });
+  }, [matches, sortOrder]);
 
   const filteredMatches = useMemo(() => {
     let filtered = sortedMatches;
@@ -93,6 +82,11 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
 
   const handleStatusFilterChange = (filter: StatusFilter) => {
     setStatusFilter(filter);
+    setVisibleLimit(6);
+  };
+
+  const handleSortOrderChange = (order: 'ASC' | 'DESC') => {
+    setSortOrder(order);
     setVisibleLimit(6);
   };
 
@@ -205,7 +199,7 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
   return (
     <div className="space-y-8">
       {/* Barra de Busca e Filtros */}
-      <div className="flex flex-col sm:flex-row items-center gap-4">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-2.5 h-4.5 w-4.5 text-zinc-400" />
           <input
@@ -217,27 +211,51 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
           />
         </div>
 
-        <div className="flex gap-2">
-          {(['TODOS', 'PENDENTES', 'FINALIZADOS'] as StatusFilter[]).map(
-            (opt) => (
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex gap-2">
+            {(['TODOS', 'PENDENTES', 'FINALIZADOS'] as StatusFilter[]).map(
+              (opt) => (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => handleStatusFilterChange(opt)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    statusFilter === opt
+                      ? 'bg-emerald-600 text-white dark:bg-emerald-500 dark:text-zinc-950'
+                      : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700'
+                  }`}
+                >
+                  {opt === 'TODOS'
+                    ? 'Todos'
+                    : opt === 'PENDENTES'
+                      ? 'Pendentes'
+                      : 'Finalizados'}
+                </button>
+              ),
+            )}
+          </div>
+
+          <div className="flex gap-1 rounded-xl border border-zinc-200 bg-white p-1 dark:border-zinc-800 dark:bg-zinc-900">
+            {(
+              [
+                { key: 'ASC', label: 'Crescente' },
+                { key: 'DESC', label: 'Decrescente' },
+              ] as const
+            ).map((opt) => (
               <button
-                key={opt}
+                key={opt.key}
                 type="button"
-                onClick={() => handleStatusFilterChange(opt)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  statusFilter === opt
-                    ? 'bg-emerald-600 text-white dark:bg-emerald-500 dark:text-zinc-950'
-                    : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700'
+                onClick={() => handleSortOrderChange(opt.key)}
+                className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                  sortOrder === opt.key
+                    ? 'bg-zinc-800 text-white dark:bg-zinc-200 dark:text-zinc-900'
+                    : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
                 }`}
               >
-                {opt === 'TODOS'
-                  ? 'Todos'
-                  : opt === 'PENDENTES'
-                    ? 'Pendentes'
-                    : 'Finalizados'}
+                {opt.label}
               </button>
-            ),
-          )}
+            ))}
+          </div>
         </div>
       </div>
 
