@@ -1,3 +1,10 @@
+# [1.19.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.18.7...v1.19.0) (2026-06-26)
+
+
+### Features
+
+* **web:** adicionar ordenação por data de início dos jogos EOB-189 ([a3aad7b](https://github.com/EoBryanDev/dev4-palpita-ai/commit/a3aad7b6315b102ffda0456b17e70a69b3a3c2d4))
+
 ## [1.18.7](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.18.6...v1.18.7) (2026-06-23)
 
 
