@@ -45,11 +45,11 @@ The system SHALL insert new events into `eventos_partida` table when the scraped
 - **THEN** the sync service SHALL skip event processing
 
 ### Requirement: Sync service respects rate limiting
-The system SHALL wait at least 2 seconds between requests to Google.
+The system SHALL handle Google rate limits by throwing a dedicated `RateLimitError` when a `429 Too Many Requests` status is returned by the engine.
 
-#### Scenario: Multiple matches pending
-- **WHEN** processing 3+ pending matches
-- **THEN** the sync service SHALL introduce a delay between each scrape request
+#### Scenario: Scraper rate limited
+- **WHEN** Google search returns an HTTP 429 status
+- **THEN** the scraper engine throws a `RateLimitError` with the `Retry-After` header value, halting the match sync execution for that run.
 
 ### Requirement: Audit logging
 The system SHALL log structured audit entries for each operation.

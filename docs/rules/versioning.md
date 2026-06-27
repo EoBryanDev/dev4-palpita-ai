@@ -6,7 +6,7 @@ Adote o **Trunk-Based Development** para manter um ritmo rápido de entrega e ev
 
 - **Branch Principal (`main`)**: A branch `main` é a fonte da verdade pronta para produção. Ela deve estar sempre estável.
 - **Branches de Vida Curta**: Crie uma nova branch para cada funcionalidade ou correção. 
-    - **Padrão de Nomenclatura**: `tipo/descricao-curta` (ex.: `feat/login-validation`, `fix/header-z-index`).
+    - **Padrão de Nomenclatura**: `tipo/ENG-XXX-descricao-curta` onde `ENG-XXX` é o ID do Ticket do Linear (ex.: `feat/ENG-123-login-validation`, `fix/ENG-456-header-z-index`).
     - **Convenção de Nomenclatura**: Utilize **kebab-case** para os nomes das branches.
 - **Merge Rápido**: Funcionalidades devem ser integradas à `main` assim que forem concluídas e testadas.
 
@@ -16,9 +16,10 @@ Seguimos a especificação do [Conventional Commits](https://www.conventionalcom
 
 ### Regras:
 - **Formatação (Casing)**: Utilize letras minúsculas (lowercase) para a descrição.
+- **Integração com Linear**: Anexe o ID do Ticket do Linear no final da mensagem do commit (ex.: `feat(api): description ENG-XXX`).
 
 ### Formato:
-`<tipo>(escopo): descricao`
+`<tipo>(escopo): descricao ENG-XXX`
 
 - **feat**: Uma nova funcionalidade para o usuário.
 - **fix**: Uma correção de bug para o usuário.
@@ -28,7 +29,7 @@ Seguimos a especificação do [Conventional Commits](https://www.conventionalcom
 - **test**: Adição de testes ausentes, refatoração de testes; sem alteração no código de produção.
 - **chore**: Atualização de tarefas de build etc.; sem alteração no código de produção.
 
-*Exemplo: `feat(api): adicionando autenticação JWT`*
+*Exemplo: `feat(api): adicionando autenticação JWT ENG-123`*
 
 ## Commits Atômicos
 

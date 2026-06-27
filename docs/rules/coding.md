@@ -9,7 +9,7 @@
 
 ## Arquivos
 
-- Utilize sufixos nos arquivos de acordo com o papel deles: `.usecase.ts`, `.repository.ts`, `.controller.ts`, `.entity.ts`
+- Utilize sufixos nos arquivos de acordo com o papel deles: `.usecase.ts`, `.repository.ts`, `.controller.ts`, `.entity.ts`, `.service.ts`, `-engine.ts`
 
 ## TypeScript
 

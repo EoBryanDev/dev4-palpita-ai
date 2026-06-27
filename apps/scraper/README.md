@@ -23,17 +23,18 @@ src/
 # Execução única
 pnpm scraper run
 
-# Modo watch (a cada N minutos, default 15)
+# Modo watch (a cada N minutos, default 5)
 pnpm scraper watch --interval 10
 ```
 
 ## Variáveis de Ambiente
 
-| Variável       | Descrição                          | Default                        |
-|----------------|------------------------------------|--------------------------------|
-| `DATABASE_URL` | URL de conexão PostgreSQL          | `postgres://...`               |
-| `NODE_ENV`     | Ambiente (production/development)  | `development`                  |
-| `SCRAPER_PORT` | Porta do healthcheck (se houver)   | `3001`                         |
+| Variável                   | Descrição                                                                      | Default           |
+|----------------------------|--------------------------------------------------------------------------------|-------------------|
+| `DATABASE_URL`             | URL de conexão PostgreSQL.                                                     | `postgres://...`  |
+| `NODE_ENV`                 | Ambiente da aplicação (production/development).                                | `development`     |
+| `SCRAPER_ENGINE`           | Engine de busca de resultados a ser utilizada (`uol`, `playwright`, `google`). | `uol`             |
+| `SCRAPER_INTERVAL_MINUTES` | Intervalo do modo watch em minutos.                                            | `5`               |
 
 ## Docker
 

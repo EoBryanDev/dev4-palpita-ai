@@ -107,11 +107,11 @@ A ausência de uma ferramenta integrada e dedicada para a realização de bolõe
 
 | #        | Regra                                                                                                                                                                                                                                                                                                               |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **RN01** | **Cálculo de Pontuação:** Se o usuário acertar o placar exato do jogo (acerto na mosca, incluindo empates), ganha 2 pontos. Se o usuário errar o placar exato, mas acertar o vencedor ou a ocorrência de empate, ganha 1 ponto. Se errar tudo, ganha 0 pontos.                                                      |
-| **RN02** | **Bloqueio Automático de Palpites:** O formulário de preenchimento de palpite de um jogo é desativado para todos os usuários no minuto exato cadastrado como o de início real do jogo.                                                                                                                              |
-| **RN03** | **Segurança e Analytics de Palpites:** No módulo público `/palpites`, os dados de percentual coletivo (analytics) e os palpites detalhados individuais de cada usuário podem ser vistos livremente por todos os participantes a qualquer momento, dado que as edições de palpites estão trancadas para o torneio inteiro. |
-| **RN04** | **Expiração de Convite:** O link para definição de senha enviado na aprovação de cadastro expira em exatamente 5 minutos após o disparo.                                                                                                                                                                            |
-| **RN05** | **Liberação Condicionada de Palpites:** Os usuários só têm permissão para gravar palpites no sistema se seu status de usuário estiver definido como "Liberado" pelo Administrador (indicando confirmação de adesão/contribuição).                                                                                   |
+| **RN01** | **Cálculo de Pontuação:**<br>1. **Fase de Grupos:** Se o usuário acertar o placar exato do jogo (acerto na mosca, incluindo empates), ganha 2 pontos. Se o usuário errar o placar exato, mas acertar o vencedor ou a ocorrência de empate, ganha 1 ponto. Se errar tudo, ganha 0 pontos.<br>2. **Fase de Mata-Mata (Knockout):** O acerto do placar exato (tempo regulamentar + prorrogação se houver, antes de pênaltis) continua valendo 2 pontos. O acerto do vencedor ou empate (antes de pênaltis) sem placar exato vale 1 ponto. Se errar tudo, ganha 0 pontos. Adicionalmente, se o palpiteiro acertar o **momento da vitória** (tempo normal, prorrogação ou disputa de pênaltis) ele ganha **+1 ponto extra** de bônus.<br>*Exemplo 1:* Palpite de 2x1 com vitória na prorrogação. Se o placar oficial for 2x1 na prorrogação, ele ganha 2 (placar exato) + 1 (momento correto) = 3 pontos.<br>*Exemplo 2:* Palpite de 1x1 com vitória nos pênaltis. Se o jogo termina 2x2 e vai para os pênaltis, ele ganha 1 (acerto de empate) + 1 (momento correto - pênaltis) = 2 pontos (gols de pênaltis não contam para o placar). |
+| **RN02** | **Bloqueio de Palpites (Deadline):**<br>1. **Regra de Implementação Atual:** O bloqueio global de palpites de usuários comuns ocorre exatamente **30 minutos antes do primeiro jogo de todo o campeonato (Copa do Mundo)**. Para usuários com liberação de acesso tardio (`dataLiberacao` preenchida pelo Admin), o prazo é de exatamente **30 minutos contados a partir da data de liberação**. Em ambos os casos, a gravação de palpites de um jogo individual é permanentemente desativada assim que o horário de início real da partida é alcançado.<br>2. **Nova Regra Planejada:** O envio ou a alteração de palpites para qualquer partida de uma determinada rodada será bloqueado exatamente **30 minutos antes do início do primeiro jogo correspondente àquela rodada**. |
+| **RN03** | **Segurança e Analytics de Palpites:** No módulo público `/palpites`, os dados de percentual coletivo (analytics) podem ser visualizados livremente por todos os participantes a qualquer momento. No entanto, para garantir a integridade da competição e impedir cópias de apostas, os palpites detalhados individuais de cada usuário ficam bloqueados e ocultos por segurança até o horário de início real da respectiva partida. |
+| **RN04** | **Expiração de Convite:** O link para definição de senha enviado na aprovação de cadastro expira em exatamente 5 minutos após o disparo. |
+| **RN05** | **Liberação Condicionada de Palpites:** Os usuários só têm permissão para gravar palpites no sistema se seu status de usuário estiver definido como "Liberado" pelo Administrador (indicando confirmação de adesão/contribuição). |
 
 ---
 
@@ -122,13 +122,12 @@ A ausência de uma ferramenta integrada e dedicada para a realização de bolõe
 | **Taxa de Conversão de Convites** | Percentual de solicitações de interesse que de fato completam o processo de cadastro de senha em até 5 minutos. |
 | **Adesão Geral do Time**          | Percentual total de colaboradores da empresa que se cadastraram no bolão.                                       |
 | **Média de Palpites por Usuário** | Quantidade média de palpites válidos salvos por usuário cadastrado a cada rodada.                               |
-| **Visualizações no Ranking**      | Total de acessos diários na página `/ranking` (indica retenção e engajamento).                                  |
+| **Visualizações no Ranking**      | Total de acessos diários na página `/ranking` (indica recuperação e engajamento).                               |
 
 ---
 
 ## 8. Fora de Escopo (v1)
 
-- Integração com APIs externas automatizadas para cadastro de jogos ou atualização em tempo real de resultados esportivos.
 - Gateway de pagamento integrado (ex: Pix, cartões) para cobrança de taxas de inscrição do bolão de forma direta.
 - Aplicação móvel nativa hospedada em lojas digitais (Google Play Store ou Apple App Store).
 

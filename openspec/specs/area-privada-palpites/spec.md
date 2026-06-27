@@ -11,11 +11,31 @@ O sistema MUST permitir que o competidor insira ou atualize seus palpites para p
 - **THEN** o sistema valida e grava o palpite no banco de dados, associando-o ao usuário logado e à partida, exibindo feedback visual de sucesso.
 
 ### Requirement: Bloqueio Temporal de Palpites (RN02)
-O sistema DEVE impedir o envio ou a alteração de palpites para uma rodada a partir de 30 minutos antes do início do primeiro jogo correspondente àquela rodada.
+O sistema DEVE impedir o envio ou a alteração de palpites em conformidade com as travas de prazo ativo:
 
-#### Scenario: Tentativa de palpite após o prazo limite da rodada
+#### 1. Comportamento Atual (Código)
+*   **Usuários comuns:** Bloqueio global 30 minutos antes do primeiro jogo da Copa do Mundo.
+*   **Usuários tardios:** Janela de 30 minutos após `dataLiberacao`.
+*   **Partidas individuais:** Bloqueio individual assim que o jogo começa.
+
+#### Scenario: Usuário comum tenta salvar após o limite global
+- **WHEN** o usuário comum tenta salvar palpites após 30 minutos do primeiro jogo do torneio
+- **THEN** o sistema recusa o salvamento e desativa os inputs correspondentes.
+
+#### Scenario: Usuário tardio tenta salvar após o limite de 30 minutos
+- **WHEN** o usuário tardio tenta salvar palpites após 30 minutos de ter sido liberado pelo administrador
+- **THEN** o sistema recusa o salvamento.
+
+#### Scenario: Tentativa de palpite em jogo que já começou
+- **WHEN** o usuário tenta enviar ou alterar o palpite de um jogo que já iniciou (`agora >= dataInicio`)
+- **THEN** o sistema rejeita a alteração.
+
+#### 2. Nova Regra Planejada (Rodada)
+*   O sistema impede o envio ou a alteração de palpites para uma rodada a partir de 30 minutos antes do início do primeiro jogo correspondente àquela rodada.
+
+#### Scenario: Tentativa de palpite após o prazo limite da rodada (Regra Planejada)
 - **WHEN** o horário atual for posterior ou igual a 30 minutos antes do início do primeiro jogo da rodada e o usuário tenta salvar ou alterar o palpite de qualquer jogo da rodada
-- **THEN** o sistema rejeita a alteração, exibe um erro de validação e desativa o formulário/inputs correspondentes no dashboard do usuário competidor.
+- **THEN** o sistema rejeita a alteração, exibe um erro de validação e desativa o formulário/inputs correspondentes no dashboard.
 
 ### Requirement: Liberação de Palpites Condicionada (RN05)
 O sistema DEVE permitir a gravação de palpites apenas para usuários que tenham sido marcados como "Liberado" pelo Administrador do bolão.
