@@ -471,17 +471,17 @@ export function AdminPartidasClient({
 
                 return (
                   <div key={rodada.id} className="space-y-4">
-                    <div className="flex items-center gap-2 border-b border-zinc-250 dark:border-zinc-800 pb-2">
-                      <span className="text-sm font-black px-2.5 py-0.5 rounded-lg bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300">
+                    <div className="flex items-center gap-2 border-b border-zinc-250 dark:border-zinc-800 pb-2 min-w-0">
+                      <span className="text-sm font-black px-2.5 py-0.5 rounded-lg bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300 shrink-0">
                         Rodada {rodada.numero}
                       </span>
-                      <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex-1">
+                      <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex-1 min-w-0 truncate">
                         {rodada.nome}
                       </h4>
                       {/* Toggle Mata-Mata inline por rodada */}
                       <label
                         htmlFor={`rodada-tipo-${rodada.id}`}
-                        className="flex items-center gap-2 cursor-pointer select-none group"
+                        className="flex items-center gap-2 cursor-pointer select-none group shrink-0"
                         title={rodada.tipo === 'MATAMATA' ? 'Clique para mudar para Fase de Grupos' : 'Clique para marcar como Mata-Mata'}
                       >
                         <div className="relative">
