@@ -311,7 +311,13 @@ describe('Palpite Entity', () => {
             dataAtualizacao: new Date(),
           });
 
-          const pontos = palpite.calcularPontos(1, 1, 'MATAMATA', 'PENALTIS', 'A');
+          const pontos = palpite.calcularPontos(
+            1,
+            1,
+            'MATAMATA',
+            'PENALTIS',
+            'A',
+          );
           expect(pontos).toBe(3); // 2 placar exato + 1 bonus vencedor
         });
 
@@ -327,7 +333,13 @@ describe('Palpite Entity', () => {
             dataAtualizacao: new Date(),
           });
 
-          const pontos = palpite.calcularPontos(1, 1, 'MATAMATA', 'PENALTIS', 'B');
+          const pontos = palpite.calcularPontos(
+            1,
+            1,
+            'MATAMATA',
+            'PENALTIS',
+            'B',
+          );
           expect(pontos).toBe(2); // 2 placar exato + 0 bonus
         });
 
@@ -343,7 +355,13 @@ describe('Palpite Entity', () => {
             dataAtualizacao: new Date(),
           });
 
-          const pontos = palpite.calcularPontos(1, 1, 'MATAMATA', 'PENALTIS', 'A');
+          const pontos = palpite.calcularPontos(
+            1,
+            1,
+            'MATAMATA',
+            'PENALTIS',
+            'A',
+          );
           expect(pontos).toBe(2); // 1 empate + 1 bonus vencedor
         });
 
@@ -359,7 +377,13 @@ describe('Palpite Entity', () => {
             dataAtualizacao: new Date(),
           });
 
-          const pontos = palpite.calcularPontos(1, 1, 'MATAMATA', 'PENALTIS', 'B');
+          const pontos = palpite.calcularPontos(
+            1,
+            1,
+            'MATAMATA',
+            'PENALTIS',
+            'B',
+          );
           expect(pontos).toBe(1); // 1 empate + 0 bonus
         });
 
@@ -374,7 +398,13 @@ describe('Palpite Entity', () => {
             dataAtualizacao: new Date(),
           });
 
-          const pontos = palpite.calcularPontos(1, 1, 'MATAMATA', 'PENALTIS', 'A');
+          const pontos = palpite.calcularPontos(
+            1,
+            1,
+            'MATAMATA',
+            'PENALTIS',
+            'A',
+          );
           expect(pontos).toBe(0); // errou o resultado
         });
 
@@ -390,7 +420,13 @@ describe('Palpite Entity', () => {
             dataAtualizacao: new Date(),
           });
 
-          const pontos = palpite.calcularPontos(1, 1, 'MATAMATA', 'PENALTIS', null);
+          const pontos = palpite.calcularPontos(
+            1,
+            1,
+            'MATAMATA',
+            'PENALTIS',
+            null,
+          );
           expect(pontos).toBe(2); // 2 placar exato + 0 bonus (sem oficial)
         });
 
@@ -406,7 +442,12 @@ describe('Palpite Entity', () => {
             dataAtualizacao: new Date(),
           });
 
-          const pontos = palpite.calcularPontos(2, 1, 'MATAMATA', 'PRORROGACAO');
+          const pontos = palpite.calcularPontos(
+            2,
+            1,
+            'MATAMATA',
+            'PRORROGACAO',
+          );
           expect(pontos).toBe(3); // 2 placar exato + 1 bonus momento
         });
 

@@ -1,4 +1,8 @@
-import type { TDecididoEm, TPenaltyWinner, TRodadaTipo } from './partida.entity';
+import type {
+  TDecididoEm,
+  TPenaltyWinner,
+  TRodadaTipo,
+} from './partida.entity';
 
 export interface IPalpiteProps {
   id: string;
