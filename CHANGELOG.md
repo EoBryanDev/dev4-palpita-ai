@@ -1,3 +1,20 @@
+# [1.21.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.20.1...v1.21.0) (2026-06-28)
+
+
+### Features
+
+* **api:** add penalty fields to services and interfaces ([20e0192](https://github.com/EoBryanDev/dev4-palpita-ai/commit/20e01924a57b2e9fe1b56cc0a296d4aa0380ea7a))
+* **api:** add penalty validation to salvarPalpite and lancarResultadoOficial ([bb28e4a](https://github.com/EoBryanDev/dev4-palpita-ai/commit/bb28e4a794defaab94b97012ac29a44d87ba3c00))
+* **api:** pass timeVencedorPenaltis through actions and services EOB-191 ([257149e](https://github.com/EoBryanDev/dev4-palpita-ai/commit/257149eacd85904f69726f7f66253e07304523ba))
+* **core:** add timeVencedorPenaltis and timeVencedorPrevisto to schema and domain entities ([698e944](https://github.com/EoBryanDev/dev4-palpita-ai/commit/698e944a821c563a26e1cf5ddd4307db72dfd1bc))
+* **core:** add timeVencedorPrevisto and timeVencedorPenaltis to Palpite entity EOB-191 ([def2a25](https://github.com/EoBryanDev/dev4-palpita-ai/commit/def2a25a9c862840c8b6c918b1f5d8efe06efc17))
+* **db:** add migration for time_vencedor_penaltis and time_vencedor_previsto EOB-191 ([26ce800](https://github.com/EoBryanDev/dev4-palpita-ai/commit/26ce80076623fd6596de0388018d5f25626045f5))
+* **db:** add timeVencedorPenaltis column to partidas schema EOB-191 ([b5eac0a](https://github.com/EoBryanDev/dev4-palpita-ai/commit/b5eac0a3c009085f3ef53571f1a7a4ff6c853277))
+* **web:** add MATAMATA penalty info to stats page and API ([c40b444](https://github.com/EoBryanDev/dev4-palpita-ai/commit/c40b4446f15579aab37fcbfb63a848952ff21546))
+* **web:** add timeVencedorPenaltis UI to admin and dashboard EOB-191 ([ae1dfb1](https://github.com/EoBryanDev/dev4-palpita-ai/commit/ae1dfb135caec78badc1d2b74cce1a59e2505de9))
+* **web:** conditional penalty selector in dashboard and per-match deadline ([5b642b0](https://github.com/EoBryanDev/dev4-palpita-ai/commit/5b642b0d579892409f974f9ea8a9eeaeb88aa102))
+* **web:** map penalty fields in meu-espaco page ([f7fd132](https://github.com/EoBryanDev/dev4-palpita-ai/commit/f7fd1328ffec0e48536f35a2df6320a0017693e0))
+
 ## [1.20.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.20.0...v1.20.1) (2026-06-28)
 
 
