@@ -5,6 +5,7 @@ import {
   Partida,
   type TDecididoEm,
   type TPartidaStatus,
+  type TPenaltyWinner,
   type TUsuarioCargo,
   type TUsuarioStatus,
   Usuario,
@@ -524,6 +525,7 @@ export async function lancarResultadoOficial(
   golsTimeA: number,
   golsTimeB: number,
   decididoEm?: TDecididoEm,
+  timeVencedorPenaltis?: TPenaltyWinner,
 ): Promise<IAdminActionResponse> {
   try {
     await validarOrigem();
@@ -561,6 +563,20 @@ export async function lancarResultadoOficial(
         return { success: false, message: 'Partida não encontrada.' };
       }
 
+      // Validar vencedor nos penaltis para MATAMATA com empate
+      const rodadaMatch = await tx.query.rodadas.findFirst({
+        where: eq(rodadas.id, match.rodadaId),
+      });
+      const isMataMata = rodadaMatch?.tipo === 'MATAMATA';
+
+      if (isMataMata && golsTimeA === golsTimeB && !timeVencedorPenaltis) {
+        return {
+          success: false,
+          message:
+            'Em partidas de mata-mata com empate, informe o time vencedor nos pênaltis.',
+        };
+      }
+
       const partidaEntity = new Partida({
         id: match.id,
         rodadaId: match.rodadaId,
@@ -575,7 +591,7 @@ export async function lancarResultadoOficial(
       });
 
       try {
-        partidaEntity.finalizar(golsTimeA, golsTimeB, decididoEm);
+        partidaEntity.finalizar(golsTimeA, golsTimeB, decididoEm, timeVencedorPenaltis);
       } catch (domainError) {
         return {
           success: false,
@@ -583,7 +599,7 @@ export async function lancarResultadoOficial(
         };
       }
 
-      // 2. Atualizar o status, o placar e decididoEm
+      // 2. Atualizar o status, placar, decididoEm e vencedor penaltis
       await tx
         .update(partidas)
         .set({
@@ -591,6 +607,7 @@ export async function lancarResultadoOficial(
           golsTimeB: partidaEntity.golsTimeB,
           status: 'FINALIZADO',
           decididoEm: partidaEntity.decididoEm,
+          timeVencedorPenaltis: partidaEntity.timeVencedorPenaltis,
         })
         .where(eq(partidas.id, partidaId));
 
