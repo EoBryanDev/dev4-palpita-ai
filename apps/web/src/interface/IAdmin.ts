@@ -8,6 +8,7 @@ export interface IRodadaAdmin {
   numero: number;
   nome: string;
   ativa: boolean;
+  tipo?: 'GRUPO' | 'MATAMATA';
 }
 
 export interface IPartidaAdmin {
@@ -22,6 +23,8 @@ export interface IPartidaAdmin {
   dataInicio: string;
   status: string;
   rodadaNome: string;
+  decididoEm?: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+  tipoRodada?: 'GRUPO' | 'MATAMATA';
 }
 
 export interface ITimeAdmin {

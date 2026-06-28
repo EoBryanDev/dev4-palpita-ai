@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import {
+  useMutationAtualizarTipoRodada,
   useMutationCriarPartida,
   useMutationCriarRodada,
   useMutationLancarResultadoOficial,
@@ -40,16 +41,19 @@ export function AdminPartidasClient({
 
   const mutationCriarRodada = useMutationCriarRodada();
   const mutationCriarPartida = useMutationCriarPartida();
+  const mutationAtualizarTipoRodada = useMutationAtualizarTipoRodada();
   const mutationLancarResultadoOficial = useMutationLancarResultadoOficial();
 
   const isPending =
     mutationCriarRodada.isPending ||
     mutationCriarPartida.isPending ||
+    mutationAtualizarTipoRodada.isPending ||
     mutationLancarResultadoOficial.isPending;
 
   // Estados para Criação de Rodada
   const [novaRodadaNum, setNovaRodadaNum] = useState('');
   const [novaRodadaNome, setNovaRodadaNome] = useState('');
+  const [novaRodadaMataMata, setNovaRodadaMataMata] = useState(false);
 
   // Estados para Criação de Partida
   const [partidaRodadaId, setPartidaRodadaId] = useState('');
@@ -60,6 +64,10 @@ export function AdminPartidasClient({
   // Estados para Lancamento de Placar
   const [placares, setPlacares] = useState<
     Record<string, { golsA: string; golsB: string }>
+  >({});
+
+  const [decididoEmValores, setDecididoEmValores] = useState<
+    Record<string, 'NORMAL' | 'PRORROGACAO' | 'PENALTIS'>
   >({});
 
   const [editingPartidas, setEditingPartidas] = useState<
@@ -74,6 +82,12 @@ export function AdminPartidasClient({
         golsA: String(partida.golsTimeA ?? ''),
         golsB: String(partida.golsTimeB ?? ''),
       },
+    }));
+    setDecididoEmValores((prev) => ({
+      ...prev,
+      [partida.id]:
+        (partida.decididoEm as 'NORMAL' | 'PRORROGACAO' | 'PENALTIS') ??
+        'NORMAL',
     }));
   };
 
@@ -109,6 +123,7 @@ export function AdminPartidasClient({
       const res = await mutationCriarRodada.mutateAsync({
         numero: Number(novaRodadaNum),
         nome: novaRodadaNome.trim(),
+        tipo: novaRodadaMataMata ? 'MATAMATA' : 'GRUPO',
       });
       toast({
         title: 'Rodada Criada!',
@@ -116,6 +131,7 @@ export function AdminPartidasClient({
       });
       setNovaRodadaNum('');
       setNovaRodadaNome('');
+      setNovaRodadaMataMata(false);
       router.refresh();
     } catch (error) {
       const err = error as { message?: string };
@@ -179,11 +195,14 @@ export function AdminPartidasClient({
       return;
     }
 
+    const decididoEm = decididoEmValores[partidaId] ?? 'NORMAL';
+
     try {
       const res = await mutationLancarResultadoOficial.mutateAsync({
         partidaId,
         golsTimeA: Number(placar.golsA),
         golsTimeB: Number(placar.golsB),
+        decididoEm,
       });
       toast({
         title: 'Resultado Lançado!',
@@ -273,6 +292,32 @@ export function AdminPartidasClient({
                 disabled={isPending}
               />
             </div>
+            {/* Toggle Mata-Mata */}
+            <label
+              htmlFor="novaRodadaMataMata"
+              className="flex items-center gap-3 cursor-pointer select-none group"
+            >
+              <div className="relative">
+                <input
+                  id="novaRodadaMataMata"
+                  type="checkbox"
+                  checked={novaRodadaMataMata}
+                  onChange={(e) => setNovaRodadaMataMata(e.target.checked)}
+                  disabled={isPending}
+                  className="sr-only peer"
+                />
+                <div className="w-10 h-6 rounded-full bg-zinc-200 dark:bg-zinc-700 peer-checked:bg-amber-500 dark:peer-checked:bg-amber-400 transition-colors duration-200" />
+                <div className="absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 peer-checked:translate-x-4" />
+              </div>
+              <div>
+                <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200 group-has-[:checked]:text-amber-600 dark:group-has-[:checked]:text-amber-400">
+                  Fase Mata-Mata
+                </span>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-tight">
+                  Habilita palpite do momento da decisão (+1 pt)
+                </p>
+              </div>
+            </label>
             <Button
               type="submit"
               disabled={isPending}
@@ -426,13 +471,65 @@ export function AdminPartidasClient({
 
                 return (
                   <div key={rodada.id} className="space-y-4">
-                    <div className="flex items-center gap-2 border-b border-zinc-250 dark:border-zinc-800 pb-2">
-                      <span className="text-sm font-black px-2.5 py-0.5 rounded-lg bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300">
+                    <div className="flex items-center gap-2 border-b border-zinc-250 dark:border-zinc-800 pb-2 min-w-0">
+                      <span className="text-sm font-black px-2.5 py-0.5 rounded-lg bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300 shrink-0">
                         Rodada {rodada.numero}
                       </span>
-                      <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-50">
+                      <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex-1 min-w-0 truncate">
                         {rodada.nome}
                       </h4>
+                      {/* Toggle Mata-Mata inline por rodada */}
+                      <label
+                        htmlFor={`rodada-tipo-${rodada.id}`}
+                        className="flex items-center gap-2 cursor-pointer select-none group shrink-0"
+                        title={
+                          rodada.tipo === 'MATAMATA'
+                            ? 'Clique para mudar para Fase de Grupos'
+                            : 'Clique para marcar como Mata-Mata'
+                        }
+                      >
+                        <div className="relative">
+                          <input
+                            id={`rodada-tipo-${rodada.id}`}
+                            type="checkbox"
+                            checked={rodada.tipo === 'MATAMATA'}
+                            disabled={isPending}
+                            onChange={async () => {
+                              const novoTipo =
+                                rodada.tipo === 'MATAMATA'
+                                  ? 'GRUPO'
+                                  : 'MATAMATA';
+                              try {
+                                await mutationAtualizarTipoRodada.mutateAsync({
+                                  rodadaId: rodada.id,
+                                  tipo: novoTipo,
+                                });
+                                toast({
+                                  title: `Rodada ${rodada.numero} atualizada para ${novoTipo === 'MATAMATA' ? 'Mata-Mata' : 'Fase de Grupos'}`,
+                                });
+                                router.refresh();
+                              } catch (err) {
+                                const e = err as { message?: string };
+                                toast({
+                                  title: 'Erro',
+                                  description: e.message,
+                                  variant: 'destructive',
+                                });
+                              }
+                            }}
+                            className="sr-only peer"
+                          />
+                          <div className="w-8 h-4 rounded-full bg-zinc-300 dark:bg-zinc-700 peer-checked:bg-amber-500 dark:peer-checked:bg-amber-400 transition-colors duration-200" />
+                          <div className="absolute top-0.5 left-0.5 w-3 h-3 rounded-full bg-white shadow-sm transition-transform duration-200 peer-checked:translate-x-4" />
+                        </div>
+                        <span
+                          className={`text-xs font-bold transition-colors ${rodada.tipo === 'MATAMATA' ? 'text-amber-500 dark:text-amber-400' : 'text-zinc-500 dark:text-zinc-400'}`}
+                        >
+                          {rodada.tipo === 'MATAMATA'
+                            ? '⚡ Mata-Mata'
+                            : 'Grupos'}
+                        </span>
+                      </label>
                     </div>
 
                     {partidasDaRodada.length === 0 ? (
@@ -511,56 +608,105 @@ export function AdminPartidasClient({
                                     <div className="flex items-center gap-2 shrink-0">
                                       {isFinalizado &&
                                       !editingPartidas[partida.id] ? (
-                                        <div className="flex items-center gap-1.5 px-3 py-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl font-black text-sm">
-                                          <span>{partida.golsTimeA}</span>
-                                          <span className="text-zinc-400 text-xs">
-                                            x
-                                          </span>
-                                          <span>{partida.golsTimeB}</span>
+                                        <div className="flex flex-col items-center gap-1">
+                                          <div className="flex items-center gap-1.5 px-3 py-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl font-black text-sm">
+                                            <span>{partida.golsTimeA}</span>
+                                            <span className="text-zinc-400 text-xs">
+                                              x
+                                            </span>
+                                            <span>{partida.golsTimeB}</span>
+                                          </div>
+                                          {partida.tipoRodada ===
+                                            'MATAMATA' && (
+                                            <span className="text-[9px] font-bold text-zinc-500 uppercase">
+                                              {partida.decididoEm ===
+                                              'PRORROGACAO'
+                                                ? 'Prorrogação'
+                                                : partida.decididoEm ===
+                                                    'PENALTIS'
+                                                  ? 'Pênaltis'
+                                                  : 'Tempo Normal'}
+                                            </span>
+                                          )}
                                         </div>
                                       ) : (
-                                        <div className="flex items-center gap-1.5">
-                                          <input
-                                            type="text"
-                                            maxLength={2}
-                                            placeholder="-"
-                                            value={placarA}
-                                            onChange={(e) =>
-                                              handlePlacarChange(
-                                                partida.id,
-                                                'A',
-                                                e.target.value,
-                                              )
-                                            }
-                                            disabled={
-                                              isPending ||
-                                              (isJogoNoFuturo &&
-                                                !editingPartidas[partida.id])
-                                            }
-                                            className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
-                                          />
-                                          <span className="text-zinc-400 text-xs">
-                                            x
-                                          </span>
-                                          <input
-                                            type="text"
-                                            maxLength={2}
-                                            placeholder="-"
-                                            value={placarB}
-                                            onChange={(e) =>
-                                              handlePlacarChange(
-                                                partida.id,
-                                                'B',
-                                                e.target.value,
-                                              )
-                                            }
-                                            disabled={
-                                              isPending ||
-                                              (isJogoNoFuturo &&
-                                                !editingPartidas[partida.id])
-                                            }
-                                            className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
-                                          />
+                                        <div className="flex flex-col items-center gap-2">
+                                          <div className="flex items-center gap-1.5">
+                                            <input
+                                              type="text"
+                                              maxLength={2}
+                                              placeholder="-"
+                                              value={placarA}
+                                              onChange={(e) =>
+                                                handlePlacarChange(
+                                                  partida.id,
+                                                  'A',
+                                                  e.target.value,
+                                                )
+                                              }
+                                              disabled={
+                                                isPending ||
+                                                (isJogoNoFuturo &&
+                                                  !editingPartidas[partida.id])
+                                              }
+                                              className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
+                                            />
+                                            <span className="text-zinc-400 text-xs">
+                                              x
+                                            </span>
+                                            <input
+                                              type="text"
+                                              maxLength={2}
+                                              placeholder="-"
+                                              value={placarB}
+                                              onChange={(e) =>
+                                                handlePlacarChange(
+                                                  partida.id,
+                                                  'B',
+                                                  e.target.value,
+                                                )
+                                              }
+                                              disabled={
+                                                isPending ||
+                                                (isJogoNoFuturo &&
+                                                  !editingPartidas[partida.id])
+                                              }
+                                              className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
+                                            />
+                                          </div>
+                                          {partida.tipoRodada ===
+                                            'MATAMATA' && (
+                                            <select
+                                              value={
+                                                decididoEmValores[partida.id] ??
+                                                'NORMAL'
+                                              }
+                                              onChange={(e) =>
+                                                setDecididoEmValores(
+                                                  (prev) => ({
+                                                    ...prev,
+                                                    [partida.id]: e.target
+                                                      .value as
+                                                      | 'NORMAL'
+                                                      | 'PRORROGACAO'
+                                                      | 'PENALTIS',
+                                                  }),
+                                                )
+                                              }
+                                              disabled={isPending}
+                                              className="text-[10px] bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-1 font-bold outline-none text-zinc-800 dark:text-zinc-200"
+                                            >
+                                              <option value="NORMAL">
+                                                Tempo Normal
+                                              </option>
+                                              <option value="PRORROGACAO">
+                                                Prorrogação
+                                              </option>
+                                              <option value="PENALTIS">
+                                                Pênaltis
+                                              </option>
+                                            </select>
+                                          )}
                                         </div>
                                       )}
                                     </div>

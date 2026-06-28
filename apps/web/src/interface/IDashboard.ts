@@ -10,6 +10,9 @@ export interface IPartidaDashboard {
   golsTimeB?: number | null;
   palpiteGolsA?: number | null;
   palpiteGolsB?: number | null;
+  momentoPrevisto?: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+  decididoEm?: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+  tipoRodada?: 'GRUPO' | 'MATAMATA';
   jaPalpitou: boolean;
   rodadaNome?: string;
 }
@@ -18,6 +21,7 @@ export interface IRodadaDashboard {
   id: string;
   numero: number;
   nome: string;
+  tipo?: 'GRUPO' | 'MATAMATA';
   partidas: IPartidaDashboard[];
 }
 
@@ -34,6 +38,9 @@ export interface IHistoricoDashboard {
   pontosGanhos: number;
   dataInicio: string;
   status?: string;
+  momentoPrevisto?: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+  decididoEm?: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+  tipoRodada?: 'GRUPO' | 'MATAMATA';
 }
 
 export interface IDashboardPalpitesProps {

@@ -217,5 +217,86 @@ describe('Palpite Entity', () => {
       const points = palpite.calcularPontos(1, 1);
       expect(points).toBe(0);
     });
+    describe('Fase Mata-Mata', () => {
+      it('deve somar +1 ponto de bonus se acertar o placar exato e o momento da decisao', () => {
+        const palpite = new Palpite({
+          id: 'palpite-1',
+          usuarioId: 'usuario-1',
+          partidaId: 'partida-1',
+          golsTimeA: 2,
+          golsTimeB: 1,
+          momentoPrevisto: 'NORMAL',
+          dataCriacao: new Date(),
+          dataAtualizacao: new Date(),
+        });
+
+        const pontos = palpite.calcularPontos(2, 1, 'MATAMATA', 'NORMAL');
+        expect(pontos).toBe(3); // 2 placar exato + 1 bonus momento
+      });
+
+      it('deve somar 2 pontos (sem bonus) se acertar placar exato mas errar o momento da decisao', () => {
+        const palpite = new Palpite({
+          id: 'palpite-1',
+          usuarioId: 'usuario-1',
+          partidaId: 'partida-1',
+          golsTimeA: 2,
+          golsTimeB: 1,
+          momentoPrevisto: 'PRORROGACAO',
+          dataCriacao: new Date(),
+          dataAtualizacao: new Date(),
+        });
+
+        const pontos = palpite.calcularPontos(2, 1, 'MATAMATA', 'NORMAL');
+        expect(pontos).toBe(2); // 2 placar exato + 0 bonus momento
+      });
+
+      it('deve somar 2 pontos (1 vencedor + 1 bonus) se errar placar exato mas acertar vencedor e momento da decisao', () => {
+        const palpite = new Palpite({
+          id: 'palpite-1',
+          usuarioId: 'usuario-1',
+          partidaId: 'partida-1',
+          golsTimeA: 3,
+          golsTimeB: 0,
+          momentoPrevisto: 'NORMAL',
+          dataCriacao: new Date(),
+          dataAtualizacao: new Date(),
+        });
+
+        const pontos = palpite.calcularPontos(2, 1, 'MATAMATA', 'NORMAL');
+        expect(pontos).toBe(2); // 1 vencedor + 1 bonus momento
+      });
+
+      it('deve somar 1 ponto se errar placar exato, acertar vencedor, mas errar momento da decisao', () => {
+        const palpite = new Palpite({
+          id: 'palpite-1',
+          usuarioId: 'usuario-1',
+          partidaId: 'partida-1',
+          golsTimeA: 3,
+          golsTimeB: 0,
+          momentoPrevisto: 'PRORROGACAO',
+          dataCriacao: new Date(),
+          dataAtualizacao: new Date(),
+        });
+
+        const pontos = palpite.calcularPontos(2, 1, 'MATAMATA', 'NORMAL');
+        expect(pontos).toBe(1); // 1 vencedor + 0 bonus momento
+      });
+
+      it('deve somar 0 pontos se errar o vencedor mesmo acertando o momento previsto', () => {
+        const palpite = new Palpite({
+          id: 'palpite-1',
+          usuarioId: 'usuario-1',
+          partidaId: 'partida-1',
+          golsTimeA: 1,
+          golsTimeB: 2,
+          momentoPrevisto: 'NORMAL',
+          dataCriacao: new Date(),
+          dataAtualizacao: new Date(),
+        });
+
+        const pontos = palpite.calcularPontos(2, 1, 'MATAMATA', 'NORMAL');
+        expect(pontos).toBe(0); // errou o vencedor
+      });
+    });
   });
 });

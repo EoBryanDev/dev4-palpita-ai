@@ -34,6 +34,7 @@ export default async function AdminPartidasPage() {
     numero: r.numero,
     nome: r.nome,
     ativa: r.ativa,
+    tipo: r.tipo,
   }));
 
   const mappedPartidas = allPartidas.map((p) => ({
@@ -48,6 +49,8 @@ export default async function AdminPartidasPage() {
     dataInicio: p.dataInicio.toISOString(),
     status: p.status,
     rodadaNome: p.rodadaNome,
+    decididoEm: p.decididoEm,
+    tipoRodada: p.rodadaTipo,
   }));
 
   const mappedTimes = allTimes.map((t) => ({

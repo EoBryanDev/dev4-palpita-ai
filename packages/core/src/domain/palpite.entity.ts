@@ -1,9 +1,12 @@
+import type { TDecididoEm, TRodadaTipo } from './partida.entity';
+
 export interface IPalpiteProps {
   id: string;
   usuarioId: string;
   partidaId: string;
   golsTimeA: number;
   golsTimeB: number;
+  momentoPrevisto?: TDecididoEm;
   dataCriacao: Date;
   dataAtualizacao: Date;
 }
@@ -14,6 +17,7 @@ export class Palpite {
   private readonly _partidaId: string;
   private _golsTimeA: number;
   private _golsTimeB: number;
+  private _momentoPrevisto: TDecididoEm;
   private readonly _dataCriacao: Date;
   private _dataAtualizacao: Date;
 
@@ -26,6 +30,7 @@ export class Palpite {
     this._partidaId = props.partidaId;
     this._golsTimeA = props.golsTimeA;
     this._golsTimeB = props.golsTimeB;
+    this._momentoPrevisto = props.momentoPrevisto ?? 'NORMAL';
     this._dataCriacao = props.dataCriacao;
     this._dataAtualizacao = props.dataAtualizacao;
   }
@@ -58,12 +63,17 @@ export class Palpite {
     return this._dataAtualizacao;
   }
 
+  public get momentoPrevisto(): TDecididoEm {
+    return this._momentoPrevisto;
+  }
+
   public atualizarPlacar(
     golsTimeA: number,
     golsTimeB: number,
     dataPartidaInicio: Date,
     dataReferencia: Date = new Date(),
     deadlineGlobal?: Date,
+    momentoPrevisto?: TDecididoEm,
   ): void {
     this.validarPrazo(dataPartidaInicio, dataReferencia, deadlineGlobal);
     if (golsTimeA < 0 || golsTimeB < 0) {
@@ -71,6 +81,9 @@ export class Palpite {
     }
     this._golsTimeA = golsTimeA;
     this._golsTimeB = golsTimeB;
+    if (momentoPrevisto) {
+      this._momentoPrevisto = momentoPrevisto;
+    }
     this._dataAtualizacao = dataReferencia;
   }
 
@@ -90,6 +103,8 @@ export class Palpite {
   public calcularPontos(
     partidaGolsTimeA: number | null,
     partidaGolsTimeB: number | null,
+    tipoRodada: TRodadaTipo = 'GRUPO',
+    decididoEm: TDecididoEm = 'NORMAL',
   ): number {
     if (partidaGolsTimeA === null || partidaGolsTimeB === null) {
       return 0;
@@ -108,11 +123,20 @@ export class Palpite {
       this._golsTimeA === partidaGolsTimeA &&
       this._golsTimeB === partidaGolsTimeB;
 
+    let pontosBase = 0;
     if (acertouPlacarExato) {
-      return 2;
+      pontosBase = 2;
+    } else if (vencedorPalpite === vencedorPartida) {
+      pontosBase = 1;
     }
 
-    return vencedorPalpite === vencedorPartida ? 1 : 0;
+    if (tipoRodada === 'MATAMATA') {
+      if (pontosBase > 0 && this._momentoPrevisto === decididoEm) {
+        return pontosBase + 1;
+      }
+    }
+
+    return pontosBase;
   }
 
   private obterVencedor(golsA: number, golsB: number): 'A' | 'B' | 'EMPATE' {

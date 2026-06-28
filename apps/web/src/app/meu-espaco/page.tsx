@@ -12,8 +12,9 @@ import {
 } from '@/services/palpites.service';
 import { obterPartidas } from '@/services/partidas.service';
 import { calcularRankingGeral } from '@/services/ranking.service';
-import { obterRodadas } from '@/services/rodadas.service';
+import { obterRodadaAtiva, obterRodadas } from '@/services/rodadas.service';
 import { obterUsuarioPorId } from '@/services/usuarios.service';
+import { Palpite } from '@palpita/core';
 import { redirect } from 'next/navigation';
 
 export default async function MeuEspacoPage() {
@@ -56,7 +57,15 @@ export default async function MeuEspacoPage() {
     isTudoBloqueado = new Date() >= deadlineIndividual;
     isLiberacaoTardia = true;
   } else if (todasPartidas.length > 0) {
-    const primeiraPartida = todasPartidas[0];
+    const rodadaAtiva = await obterRodadaAtiva();
+    const partidasRodada = rodadaAtiva
+      ? todasPartidas.filter((p) => p.rodadaId === rodadaAtiva.id)
+      : todasPartidas;
+    const primeiraPartida =
+      [...partidasRodada].sort(
+        (a, b) => a.dataInicio.getTime() - b.dataInicio.getTime(),
+      )[0] || todasPartidas[0];
+
     const deadline = new Date(
       primeiraPartida.dataInicio.getTime() - 30 * 60 * 1000,
     );
@@ -92,6 +101,9 @@ export default async function MeuEspacoPage() {
           golsTimeB: partida.golsTimeB,
           palpiteGolsA: palpite ? palpite.golsTimeA : null,
           palpiteGolsB: palpite ? palpite.golsTimeB : null,
+          momentoPrevisto: palpite ? palpite.momentoPrevisto : 'NORMAL',
+          decididoEm: partida.decididoEm,
+          tipoRodada: partida.rodadaTipo,
           jaPalpitou: !!palpite,
           rodadaNome: rodada.nome,
         };
@@ -102,6 +114,7 @@ export default async function MeuEspacoPage() {
       id: rodada.id,
       numero: rodada.numero,
       nome: rodada.nome,
+      tipo: rodada.tipo,
       partidas: partidasEnriquecidas,
     });
   }
@@ -137,20 +150,23 @@ export default async function MeuEspacoPage() {
       const golsA = match.golsTimeA ?? 0;
       const golsB = match.golsTimeB ?? 0;
 
-      const vencedorPalpite = obterVencedor(
-        palpite.golsTimeA,
-        palpite.golsTimeB,
+      const palpiteEntity = new Palpite({
+        id: palpite.id,
+        usuarioId: palpite.usuarioId,
+        partidaId: palpite.partidaId,
+        golsTimeA: palpite.golsTimeA,
+        golsTimeB: palpite.golsTimeB,
+        momentoPrevisto: palpite.momentoPrevisto,
+        dataCriacao: palpite.dataCriacao,
+        dataAtualizacao: palpite.dataAtualizacao,
+      });
+
+      const pontosGanhos = palpiteEntity.calcularPontos(
+        golsA,
+        golsB,
+        match.rodadaTipo ?? 'GRUPO',
+        match.decididoEm ?? 'NORMAL',
       );
-      const vencedorPartida = obterVencedor(golsA, golsB);
-
-      const acertouPlacarExato =
-        palpite.golsTimeA === golsA && palpite.golsTimeB === golsB;
-
-      const pontosGanhos = acertouPlacarExato
-        ? 2
-        : vencedorPalpite === vencedorPartida
-          ? 1
-          : 0;
 
       historico.push({
         partidaId: match.id,
@@ -165,6 +181,9 @@ export default async function MeuEspacoPage() {
         pontosGanhos,
         dataInicio: match.dataInicio.toISOString(),
         status: match.status,
+        momentoPrevisto: palpite.momentoPrevisto,
+        decididoEm: match.decididoEm,
+        tipoRodada: match.rodadaTipo,
       });
     }
   }
@@ -203,6 +222,9 @@ export default async function MeuEspacoPage() {
         golsTimeB: partida.golsTimeB,
         palpiteGolsA: palpite ? palpite.golsTimeA : null,
         palpiteGolsB: palpite ? palpite.golsTimeB : null,
+        momentoPrevisto: palpite ? palpite.momentoPrevisto : 'NORMAL',
+        decididoEm: partida.decididoEm,
+        tipoRodada: partida.rodadaTipo,
         jaPalpitou: !!palpite,
       };
     },

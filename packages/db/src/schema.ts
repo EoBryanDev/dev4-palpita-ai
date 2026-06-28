@@ -1,5 +1,7 @@
 import type {
+  TDecididoEm,
   TPartidaStatus,
+  TRodadaTipo,
   TUsuarioCargo,
   TUsuarioStatus,
 } from '@palpita/core';
@@ -19,6 +21,10 @@ export const rodadas = pgTable('rodadas', {
   numero: integer('numero').notNull(),
   nome: varchar('nome', { length: 100 }).notNull(),
   ativa: boolean('ativa').default(true).notNull(),
+  tipo: varchar('tipo', { length: 50 })
+    .$type<TRodadaTipo>()
+    .default('GRUPO')
+    .notNull(),
   dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
 });
 
@@ -62,6 +68,10 @@ export const partidas = pgTable('partidas', {
   golsTimeB: integer('gols_time_b'),
   dataInicio: timestamp('data_inicio').notNull(),
   status: varchar('status', { length: 50 }).$type<TPartidaStatus>().notNull(),
+  decididoEm: varchar('decidido_em', { length: 50 })
+    .$type<TDecididoEm>()
+    .default('NORMAL')
+    .notNull(),
   dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
 });
 
@@ -78,6 +88,10 @@ export const palpites = pgTable(
       .references(() => partidas.id, { onDelete: 'cascade' }),
     golsTimeA: integer('gols_time_a').notNull(),
     golsTimeB: integer('gols_time_b').notNull(),
+    momentoPrevisto: varchar('momento_previsto', { length: 50 })
+      .$type<TDecididoEm>()
+      .default('NORMAL')
+      .notNull(),
     dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
     dataAtualizacao: timestamp('data_atualizacao').defaultNow().notNull(),
   },

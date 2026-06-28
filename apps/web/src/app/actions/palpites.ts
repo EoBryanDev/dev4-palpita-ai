@@ -7,6 +7,7 @@ import {
   obterTodosPalpitesUsuario,
   obterTotalPalpitesSalvosFuturos,
 } from '@/services/palpites.service';
+import type { TDecididoEm } from '@palpita/core';
 import { db, palpites, partidas, usuarios } from '@palpita/db';
 import { and, eq } from 'drizzle-orm';
 import { obterSessao } from './auth';
@@ -20,6 +21,7 @@ export async function salvarPalpite(
   partidaId: string,
   golsTimeA: number,
   golsTimeB: number,
+  momentoPrevisto: TDecididoEm = 'NORMAL',
 ): Promise<ISalvarPalpiteResult> {
   try {
     await validarOrigem();
@@ -69,6 +71,7 @@ export async function salvarPalpite(
       .select({
         dataInicio: partidas.dataInicio,
         status: partidas.status,
+        rodadaId: partidas.rodadaId,
       })
       .from(partidas)
       .where(eq(partidas.id, partidaId))
@@ -109,19 +112,23 @@ export async function salvarPalpite(
         };
       }
     } else {
-      // Usuário normal: validar deadline global (30 min antes da 1ª partida)
-      const primeiraPartidaTorneio = await db
+      // Usuário normal: validar deadline da rodada (30 min antes do primeiro jogo da rodada)
+      const primeiraPartidaRodada = await db
         .select({ dataInicio: partidas.dataInicio })
         .from(partidas)
+        .where(eq(partidas.rodadaId, match[0].rodadaId))
         .orderBy(partidas.dataInicio)
         .limit(1);
 
-      if (primeiraPartidaTorneio.length === 0) {
-        return { success: false, message: 'Nenhuma partida encontrada.' };
+      if (primeiraPartidaRodada.length === 0) {
+        return {
+          success: false,
+          message: 'Nenhuma partida encontrada para esta rodada.',
+        };
       }
 
       const dataLimite = new Date(
-        new Date(primeiraPartidaTorneio[0].dataInicio).getTime() -
+        new Date(primeiraPartidaRodada[0].dataInicio).getTime() -
           30 * 60 * 1000,
       );
 
@@ -129,7 +136,7 @@ export async function salvarPalpite(
         return {
           success: false,
           message:
-            'O prazo para palpitar expirou (palpites fechados 30 minutos antes do primeiro jogo da Copa do Mundo).',
+            'O prazo para palpitar expirou (palpites fechados 30 minutos antes do início do primeiro jogo desta rodada).',
         };
       }
     }
@@ -153,6 +160,7 @@ export async function salvarPalpite(
         .set({
           golsTimeA,
           golsTimeB,
+          momentoPrevisto,
           dataAtualizacao: new Date(),
         })
         .where(eq(palpites.id, palpiteExistente[0].id));
@@ -166,6 +174,7 @@ export async function salvarPalpite(
       partidaId,
       golsTimeA,
       golsTimeB,
+      momentoPrevisto,
     });
 
     return { success: true, message: 'Palpite registrado com sucesso!' };

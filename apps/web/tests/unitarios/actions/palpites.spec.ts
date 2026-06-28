@@ -207,6 +207,7 @@ describe('salvarPalpite', () => {
               {
                 dataInicio: dataFuturo,
                 status: 'AGENDADO',
+                rodadaId: 'rodada-123',
               },
             ]),
           ),
@@ -214,11 +215,13 @@ describe('salvarPalpite', () => {
       })),
     }));
 
-    // mock da busca da primeira partida do torneio (futura)
+    // mock da busca da primeira partida da rodada (futura)
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
-        orderBy: vi.fn(() => ({
-          limit: vi.fn(() => Promise.resolve([{ dataInicio: dataFuturo }])),
+        where: vi.fn(() => ({
+          orderBy: vi.fn(() => ({
+            limit: vi.fn(() => Promise.resolve([{ dataInicio: dataFuturo }])),
+          })),
         })),
       })),
     }));
@@ -273,6 +276,7 @@ describe('salvarPalpite', () => {
               {
                 dataInicio: dataFuturo,
                 status: 'AGENDADO',
+                rodadaId: 'rodada-123',
               },
             ]),
           ),
@@ -280,11 +284,13 @@ describe('salvarPalpite', () => {
       })),
     }));
 
-    // mock da busca da primeira partida do torneio (futura)
+    // mock da busca da primeira partida da rodada (futura)
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
-        orderBy: vi.fn(() => ({
-          limit: vi.fn(() => Promise.resolve([{ dataInicio: dataFuturo }])),
+        where: vi.fn(() => ({
+          orderBy: vi.fn(() => ({
+            limit: vi.fn(() => Promise.resolve([{ dataInicio: dataFuturo }])),
+          })),
         })),
       })),
     }));

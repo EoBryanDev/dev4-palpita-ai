@@ -5,6 +5,9 @@ export type TPartidaStatus =
   | 'AGENDADO'
   | 'FINALIZADO';
 
+export type TRodadaTipo = 'GRUPO' | 'MATAMATA';
+export type TDecididoEm = 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+
 export interface IPartidaProps {
   id: string;
   rodadaId: string;
@@ -14,6 +17,7 @@ export interface IPartidaProps {
   golsTimeB: number | null;
   dataInicio: Date;
   status: TPartidaStatus;
+  decididoEm?: TDecididoEm;
   dataCriacao: Date;
 }
 
@@ -26,6 +30,7 @@ export class Partida {
   private _golsTimeB: number | null;
   private _dataInicio: Date;
   private _status: TPartidaStatus;
+  private _decididoEm: TDecididoEm;
   private readonly _dataCriacao: Date;
 
   constructor(props: IPartidaProps) {
@@ -37,6 +42,7 @@ export class Partida {
     this._golsTimeB = props.golsTimeB;
     this._dataInicio = props.dataInicio;
     this._status = props.status;
+    this._decididoEm = props.decididoEm ?? 'NORMAL';
     this._dataCriacao = props.dataCriacao;
   }
 
@@ -72,11 +78,19 @@ export class Partida {
     return this._status;
   }
 
+  public get decididoEm(): TDecididoEm {
+    return this._decididoEm;
+  }
+
   public get dataCriacao(): Date {
     return this._dataCriacao;
   }
 
-  public finalizar(golsTimeA: number, golsTimeB: number): void {
+  public finalizar(
+    golsTimeA: number,
+    golsTimeB: number,
+    decididoEm?: TDecididoEm,
+  ): void {
     if (golsTimeA < 0 || golsTimeB < 0) {
       throw new Error('Gols nao podem ser negativos');
     }
@@ -88,6 +102,9 @@ export class Partida {
     this._golsTimeA = golsTimeA;
     this._golsTimeB = golsTimeB;
     this._status = 'FINALIZADA';
+    if (decididoEm) {
+      this._decididoEm = decididoEm;
+    }
   }
 
   public iniciar(): void {

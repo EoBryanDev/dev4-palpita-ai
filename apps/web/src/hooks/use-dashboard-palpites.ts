@@ -15,7 +15,14 @@ export function useDashboardPalpites() {
 
   // Estado para armazenar os valores temporários digitados nos inputs de palpites
   const [valoresPalpites, setValoresPalpites] = useState<
-    Record<string, { golsA: string; golsB: string }>
+    Record<
+      string,
+      {
+        golsA: string;
+        golsB: string;
+        momentoPrevisto?: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+      }
+    >
   >({});
 
   const handleInputChange = (
@@ -39,11 +46,29 @@ export function useDashboardPalpites() {
     });
   };
 
+  const handleMomentoChange = (
+    partidaId: string,
+    value: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS',
+  ) => {
+    setValoresPalpites((prev) => {
+      const atual = prev[partidaId] || { golsA: '', golsB: '' };
+      return {
+        ...prev,
+        [partidaId]: {
+          ...atual,
+          momentoPrevisto: value,
+        },
+      };
+    });
+  };
+
   const handleSalvar = (partidaId: string, partida: IPartidaDashboard) => {
     const valores = valoresPalpites[partidaId];
     // Se não digitou novos valores, usa o palpite anterior ou assume 0
     const golsAStr = valores?.golsA ?? String(partida.palpiteGolsA ?? '');
     const golsBStr = valores?.golsB ?? String(partida.palpiteGolsB ?? '');
+    const momentoPrevisto =
+      valores?.momentoPrevisto ?? partida.momentoPrevisto ?? 'NORMAL';
 
     if (golsAStr === '' || golsBStr === '') {
       toast({
@@ -58,7 +83,12 @@ export function useDashboardPalpites() {
     const golsB = Number.parseInt(golsBStr, 10);
 
     startTransition(async () => {
-      const result = await salvarPalpite(partidaId, golsA, golsB);
+      const result = await salvarPalpite(
+        partidaId,
+        golsA,
+        golsB,
+        momentoPrevisto,
+      );
 
       if (result.success) {
         toast({
@@ -91,6 +121,7 @@ export function useDashboardPalpites() {
     isPending,
     logoutPending,
     handleInputChange,
+    handleMomentoChange,
     handleSalvar,
     handleLogout,
   };
