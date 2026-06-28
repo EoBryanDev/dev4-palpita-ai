@@ -1,8 +1,11 @@
+import { obterValorPalpite } from '@/app/actions/admin';
 import { obterSessao } from '@/app/actions/auth';
 import { AdminPartidasClient } from '@/components/admin-partidas-client';
+import { obterPalpitesConfirmadosCount } from '@/services/palpites.service';
 import { obterPartidas } from '@/services/partidas.service';
-import { obterRodadas } from '@/services/rodadas.service';
+import { obterRodadaAtiva, obterRodadas } from '@/services/rodadas.service';
 import { obterTimes } from '@/services/times.service';
+import { obterResumoStatusUsuarios } from '@/services/usuarios.service';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
@@ -28,6 +31,35 @@ export default async function AdminPartidasPage() {
   // 3. Buscar todos os times cadastrados
   const allTimes = await obterTimes();
 
+  // 4. Buscar dados para o card de engajamento da rodada atual
+  const allUsers = await obterResumoStatusUsuarios();
+  const totalLiberados = allUsers.filter((u) => u.status === 'LIBERADO').length;
+  const rodadaAtiva = await obterRodadaAtiva();
+
+  let totalPartidasRodada = 0;
+  let totalEsperado = 0;
+  let totalPalpitesRealizados = 0;
+  let percentualSubmetidos = 0;
+
+  if (rodadaAtiva) {
+    const dbPartidas = await obterPartidas(rodadaAtiva.id);
+    totalPartidasRodada = dbPartidas.length;
+    totalEsperado = totalLiberados * totalPartidasRodada;
+
+    if (totalPartidasRodada > 0 && totalLiberados > 0) {
+      const partidaIds = dbPartidas.map((p) => p.id);
+      const usuariosLiberados = allUsers.filter((u) => u.status === 'LIBERADO');
+      const usuarioIds = usuariosLiberados.map((u) => u.id);
+      totalPalpitesRealizados = await obterPalpitesConfirmadosCount(
+        partidaIds,
+        usuarioIds,
+      );
+      percentualSubmetidos = Math.round(
+        (totalPalpitesRealizados / totalEsperado) * 100,
+      );
+    }
+  }
+
   // Mapear dados para formatos compatíveis com Client Component
   const mappedRodadas = allRodadas.map((r) => ({
     id: r.id,
@@ -36,6 +68,16 @@ export default async function AdminPartidasPage() {
     ativa: r.ativa,
     tipo: r.tipo,
   }));
+
+  const mappedRodadaAtiva = rodadaAtiva
+    ? {
+        id: rodadaAtiva.id,
+        numero: rodadaAtiva.numero,
+        nome: rodadaAtiva.nome,
+        ativa: rodadaAtiva.ativa,
+        tipo: rodadaAtiva.tipo,
+      }
+    : null;
 
   const mappedPartidas = allPartidas.map((p) => ({
     id: p.id,
@@ -75,6 +117,12 @@ export default async function AdminPartidasPage() {
         rodadas={mappedRodadas}
         partidas={mappedPartidas}
         times={mappedTimes}
+        rodadaAtiva={mappedRodadaAtiva}
+        totalPartidasRodada={totalPartidasRodada}
+        totalEsperado={totalEsperado}
+        totalPalpitesRealizados={totalPalpitesRealizados}
+        percentualSubmetidos={percentualSubmetidos}
+        totalLiberados={totalLiberados}
       />
     </div>
   );
