@@ -297,6 +297,135 @@ describe('Palpite Entity', () => {
         const pontos = palpite.calcularPontos(2, 1, 'MATAMATA', 'NORMAL');
         expect(pontos).toBe(0); // errou o vencedor
       });
+
+      describe('Penaltis (empate no placar)', () => {
+        it('deve somar 3 pontos se acertar placar exato do empate e o vencedor nos penaltis', () => {
+          const palpite = new Palpite({
+            id: 'palpite-1',
+            usuarioId: 'usuario-1',
+            partidaId: 'partida-1',
+            golsTimeA: 1,
+            golsTimeB: 1,
+            timeVencedorPrevisto: 'A',
+            dataCriacao: new Date(),
+            dataAtualizacao: new Date(),
+          });
+
+          const pontos = palpite.calcularPontos(1, 1, 'MATAMATA', 'PENALTIS', 'A');
+          expect(pontos).toBe(3); // 2 placar exato + 1 bonus vencedor
+        });
+
+        it('deve somar 2 pontos se acertar placar exato do empate mas errar o vencedor nos penaltis', () => {
+          const palpite = new Palpite({
+            id: 'palpite-1',
+            usuarioId: 'usuario-1',
+            partidaId: 'partida-1',
+            golsTimeA: 1,
+            golsTimeB: 1,
+            timeVencedorPrevisto: 'A',
+            dataCriacao: new Date(),
+            dataAtualizacao: new Date(),
+          });
+
+          const pontos = palpite.calcularPontos(1, 1, 'MATAMATA', 'PENALTIS', 'B');
+          expect(pontos).toBe(2); // 2 placar exato + 0 bonus
+        });
+
+        it('deve somar 2 pontos se acertar o empate (placar diferente) e o vencedor nos penaltis', () => {
+          const palpite = new Palpite({
+            id: 'palpite-1',
+            usuarioId: 'usuario-1',
+            partidaId: 'partida-1',
+            golsTimeA: 2,
+            golsTimeB: 2,
+            timeVencedorPrevisto: 'A',
+            dataCriacao: new Date(),
+            dataAtualizacao: new Date(),
+          });
+
+          const pontos = palpite.calcularPontos(1, 1, 'MATAMATA', 'PENALTIS', 'A');
+          expect(pontos).toBe(2); // 1 empate + 1 bonus vencedor
+        });
+
+        it('deve somar 1 ponto se acertar o empate (placar diferente) mas errar o vencedor nos penaltis', () => {
+          const palpite = new Palpite({
+            id: 'palpite-1',
+            usuarioId: 'usuario-1',
+            partidaId: 'partida-1',
+            golsTimeA: 2,
+            golsTimeB: 2,
+            timeVencedorPrevisto: 'A',
+            dataCriacao: new Date(),
+            dataAtualizacao: new Date(),
+          });
+
+          const pontos = palpite.calcularPontos(1, 1, 'MATAMATA', 'PENALTIS', 'B');
+          expect(pontos).toBe(1); // 1 empate + 0 bonus
+        });
+
+        it('deve somar 0 pontos se palpitou vitoria de um time mas o jogo terminou empatado', () => {
+          const palpite = new Palpite({
+            id: 'palpite-1',
+            usuarioId: 'usuario-1',
+            partidaId: 'partida-1',
+            golsTimeA: 2,
+            golsTimeB: 1,
+            dataCriacao: new Date(),
+            dataAtualizacao: new Date(),
+          });
+
+          const pontos = palpite.calcularPontos(1, 1, 'MATAMATA', 'PENALTIS', 'A');
+          expect(pontos).toBe(0); // errou o resultado
+        });
+
+        it('deve somar 2 pontos se acertar placar exato do empate mas sem timeVencedorPenaltis oficial', () => {
+          const palpite = new Palpite({
+            id: 'palpite-1',
+            usuarioId: 'usuario-1',
+            partidaId: 'partida-1',
+            golsTimeA: 1,
+            golsTimeB: 1,
+            timeVencedorPrevisto: 'A',
+            dataCriacao: new Date(),
+            dataAtualizacao: new Date(),
+          });
+
+          const pontos = palpite.calcularPontos(1, 1, 'MATAMATA', 'PENALTIS', null);
+          expect(pontos).toBe(2); // 2 placar exato + 0 bonus (sem oficial)
+        });
+
+        it('deve somar 3 pontos se acertar placar exato de vitoria e momento PENALTIS', () => {
+          const palpite = new Palpite({
+            id: 'palpite-1',
+            usuarioId: 'usuario-1',
+            partidaId: 'partida-1',
+            golsTimeA: 2,
+            golsTimeB: 1,
+            momentoPrevisto: 'PRORROGACAO',
+            dataCriacao: new Date(),
+            dataAtualizacao: new Date(),
+          });
+
+          const pontos = palpite.calcularPontos(2, 1, 'MATAMATA', 'PRORROGACAO');
+          expect(pontos).toBe(3); // 2 placar exato + 1 bonus momento
+        });
+
+        it('deve somar 1 ponto se acertar vencedor (placar diferente) em jogo sem empate, bonus momento nao se aplica para penaltis', () => {
+          const palpite = new Palpite({
+            id: 'palpite-1',
+            usuarioId: 'usuario-1',
+            partidaId: 'partida-1',
+            golsTimeA: 3,
+            golsTimeB: 0,
+            momentoPrevisto: 'PENALTIS',
+            dataCriacao: new Date(),
+            dataAtualizacao: new Date(),
+          });
+
+          const pontos = palpite.calcularPontos(2, 1, 'MATAMATA', 'NORMAL');
+          expect(pontos).toBe(1); // 1 vencedor + 0 bonus (momento errado)
+        });
+      });
     });
   });
 });
