@@ -92,6 +92,7 @@ export default async function AdminPartidasPage() {
     status: p.status,
     rodadaNome: p.rodadaNome,
     decididoEm: p.decididoEm,
+    timeVencedorPenaltis: p.timeVencedorPenaltis,
     tipoRodada: p.rodadaTipo,
   }));
 

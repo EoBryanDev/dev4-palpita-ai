@@ -24,6 +24,7 @@ export interface IPartidaAdmin {
   status: string;
   rodadaNome: string;
   decididoEm?: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+  timeVencedorPenaltis?: 'A' | 'B' | null;
   tipoRodada?: 'GRUPO' | 'MATAMATA';
 }
 

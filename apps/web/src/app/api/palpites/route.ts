@@ -61,6 +61,9 @@ export async function GET(): Promise<NextResponse> {
         dataInicio: match.dataInicio,
         status: match.status,
         rodadaNome: match.rodadaNome,
+        tipoRodada: match.rodadaTipo,
+        decididoEm: match.decididoEm,
+        timeVencedorPenaltis: match.timeVencedorPenaltis,
         estatisticas: {
           total: totalGuesses,
           vitoriasA,
@@ -76,6 +79,8 @@ export async function GET(): Promise<NextResponse> {
           usuarioNome: g.usuarioNome,
           golsTimeA: g.golsTimeA,
           golsTimeB: g.golsTimeB,
+          momentoPrevisto: g.momentoPrevisto,
+          timeVencedorPrevisto: g.timeVencedorPrevisto,
         })),
       };
     });

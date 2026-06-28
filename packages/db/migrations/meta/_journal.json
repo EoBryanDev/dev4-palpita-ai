@@ -71,6 +71,13 @@
       "when": 1782101200000,
       "tag": "0009_add_mata_mata_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1739124000000,
+      "tag": "0010_add_penaltis_columns",
+      "breakpoints": true
     }
   ]
 }

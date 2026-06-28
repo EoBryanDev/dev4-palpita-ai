@@ -21,6 +21,7 @@ export function useDashboardPalpites() {
         golsA: string;
         golsB: string;
         momentoPrevisto?: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+        timeVencedorPrevisto?: 'A' | 'B';
       }
     >
   >({});
@@ -62,6 +63,19 @@ export function useDashboardPalpites() {
     });
   };
 
+  const handleTimeVencedorChange = (partidaId: string, value: 'A' | 'B') => {
+    setValoresPalpites((prev) => {
+      const atual = prev[partidaId] || { golsA: '', golsB: '' };
+      return {
+        ...prev,
+        [partidaId]: {
+          ...atual,
+          timeVencedorPrevisto: value,
+        },
+      };
+    });
+  };
+
   const handleSalvar = (partidaId: string, partida: IPartidaDashboard) => {
     const valores = valoresPalpites[partidaId];
     // Se não digitou novos valores, usa o palpite anterior ou assume 0
@@ -82,12 +96,21 @@ export function useDashboardPalpites() {
     const golsA = Number.parseInt(golsAStr, 10);
     const golsB = Number.parseInt(golsBStr, 10);
 
+    const ehEmpateMataMata =
+      partida.tipoRodada === 'MATAMATA' && golsA === golsB;
+    const timeVencedorPrevisto = ehEmpateMataMata
+      ? (valores?.timeVencedorPrevisto ??
+        partida.timeVencedorPrevisto ??
+        undefined)
+      : undefined;
+
     startTransition(async () => {
       const result = await salvarPalpite(
         partidaId,
         golsA,
         golsB,
         momentoPrevisto,
+        timeVencedorPrevisto,
       );
 
       if (result.success) {
@@ -122,6 +145,7 @@ export function useDashboardPalpites() {
     logoutPending,
     handleInputChange,
     handleMomentoChange,
+    handleTimeVencedorChange,
     handleSalvar,
     handleLogout,
   };

@@ -8,7 +8,7 @@ import {
   obterTotalPalpitesSalvosFuturos,
 } from '@/services/palpites.service';
 import type { TDecididoEm } from '@palpita/core';
-import { db, palpites, partidas, usuarios } from '@palpita/db';
+import { db, palpites, partidas, rodadas, usuarios } from '@palpita/db';
 import { and, eq } from 'drizzle-orm';
 import { obterSessao } from './auth';
 
@@ -22,6 +22,7 @@ export async function salvarPalpite(
   golsTimeA: number,
   golsTimeB: number,
   momentoPrevisto: TDecididoEm = 'NORMAL',
+  timeVencedorPrevisto?: 'A' | 'B',
 ): Promise<ISalvarPalpiteResult> {
   try {
     await validarOrigem();
@@ -81,21 +82,33 @@ export async function salvarPalpite(
       return { success: false, message: 'Partida não encontrada.' };
     }
 
-    // 4. Validar prazos
+    // 4. Buscar a rodada para validar tipo (MATAMATA)
+    const rodada = await db
+      .select({ tipo: rodadas.tipo })
+      .from(rodadas)
+      .where(eq(rodadas.id, match[0].rodadaId))
+      .limit(1);
+    const isMataMata = rodada.length > 0 && rodada[0].tipo === 'MATAMATA';
+
+    // 5. Validar prazos
     const agora = new Date();
+
+    // Deadline per-match: 30 min antes desta partida
+    const prazoPartida = new Date(
+      new Date(match[0].dataInicio).getTime() - 30 * 60 * 1000,
+    );
+    if (agora >= prazoPartida) {
+      return {
+        success: false,
+        message:
+          'O prazo para palpitar nesta partida expirou (palpites fechados 30 minutos antes do início).',
+      };
+    }
 
     if (match[0].status === 'FINALIZADO') {
       return {
         success: false,
         message: 'Esta partida já foi finalizada.',
-      };
-    }
-
-    // Se a partida já começou, bloquear
-    if (agora >= new Date(match[0].dataInicio)) {
-      return {
-        success: false,
-        message: 'Esta partida já começou. Não é mais possível palpitar.',
       };
     }
 
@@ -111,37 +124,24 @@ export async function salvarPalpite(
             'Seu prazo de 30 minutos para palpitar expirou. Entre em contato com o administrador.',
         };
       }
-    } else {
-      // Usuário normal: validar deadline da rodada (30 min antes do primeiro jogo da rodada)
-      const primeiraPartidaRodada = await db
-        .select({ dataInicio: partidas.dataInicio })
-        .from(partidas)
-        .where(eq(partidas.rodadaId, match[0].rodadaId))
-        .orderBy(partidas.dataInicio)
-        .limit(1);
-
-      if (primeiraPartidaRodada.length === 0) {
-        return {
-          success: false,
-          message: 'Nenhuma partida encontrada para esta rodada.',
-        };
-      }
-
-      const dataLimite = new Date(
-        new Date(primeiraPartidaRodada[0].dataInicio).getTime() -
-          30 * 60 * 1000,
-      );
-
-      if (agora >= dataLimite) {
-        return {
-          success: false,
-          message:
-            'O prazo para palpitar expirou (palpites fechados 30 minutos antes do início do primeiro jogo desta rodada).',
-        };
-      }
     }
 
-    // 4. Salvar ou Atualizar o Palpite
+    // 6. Validar vencedor nos penaltis para MATAMATA com empate
+    if (isMataMata && golsTimeA === golsTimeB && !timeVencedorPrevisto) {
+      return {
+        success: false,
+        message:
+          'Em partidas de mata-mata com empate, informe o time vencedor nos pênaltis.',
+      };
+    }
+
+    // Forcar momentoPrevisto para PENALTIS em MATAMATA com empate
+    const momentoFinal =
+      isMataMata && golsTimeA === golsTimeB
+        ? ('PENALTIS' as TDecididoEm)
+        : momentoPrevisto;
+
+    // 7. Salvar ou Atualizar o Palpite
     const palpiteExistente = await db
       .select()
       .from(palpites)
@@ -160,7 +160,8 @@ export async function salvarPalpite(
         .set({
           golsTimeA,
           golsTimeB,
-          momentoPrevisto,
+          momentoPrevisto: momentoFinal,
+          timeVencedorPrevisto,
           dataAtualizacao: new Date(),
         })
         .where(eq(palpites.id, palpiteExistente[0].id));
@@ -174,7 +175,8 @@ export async function salvarPalpite(
       partidaId,
       golsTimeA,
       golsTimeB,
-      momentoPrevisto,
+      momentoPrevisto: momentoFinal,
+      timeVencedorPrevisto,
     });
 
     return { success: true, message: 'Palpite registrado com sucesso!' };

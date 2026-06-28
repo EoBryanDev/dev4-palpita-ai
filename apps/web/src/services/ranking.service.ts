@@ -42,6 +42,7 @@ export async function calcularRankingGeral(): Promise<IRankedUser[]> {
       golsTimeA: partidas.golsTimeA,
       golsTimeB: partidas.golsTimeB,
       decididoEm: partidas.decididoEm,
+      timeVencedorPenaltis: partidas.timeVencedorPenaltis,
       rodadaTipo: rodadas.tipo,
     })
     .from(partidas)
@@ -55,6 +56,7 @@ export async function calcularRankingGeral(): Promise<IRankedUser[]> {
       golsTimeA: number;
       golsTimeB: number;
       decididoEm: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+      timeVencedorPenaltis: 'A' | 'B' | null;
       rodadaTipo: 'GRUPO' | 'MATAMATA';
     }
   >();
@@ -64,6 +66,7 @@ export async function calcularRankingGeral(): Promise<IRankedUser[]> {
         golsTimeA: match.golsTimeA,
         golsTimeB: match.golsTimeB,
         decididoEm: match.decididoEm,
+        timeVencedorPenaltis: match.timeVencedorPenaltis,
         rodadaTipo: match.rodadaTipo,
       });
     }
@@ -97,6 +100,7 @@ export async function calcularRankingGeral(): Promise<IRankedUser[]> {
           golsTimeA: guess.golsTimeA,
           golsTimeB: guess.golsTimeB,
           momentoPrevisto: guess.momentoPrevisto,
+          timeVencedorPrevisto: guess.timeVencedorPrevisto ?? undefined,
           dataCriacao: guess.dataCriacao,
           dataAtualizacao: guess.dataAtualizacao,
         });
@@ -106,6 +110,7 @@ export async function calcularRankingGeral(): Promise<IRankedUser[]> {
           match.golsTimeB,
           match.rodadaTipo,
           match.decididoEm,
+          match.timeVencedorPenaltis ?? undefined,
         );
 
         if (pontosPartida > 0) {

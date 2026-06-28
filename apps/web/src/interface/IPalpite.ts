@@ -3,6 +3,8 @@ export interface IPalpiteIndividual {
   usuarioNome: string;
   golsTimeA: number;
   golsTimeB: number;
+  momentoPrevisto?: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+  timeVencedorPrevisto?: 'A' | 'B' | null;
 }
 
 export interface IPartidaStats {
@@ -14,6 +16,9 @@ export interface IPartidaStats {
   dataInicio: string;
   status: string;
   rodadaNome: string;
+  tipoRodada?: 'GRUPO' | 'MATAMATA';
+  decididoEm?: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+  timeVencedorPenaltis?: 'A' | 'B' | null;
   estatisticas: {
     total: number;
     vitoriasA: number;

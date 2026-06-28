@@ -4,6 +4,7 @@ import {
   criarRodada,
   lancarResultadoOficial,
 } from '@/app/actions/admin';
+import type { TPenaltyWinner } from '@palpita/core';
 import { useMutation } from '@tanstack/react-query';
 
 export function useMutationCriarRodada() {
@@ -55,17 +56,20 @@ export function useMutationLancarResultadoOficial() {
       golsTimeA,
       golsTimeB,
       decididoEm,
+      timeVencedorPenaltis,
     }: {
       partidaId: string;
       golsTimeA: number;
       golsTimeB: number;
       decididoEm?: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+      timeVencedorPenaltis?: TPenaltyWinner;
     }) => {
       const res = await lancarResultadoOficial(
         partidaId,
         golsTimeA,
         golsTimeB,
         decididoEm,
+        timeVencedorPenaltis,
       );
       if (!res.success) {
         throw new Error(res.message);

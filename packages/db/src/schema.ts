@@ -1,6 +1,7 @@
 import type {
   TDecididoEm,
   TPartidaStatus,
+  TPenaltyWinner,
   TRodadaTipo,
   TUsuarioCargo,
   TUsuarioStatus,
@@ -72,6 +73,9 @@ export const partidas = pgTable('partidas', {
     .$type<TDecididoEm>()
     .default('NORMAL')
     .notNull(),
+  timeVencedorPenaltis: varchar('time_vencedor_penaltis', {
+    length: 1,
+  }).$type<TPenaltyWinner | null>(),
   dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
 });
 
@@ -92,6 +96,9 @@ export const palpites = pgTable(
       .$type<TDecididoEm>()
       .default('NORMAL')
       .notNull(),
+    timeVencedorPrevisto: varchar('time_vencedor_previsto', {
+      length: 1,
+    }).$type<TPenaltyWinner | null>(),
     dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
     dataAtualizacao: timestamp('data_atualizacao').defaultNow().notNull(),
   },

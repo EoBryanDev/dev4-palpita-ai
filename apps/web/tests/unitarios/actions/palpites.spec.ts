@@ -48,6 +48,10 @@ vi.mock('@palpita/db', () => {
       usuarioId: 'palpites.usuarioId',
       partidaId: 'palpites.partidaId',
     },
+    rodadas: {
+      id: 'rodadas.id',
+      tipo: 'rodadas.tipo',
+    },
   };
 });
 
@@ -167,6 +171,7 @@ describe('salvarPalpite', () => {
               {
                 dataInicio: dataPassado,
                 status: 'AGENDADO',
+                rodadaId: 'rodada-123',
               },
             ]),
           ),
@@ -174,9 +179,20 @@ describe('salvarPalpite', () => {
       })),
     }));
 
+    // mock da busca da rodada
+    mockSelect.mockImplementationOnce(() => ({
+      from: vi.fn(() => ({
+        where: vi.fn(() => ({
+          limit: vi.fn(() => Promise.resolve([{ tipo: 'GRUPO' }])),
+        })),
+      })),
+    }));
+
     const result = await salvarPalpite('partida-123', 2, 1);
     expect(result.success).toBe(false);
-    expect(result.message).toContain('Esta partida já começou');
+    expect(result.message).toContain(
+      'prazo para palpitar nesta partida expirou',
+    );
   });
 
   it('deve atualizar o palpite com sucesso se já existir um palpite anterior', async () => {
@@ -215,13 +231,11 @@ describe('salvarPalpite', () => {
       })),
     }));
 
-    // mock da busca da primeira partida da rodada (futura)
+    // mock da busca da rodada
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
-          orderBy: vi.fn(() => ({
-            limit: vi.fn(() => Promise.resolve([{ dataInicio: dataFuturo }])),
-          })),
+          limit: vi.fn(() => Promise.resolve([{ tipo: 'GRUPO' }])),
         })),
       })),
     }));
@@ -284,13 +298,11 @@ describe('salvarPalpite', () => {
       })),
     }));
 
-    // mock da busca da primeira partida da rodada (futura)
+    // mock da busca da rodada
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
-          orderBy: vi.fn(() => ({
-            limit: vi.fn(() => Promise.resolve([{ dataInicio: dataFuturo }])),
-          })),
+          limit: vi.fn(() => Promise.resolve([{ tipo: 'GRUPO' }])),
         })),
       })),
     }));
