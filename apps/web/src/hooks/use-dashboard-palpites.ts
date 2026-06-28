@@ -63,10 +63,7 @@ export function useDashboardPalpites() {
     });
   };
 
-  const handleTimeVencedorChange = (
-    partidaId: string,
-    value: 'A' | 'B',
-  ) => {
+  const handleTimeVencedorChange = (partidaId: string, value: 'A' | 'B') => {
     setValoresPalpites((prev) => {
       const atual = prev[partidaId] || { golsA: '', golsB: '' };
       return {
@@ -102,7 +99,9 @@ export function useDashboardPalpites() {
     const ehEmpateMataMata =
       partida.tipoRodada === 'MATAMATA' && golsA === golsB;
     const timeVencedorPrevisto = ehEmpateMataMata
-      ? (valores?.timeVencedorPrevisto ?? partida.timeVencedorPrevisto ?? undefined)
+      ? (valores?.timeVencedorPrevisto ??
+        partida.timeVencedorPrevisto ??
+        undefined)
       : undefined;
 
     startTransition(async () => {

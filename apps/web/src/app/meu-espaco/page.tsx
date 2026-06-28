@@ -144,7 +144,7 @@ export default async function MeuEspacoPage() {
         golsTimeA: palpite.golsTimeA,
         golsTimeB: palpite.golsTimeB,
         momentoPrevisto: palpite.momentoPrevisto,
-        timeVencedorPrevisto: palpite.timeVencedorPrevisto,
+        timeVencedorPrevisto: palpite.timeVencedorPrevisto ?? undefined,
         dataCriacao: palpite.dataCriacao,
         dataAtualizacao: palpite.dataAtualizacao,
       });

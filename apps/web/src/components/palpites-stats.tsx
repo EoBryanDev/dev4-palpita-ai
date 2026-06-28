@@ -460,9 +460,11 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
                                           </td>
                                           {match.tipoRodada === 'MATAMATA' && (
                                             <td className="py-2.5 text-right text-xs font-bold text-zinc-500 dark:text-zinc-400">
-                                              {palpite.golsTimeA === palpite.golsTimeB
+                                              {palpite.golsTimeA ===
+                                              palpite.golsTimeB
                                                 ? `Pênaltis: ${palpite.timeVencedorPrevisto === 'A' ? match.timeA : palpite.timeVencedorPrevisto === 'B' ? match.timeB : '-'}`
-                                                : palpite.momentoPrevisto === 'PRORROGACAO'
+                                                : palpite.momentoPrevisto ===
+                                                    'PRORROGACAO'
                                                   ? 'Prorrogação'
                                                   : 'Tempo Normal'}
                                             </td>
@@ -571,7 +573,7 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
                 </p>
               ) : (
                 <div className="space-y-2">
-                      {filteredVotes.map((voto) => (
+                  {filteredVotes.map((voto) => (
                     <div
                       key={voto.id}
                       className={`flex items-center justify-between p-3 rounded-xl text-sm ${

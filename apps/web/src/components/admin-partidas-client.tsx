@@ -78,6 +78,9 @@ export function AdminPartidasClient({
     Record<string, 'NORMAL' | 'PRORROGACAO' | 'PENALTIS'>
   >({});
 
+  const [timeVencedorPenaltisValores, setTimeVencedorPenaltisValores] =
+    useState<Record<string, 'A' | 'B'>>({});
+
   const [editingPartidas, setEditingPartidas] = useState<
     Record<string, boolean>
   >({});
@@ -97,10 +100,21 @@ export function AdminPartidasClient({
         (partida.decididoEm as 'NORMAL' | 'PRORROGACAO' | 'PENALTIS') ??
         'NORMAL',
     }));
+    if (partida.timeVencedorPenaltis) {
+      setTimeVencedorPenaltisValores((prev) => ({
+        ...prev,
+        [partida.id]: partida.timeVencedorPenaltis as 'A' | 'B',
+      }));
+    }
   };
 
   const handleCancelarRevisao = (partidaId: string) => {
     setEditingPartidas((prev) => ({ ...prev, [partidaId]: false }));
+    setTimeVencedorPenaltisValores((prev) => {
+      const next = { ...prev };
+      delete next[partidaId];
+      return next;
+    });
   };
 
   // Estado de paginação por rodada (6 partidas visíveis por padrão)
@@ -204,6 +218,7 @@ export function AdminPartidasClient({
     }
 
     const decididoEm = decididoEmValores[partidaId] ?? 'NORMAL';
+    const timeVencedorPenaltis = timeVencedorPenaltisValores[partidaId];
 
     try {
       const res = await mutationLancarResultadoOficial.mutateAsync({
@@ -211,6 +226,7 @@ export function AdminPartidasClient({
         golsTimeA: Number(placar.golsA),
         golsTimeB: Number(placar.golsB),
         decididoEm,
+        timeVencedorPenaltis,
       });
       toast({
         title: 'Resultado Lançado!',
@@ -708,7 +724,9 @@ export function AdminPartidasClient({
                                                 ? 'Prorrogação'
                                                 : partida.decididoEm ===
                                                     'PENALTIS'
-                                                  ? 'Pênaltis'
+                                                  ? partida.timeVencedorPenaltis
+                                                    ? `Pênaltis (${partida.timeVencedorPenaltis === 'A' ? partida.timeA : partida.timeB})`
+                                                    : 'Pênaltis'
                                                   : 'Tempo Normal'}
                                             </span>
                                           )}
@@ -760,36 +778,74 @@ export function AdminPartidasClient({
                                           </div>
                                           {partida.tipoRodada ===
                                             'MATAMATA' && (
-                                            <select
-                                              value={
-                                                decididoEmValores[partida.id] ??
-                                                'NORMAL'
-                                              }
-                                              onChange={(e) =>
-                                                setDecididoEmValores(
-                                                  (prev) => ({
-                                                    ...prev,
-                                                    [partida.id]: e.target
-                                                      .value as
-                                                      | 'NORMAL'
-                                                      | 'PRORROGACAO'
-                                                      | 'PENALTIS',
-                                                  }),
-                                                )
-                                              }
-                                              disabled={isPending}
-                                              className="text-[10px] bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-1 font-bold outline-none text-zinc-800 dark:text-zinc-200"
-                                            >
-                                              <option value="NORMAL">
-                                                Tempo Normal
-                                              </option>
-                                              <option value="PRORROGACAO">
-                                                Prorrogação
-                                              </option>
-                                              <option value="PENALTIS">
-                                                Pênaltis
-                                              </option>
-                                            </select>
+                                            <>
+                                              <select
+                                                value={
+                                                  decididoEmValores[
+                                                    partida.id
+                                                  ] ?? 'NORMAL'
+                                                }
+                                                onChange={(e) =>
+                                                  setDecididoEmValores(
+                                                    (prev) => ({
+                                                      ...prev,
+                                                      [partida.id]: e.target
+                                                        .value as
+                                                        | 'NORMAL'
+                                                        | 'PRORROGACAO'
+                                                        | 'PENALTIS',
+                                                    }),
+                                                  )
+                                                }
+                                                disabled={isPending}
+                                                className="text-[10px] bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-1 font-bold outline-none text-zinc-800 dark:text-zinc-200"
+                                              >
+                                                <option value="NORMAL">
+                                                  Tempo Normal
+                                                </option>
+                                                <option value="PRORROGACAO">
+                                                  Prorrogação
+                                                </option>
+                                                <option value="PENALTIS">
+                                                  Pênaltis
+                                                </option>
+                                              </select>
+                                              {(decididoEmValores[partida.id] ??
+                                                'NORMAL') === 'PENALTIS' &&
+                                                placarA !== '' &&
+                                                placarB !== '' &&
+                                                Number(placarA) ===
+                                                  Number(placarB) && (
+                                                  <select
+                                                    value={
+                                                      timeVencedorPenaltisValores[
+                                                        partida.id
+                                                      ] ?? ''
+                                                    }
+                                                    onChange={(e) =>
+                                                      setTimeVencedorPenaltisValores(
+                                                        (prev) => ({
+                                                          ...prev,
+                                                          [partida.id]: e.target
+                                                            .value as 'A' | 'B',
+                                                        }),
+                                                      )
+                                                    }
+                                                    disabled={isPending}
+                                                    className="text-[10px] bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-1 font-bold outline-none text-amber-800 dark:text-amber-200"
+                                                  >
+                                                    <option value="">
+                                                      Vencedor pênaltis?
+                                                    </option>
+                                                    <option value="A">
+                                                      {partida.timeA}
+                                                    </option>
+                                                    <option value="B">
+                                                      {partida.timeB}
+                                                    </option>
+                                                  </select>
+                                                )}
+                                            </>
                                           )}
                                         </div>
                                       )}

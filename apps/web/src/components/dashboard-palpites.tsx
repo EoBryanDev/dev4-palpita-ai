@@ -532,53 +532,75 @@ export function DashboardPalpites({
                                     className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
                                   />
                                 </div>
-                                {rodada.tipo === 'MATAMATA' && (
-                                  <>
-                                    {valoresPalpites[partida.id]?.golsA !== undefined &&
-                                    valoresPalpites[partida.id]?.golsB !== undefined &&
-                                    valoresPalpites[partida.id].golsA !== '' &&
-                                    valoresPalpites[partida.id].golsB !== '' &&
-                                    valoresPalpites[partida.id].golsA === valoresPalpites[partida.id].golsB ? (
-                                      <div className="flex items-center gap-1.5">
-                                        <span className="text-[10px] font-bold text-zinc-500">Vence nos pênaltis:</span>
-                                        <select
-                                          disabled={!isPartidaHabilitada(partida) || isPending}
-                                          value={
-                                            valoresPalpites[partida.id]?.timeVencedorPrevisto ?? ''
-                                          }
-                                          onChange={(e) =>
-                                            handleTimeVencedorChange(
-                                              partida.id,
-                                              e.target.value as 'A' | 'B',
-                                            )
-                                          }
-                                          className="text-xs bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-1.5 font-bold outline-none text-zinc-800 dark:text-zinc-200 focus:ring-2 focus:ring-emerald-500"
-                                        >
-                                          <option value="" disabled>Quem vence?</option>
-                                          <option value="A">{partida.timeA}</option>
-                                          <option value="B">{partida.timeB}</option>
-                                        </select>
-                                      </div>
-                                    ) : (
+                                {rodada.tipo === 'MATAMATA' &&
+                                  (valoresPalpites[partida.id]?.golsA !==
+                                    undefined &&
+                                  valoresPalpites[partida.id]?.golsB !==
+                                    undefined &&
+                                  valoresPalpites[partida.id].golsA !== '' &&
+                                  valoresPalpites[partida.id].golsB !== '' &&
+                                  valoresPalpites[partida.id].golsA ===
+                                    valoresPalpites[partida.id].golsB ? (
+                                    <div className="flex items-center gap-1.5">
+                                      <span className="text-[10px] font-bold text-zinc-500">
+                                        Vence nos pênaltis:
+                                      </span>
                                       <select
-                                        disabled={!isPartidaHabilitada(partida) || isPending}
+                                        disabled={
+                                          !isPartidaHabilitada(partida) ||
+                                          isPending
+                                        }
                                         value={
-                                          valoresPalpites[partida.id]?.momentoPrevisto ?? 'NORMAL'
+                                          valoresPalpites[partida.id]
+                                            ?.timeVencedorPrevisto ?? ''
                                         }
                                         onChange={(e) =>
-                                          handleMomentoChange(
+                                          handleTimeVencedorChange(
                                             partida.id,
-                                            e.target.value as 'NORMAL' | 'PRORROGACAO',
+                                            e.target.value as 'A' | 'B',
                                           )
                                         }
                                         className="text-xs bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-1.5 font-bold outline-none text-zinc-800 dark:text-zinc-200 focus:ring-2 focus:ring-emerald-500"
                                       >
-                                        <option value="NORMAL">Tempo Normal</option>
-                                        <option value="PRORROGACAO">Prorrogação</option>
+                                        <option value="" disabled>
+                                          Quem vence?
+                                        </option>
+                                        <option value="A">
+                                          {partida.timeA}
+                                        </option>
+                                        <option value="B">
+                                          {partida.timeB}
+                                        </option>
                                       </select>
-                                    )}
-                                  </>
-                                )}
+                                    </div>
+                                  ) : (
+                                    <select
+                                      disabled={
+                                        !isPartidaHabilitada(partida) ||
+                                        isPending
+                                      }
+                                      value={
+                                        valoresPalpites[partida.id]
+                                          ?.momentoPrevisto ?? 'NORMAL'
+                                      }
+                                      onChange={(e) =>
+                                        handleMomentoChange(
+                                          partida.id,
+                                          e.target.value as
+                                            | 'NORMAL'
+                                            | 'PRORROGACAO',
+                                        )
+                                      }
+                                      className="text-xs bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-1.5 font-bold outline-none text-zinc-800 dark:text-zinc-200 focus:ring-2 focus:ring-emerald-500"
+                                    >
+                                      <option value="NORMAL">
+                                        Tempo Normal
+                                      </option>
+                                      <option value="PRORROGACAO">
+                                        Prorrogação
+                                      </option>
+                                    </select>
+                                  ))}
                               </div>
 
                               {/* Botão Salvar */}
@@ -708,53 +730,66 @@ export function DashboardPalpites({
                                 className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
                               />
                             </div>
-                            {partida.tipoRodada === 'MATAMATA' && (
-                              <>
-                                {golsA !== '' && golsB !== '' && golsA === golsB ? (
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="text-[10px] font-bold text-zinc-500">Vence nos pênaltis:</span>
-                                    <select
-                                      disabled={!isPartidaHabilitada(partida) || isPending}
-                                      value={
-                                        valoresPalpites[partida.id]?.timeVencedorPrevisto ??
-                                        partida.timeVencedorPrevisto ??
-                                        ''
-                                      }
-                                      onChange={(e) =>
-                                        handleTimeVencedorChange(
-                                          partida.id,
-                                          e.target.value as 'A' | 'B',
-                                        )
-                                      }
-                                      className="text-xs bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-1.5 font-bold outline-none text-zinc-800 dark:text-zinc-200 focus:ring-2 focus:ring-emerald-500"
-                                    >
-                                      <option value="" disabled>Quem vence?</option>
-                                      <option value="A">{partida.timeA}</option>
-                                      <option value="B">{partida.timeB}</option>
-                                    </select>
-                                  </div>
-                                ) : (
+                            {partida.tipoRodada === 'MATAMATA' &&
+                              (golsA !== '' &&
+                              golsB !== '' &&
+                              golsA === golsB ? (
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-[10px] font-bold text-zinc-500">
+                                    Vence nos pênaltis:
+                                  </span>
                                   <select
-                                    disabled={!isPartidaHabilitada(partida) || isPending}
+                                    disabled={
+                                      !isPartidaHabilitada(partida) || isPending
+                                    }
                                     value={
-                                      valoresPalpites[partida.id]?.momentoPrevisto ??
-                                      partida.momentoPrevisto ??
-                                      'NORMAL'
+                                      valoresPalpites[partida.id]
+                                        ?.timeVencedorPrevisto ??
+                                      partida.timeVencedorPrevisto ??
+                                      ''
                                     }
                                     onChange={(e) =>
-                                      handleMomentoChange(
+                                      handleTimeVencedorChange(
                                         partida.id,
-                                        e.target.value as 'NORMAL' | 'PRORROGACAO',
+                                        e.target.value as 'A' | 'B',
                                       )
                                     }
                                     className="text-xs bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-1.5 font-bold outline-none text-zinc-800 dark:text-zinc-200 focus:ring-2 focus:ring-emerald-500"
                                   >
-                                    <option value="NORMAL">Tempo Normal</option>
-                                    <option value="PRORROGACAO">Prorrogação</option>
+                                    <option value="" disabled>
+                                      Quem vence?
+                                    </option>
+                                    <option value="A">{partida.timeA}</option>
+                                    <option value="B">{partida.timeB}</option>
                                   </select>
-                                )}
-                              </>
-                            )}
+                                </div>
+                              ) : (
+                                <select
+                                  disabled={
+                                    !isPartidaHabilitada(partida) || isPending
+                                  }
+                                  value={
+                                    valoresPalpites[partida.id]
+                                      ?.momentoPrevisto ??
+                                    partida.momentoPrevisto ??
+                                    'NORMAL'
+                                  }
+                                  onChange={(e) =>
+                                    handleMomentoChange(
+                                      partida.id,
+                                      e.target.value as
+                                        | 'NORMAL'
+                                        | 'PRORROGACAO',
+                                    )
+                                  }
+                                  className="text-xs bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-1.5 font-bold outline-none text-zinc-800 dark:text-zinc-200 focus:ring-2 focus:ring-emerald-500"
+                                >
+                                  <option value="NORMAL">Tempo Normal</option>
+                                  <option value="PRORROGACAO">
+                                    Prorrogação
+                                  </option>
+                                </select>
+                              ))}
                           </div>
 
                           {/* Botão Alterar */}
