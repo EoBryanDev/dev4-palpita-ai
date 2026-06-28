@@ -63,6 +63,8 @@ export interface IPalpiteComUsuario {
   golsTimeA: number;
   golsTimeB: number;
   usuarioNome: string;
+  momentoPrevisto: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+  timeVencedorPrevisto: 'A' | 'B' | null;
 }
 
 export async function obterPalpitesUsuariosAtivos(): Promise<
@@ -74,6 +76,8 @@ export async function obterPalpitesUsuariosAtivos(): Promise<
       partidaId: palpites.partidaId,
       golsTimeA: palpites.golsTimeA,
       golsTimeB: palpites.golsTimeB,
+      momentoPrevisto: palpites.momentoPrevisto,
+      timeVencedorPrevisto: palpites.timeVencedorPrevisto,
       usuarioNome: usuarios.nome,
     })
     .from(palpites)

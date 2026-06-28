@@ -276,6 +276,11 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
                       <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
                         {match.rodadaNome}
                       </span>
+                      {match.tipoRodada === 'MATAMATA' && (
+                        <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                          Mata-Mata
+                        </span>
+                      )}
                       <span
                         className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${statusInfo.styles}`}
                       >
@@ -418,6 +423,11 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
                                     <th className="pb-2 text-right pr-4">
                                       Placar
                                     </th>
+                                    {match.tipoRodada === 'MATAMATA' && (
+                                      <th className="pb-2 text-right">
+                                        Decisão
+                                      </th>
+                                    )}
                                   </tr>
                                 </thead>
                                 <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
@@ -448,6 +458,15 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
                                             {palpite.golsTimeA} x{' '}
                                             {palpite.golsTimeB}
                                           </td>
+                                          {match.tipoRodada === 'MATAMATA' && (
+                                            <td className="py-2.5 text-right text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                                              {palpite.golsTimeA === palpite.golsTimeB
+                                                ? `Pênaltis: ${palpite.timeVencedorPrevisto === 'A' ? match.timeA : palpite.timeVencedorPrevisto === 'B' ? match.timeB : '-'}`
+                                                : palpite.momentoPrevisto === 'PRORROGACAO'
+                                                  ? 'Prorrogação'
+                                                  : 'Tempo Normal'}
+                                            </td>
+                                          )}
                                         </tr>
                                       );
                                     })}
@@ -552,7 +571,7 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
                 </p>
               ) : (
                 <div className="space-y-2">
-                  {filteredVotes.map((voto) => (
+                      {filteredVotes.map((voto) => (
                     <div
                       key={voto.id}
                       className={`flex items-center justify-between p-3 rounded-xl text-sm ${
@@ -564,9 +583,20 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
                       <span className="font-medium text-zinc-700 dark:text-zinc-300">
                         {voto.usuarioNome}
                       </span>
-                      <span className="font-black text-emerald-600 dark:text-emerald-400">
-                        {voto.golsTimeA} x {voto.golsTimeB}
-                      </span>
+                      <div className="text-right">
+                        <span className="font-black text-emerald-600 dark:text-emerald-400">
+                          {voto.golsTimeA} x {voto.golsTimeB}
+                        </span>
+                        {modalMatch.tipoRodada === 'MATAMATA' && (
+                          <div className="text-[10px] text-zinc-400 mt-0.5">
+                            {voto.golsTimeA === voto.golsTimeB
+                              ? `Pênaltis: ${voto.timeVencedorPrevisto === 'A' ? modalMatch.timeA : voto.timeVencedorPrevisto === 'B' ? modalMatch.timeB : '-'}`
+                              : voto.momentoPrevisto === 'PRORROGACAO'
+                                ? 'Prorrogação'
+                                : 'Tempo Normal'}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
