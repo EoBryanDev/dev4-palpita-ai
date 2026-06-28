@@ -1,3 +1,17 @@
+# [1.20.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.19.0...v1.20.0) (2026-06-28)
+
+
+### Bug Fixes
+
+* **lint:** fix biome import order and line length in admin-partidas-client EOB-191 ([30c56fc](https://github.com/EoBryanDev/dev4-palpita-ai/commit/30c56fc1e895c52a68e8144185ec613332c98815))
+* **ui:** fix select text color and admin round header layout EOB-191 ([08a9e89](https://github.com/EoBryanDev/dev4-palpita-ai/commit/08a9e89683fc03f54285d78380d1190a6cdb8ec3))
+
+
+### Features
+
+* **admin:** add MATAMATA toggle to round creation and listing EOB-191 ([3b792a4](https://github.com/EoBryanDev/dev4-palpita-ai/commit/3b792a441c02a6a75bd2823f4672c8bfe82c5728))
+* **domain:** implement pontuacao mata-mata EOB-191 ([8efb0bc](https://github.com/EoBryanDev/dev4-palpita-ai/commit/8efb0bcd8797637ce494dc135828418fb56e3390))
+
 # [1.19.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.18.7...v1.19.0) (2026-06-26)
 
 
