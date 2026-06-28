@@ -190,7 +190,7 @@ describe('DashboardPalpites Component', () => {
     fireEvent.click(btnSalvar);
 
     await waitFor(() => {
-      expect(salvarPalpite).toHaveBeenCalledWith('partida-1', 3, 2, 'NORMAL');
+      expect(salvarPalpite).toHaveBeenCalledWith('partida-1', 3, 2, 'NORMAL', undefined);
     });
 
     expect(mockToast).toHaveBeenCalledWith({
