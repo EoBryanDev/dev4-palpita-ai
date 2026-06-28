@@ -12,6 +12,7 @@ export {
   type TPartidaStatus,
   type TRodadaTipo,
   type TDecididoEm,
+  type TPenaltyWinner,
 } from './domain/partida.entity';
 
 export {

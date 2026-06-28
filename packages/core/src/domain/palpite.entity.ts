@@ -1,4 +1,4 @@
-import type { TDecididoEm, TRodadaTipo } from './partida.entity';
+import type { TDecididoEm, TPenaltyWinner, TRodadaTipo } from './partida.entity';
 
 export interface IPalpiteProps {
   id: string;
@@ -7,6 +7,7 @@ export interface IPalpiteProps {
   golsTimeA: number;
   golsTimeB: number;
   momentoPrevisto?: TDecididoEm;
+  timeVencedorPrevisto?: TPenaltyWinner;
   dataCriacao: Date;
   dataAtualizacao: Date;
 }
@@ -18,6 +19,7 @@ export class Palpite {
   private _golsTimeA: number;
   private _golsTimeB: number;
   private _momentoPrevisto: TDecididoEm;
+  private _timeVencedorPrevisto: TPenaltyWinner | null;
   private readonly _dataCriacao: Date;
   private _dataAtualizacao: Date;
 
@@ -31,6 +33,7 @@ export class Palpite {
     this._golsTimeA = props.golsTimeA;
     this._golsTimeB = props.golsTimeB;
     this._momentoPrevisto = props.momentoPrevisto ?? 'NORMAL';
+    this._timeVencedorPrevisto = props.timeVencedorPrevisto ?? null;
     this._dataCriacao = props.dataCriacao;
     this._dataAtualizacao = props.dataAtualizacao;
   }
@@ -67,6 +70,10 @@ export class Palpite {
     return this._momentoPrevisto;
   }
 
+  public get timeVencedorPrevisto(): TPenaltyWinner | null {
+    return this._timeVencedorPrevisto;
+  }
+
   public atualizarPlacar(
     golsTimeA: number,
     golsTimeB: number,
@@ -74,6 +81,7 @@ export class Palpite {
     dataReferencia: Date = new Date(),
     deadlineGlobal?: Date,
     momentoPrevisto?: TDecididoEm,
+    timeVencedorPrevisto?: TPenaltyWinner,
   ): void {
     this.validarPrazo(dataPartidaInicio, dataReferencia, deadlineGlobal);
     if (golsTimeA < 0 || golsTimeB < 0) {
@@ -83,6 +91,9 @@ export class Palpite {
     this._golsTimeB = golsTimeB;
     if (momentoPrevisto) {
       this._momentoPrevisto = momentoPrevisto;
+    }
+    if (timeVencedorPrevisto) {
+      this._timeVencedorPrevisto = timeVencedorPrevisto;
     }
     this._dataAtualizacao = dataReferencia;
   }
@@ -105,19 +116,11 @@ export class Palpite {
     partidaGolsTimeB: number | null,
     tipoRodada: TRodadaTipo = 'GRUPO',
     decididoEm: TDecididoEm = 'NORMAL',
+    timeVencedorPenaltis?: TPenaltyWinner | null,
   ): number {
     if (partidaGolsTimeA === null || partidaGolsTimeB === null) {
       return 0;
     }
-
-    const vencedorPalpite = this.obterVencedor(
-      this._golsTimeA,
-      this._golsTimeB,
-    );
-    const vencedorPartida = this.obterVencedor(
-      partidaGolsTimeA,
-      partidaGolsTimeB,
-    );
 
     const acertouPlacarExato =
       this._golsTimeA === partidaGolsTimeA &&
@@ -126,12 +129,29 @@ export class Palpite {
     let pontosBase = 0;
     if (acertouPlacarExato) {
       pontosBase = 2;
-    } else if (vencedorPalpite === vencedorPartida) {
-      pontosBase = 1;
+    } else {
+      const vencedorPalpite = this.obterVencedor(
+        this._golsTimeA,
+        this._golsTimeB,
+      );
+      const vencedorPartida = this.obterVencedor(
+        partidaGolsTimeA,
+        partidaGolsTimeB,
+      );
+      if (vencedorPalpite === vencedorPartida) {
+        pontosBase = 1;
+      }
     }
 
-    if (tipoRodada === 'MATAMATA') {
-      if (pontosBase > 0 && this._momentoPrevisto === decididoEm) {
+    if (tipoRodada === 'MATAMATA' && pontosBase > 0) {
+      if (this._golsTimeA !== this._golsTimeB) {
+        if (this._momentoPrevisto === decididoEm) {
+          return pontosBase + 1;
+        }
+      } else if (
+        timeVencedorPenaltis &&
+        this._timeVencedorPrevisto === timeVencedorPenaltis
+      ) {
         return pontosBase + 1;
       }
     }
