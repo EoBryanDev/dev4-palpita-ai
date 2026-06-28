@@ -183,16 +183,16 @@ describe('salvarPalpite', () => {
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
-          limit: vi.fn(() =>
-            Promise.resolve([{ tipo: 'GRUPO' }]),
-          ),
+          limit: vi.fn(() => Promise.resolve([{ tipo: 'GRUPO' }])),
         })),
       })),
     }));
 
     const result = await salvarPalpite('partida-123', 2, 1);
     expect(result.success).toBe(false);
-    expect(result.message).toContain('prazo para palpitar nesta partida expirou');
+    expect(result.message).toContain(
+      'prazo para palpitar nesta partida expirou',
+    );
   });
 
   it('deve atualizar o palpite com sucesso se já existir um palpite anterior', async () => {
@@ -235,9 +235,7 @@ describe('salvarPalpite', () => {
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
-          limit: vi.fn(() =>
-            Promise.resolve([{ tipo: 'GRUPO' }]),
-          ),
+          limit: vi.fn(() => Promise.resolve([{ tipo: 'GRUPO' }])),
         })),
       })),
     }));
@@ -304,9 +302,7 @@ describe('salvarPalpite', () => {
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
-          limit: vi.fn(() =>
-            Promise.resolve([{ tipo: 'GRUPO' }]),
-          ),
+          limit: vi.fn(() => Promise.resolve([{ tipo: 'GRUPO' }])),
         })),
       })),
     }));
