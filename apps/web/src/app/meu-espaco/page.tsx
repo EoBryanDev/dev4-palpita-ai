@@ -56,21 +56,6 @@ export default async function MeuEspacoPage() {
     prazoLimite = deadlineIndividual.toISOString();
     isTudoBloqueado = new Date() >= deadlineIndividual;
     isLiberacaoTardia = true;
-  } else if (todasPartidas.length > 0) {
-    const rodadaAtiva = await obterRodadaAtiva();
-    const partidasRodada = rodadaAtiva
-      ? todasPartidas.filter((p) => p.rodadaId === rodadaAtiva.id)
-      : todasPartidas;
-    const primeiraPartida =
-      [...partidasRodada].sort(
-        (a, b) => a.dataInicio.getTime() - b.dataInicio.getTime(),
-      )[0] || todasPartidas[0];
-
-    const deadline = new Date(
-      primeiraPartida.dataInicio.getTime() - 30 * 60 * 1000,
-    );
-    prazoLimite = deadline.toISOString();
-    isTudoBloqueado = new Date() >= deadline;
   }
 
   // 6. Para usuários com liberação tardia, filtrar apenas partidas futuras
@@ -102,7 +87,9 @@ export default async function MeuEspacoPage() {
           palpiteGolsA: palpite ? palpite.golsTimeA : null,
           palpiteGolsB: palpite ? palpite.golsTimeB : null,
           momentoPrevisto: palpite ? palpite.momentoPrevisto : 'NORMAL',
+          timeVencedorPrevisto: palpite ? palpite.timeVencedorPrevisto : null,
           decididoEm: partida.decididoEm,
+          timeVencedorPenaltis: partida.timeVencedorPenaltis,
           tipoRodada: partida.rodadaTipo,
           jaPalpitou: !!palpite,
           rodadaNome: rodada.nome,
@@ -157,6 +144,7 @@ export default async function MeuEspacoPage() {
         golsTimeA: palpite.golsTimeA,
         golsTimeB: palpite.golsTimeB,
         momentoPrevisto: palpite.momentoPrevisto,
+        timeVencedorPrevisto: palpite.timeVencedorPrevisto,
         dataCriacao: palpite.dataCriacao,
         dataAtualizacao: palpite.dataAtualizacao,
       });
@@ -166,6 +154,7 @@ export default async function MeuEspacoPage() {
         golsB,
         match.rodadaTipo ?? 'GRUPO',
         match.decididoEm ?? 'NORMAL',
+        match.timeVencedorPenaltis,
       );
 
       historico.push({
@@ -182,6 +171,8 @@ export default async function MeuEspacoPage() {
         dataInicio: match.dataInicio.toISOString(),
         status: match.status,
         momentoPrevisto: palpite.momentoPrevisto,
+        timeVencedorPrevisto: palpite.timeVencedorPrevisto,
+        timeVencedorPenaltis: match.timeVencedorPenaltis,
         decididoEm: match.decididoEm,
         tipoRodada: match.rodadaTipo,
       });
@@ -223,7 +214,9 @@ export default async function MeuEspacoPage() {
         palpiteGolsA: palpite ? palpite.golsTimeA : null,
         palpiteGolsB: palpite ? palpite.golsTimeB : null,
         momentoPrevisto: palpite ? palpite.momentoPrevisto : 'NORMAL',
+        timeVencedorPrevisto: palpite ? palpite.timeVencedorPrevisto : null,
         decididoEm: partida.decididoEm,
+        timeVencedorPenaltis: partida.timeVencedorPenaltis,
         tipoRodada: partida.rodadaTipo,
         jaPalpitou: !!palpite,
       };
