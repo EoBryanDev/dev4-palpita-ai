@@ -1,3 +1,10 @@
+## [1.20.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.20.0...v1.20.1) (2026-06-28)
+
+
+### Bug Fixes
+
+* **admin:** rodada atual e engajamento na pagina de partidas ([ee7cbeb](https://github.com/EoBryanDev/dev4-palpita-ai/commit/ee7cbeb5183b7bf7f3aee7fd13264cb7a509a0cf))
+
 # [1.20.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.19.0...v1.20.0) (2026-06-28)
 
 
