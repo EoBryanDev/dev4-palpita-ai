@@ -17,9 +17,11 @@ import {
   Calendar,
   CheckCircle,
   ClipboardList,
+  Percent,
   Play,
   Plus,
   Trophy,
+  UserCheck,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -35,6 +37,12 @@ export function AdminPartidasClient({
   rodadas,
   partidas,
   times,
+  rodadaAtiva,
+  totalPartidasRodada,
+  totalEsperado,
+  totalPalpitesRealizados,
+  percentualSubmetidos,
+  totalLiberados,
 }: IAdminPartidasClientProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -450,7 +458,72 @@ export function AdminPartidasClient({
         </div>
       </div>
 
-      {/* Seção 2: Visualização e Lançamento de Resultados agrupados por Rodada */}
+      {/* Seção 2: Rodada Atual e Engajamento */}
+      {rodadaAtiva && (
+        <div className="rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/30 space-y-4">
+          <h3 className="text-lg font-black tracking-tight flex items-center gap-2">
+            <Trophy className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            Rodada Atual e Engajamento
+          </h3>
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50">
+              <div>
+                <span className="text-xs font-bold text-zinc-500 uppercase">
+                  Rodada
+                </span>
+                <h4 className="text-md font-bold">{rodadaAtiva.nome}</h4>
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="text-left">
+                  <span className="text-xs font-bold text-zinc-500 uppercase">
+                    Partidas
+                  </span>
+                  <p className="text-md font-bold">{totalPartidasRodada}</p>
+                </div>
+                <div className="text-left">
+                  <span className="text-xs font-bold text-zinc-500 uppercase">
+                    Liberados
+                  </span>
+                  <p className="text-md font-bold flex items-center gap-1">
+                    <UserCheck className="h-4 w-4 text-emerald-500" />
+                    {totalLiberados}
+                  </p>
+                </div>
+                <div className="text-left">
+                  <span className="text-xs font-bold text-zinc-500 uppercase">
+                    Palpites
+                  </span>
+                  <p className="text-md font-bold flex items-center gap-1">
+                    <Percent className="h-4 w-4 text-purple-500" />
+                    {percentualSubmetidos}%
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs font-bold">
+                <span className="text-zinc-500 uppercase">
+                  Progresso de Palpites
+                </span>
+                <span>
+                  {totalPalpitesRealizados} de {totalEsperado} palpites
+                  esperados
+                </span>
+              </div>
+              <div className="h-2 w-full rounded-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
+                <div
+                  className="h-full bg-emerald-500 transition-all duration-500"
+                  style={{
+                    width: `${Math.min(percentualSubmetidos, 100)}%`,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Seção 3: Visualização e Lançamento de Resultados agrupados por Rodada */}
       <div className="space-y-6">
         <h3 className="text-xl font-black tracking-tight flex items-center gap-2">
           <Trophy className="h-6 w-6 text-amber-500" />
@@ -470,14 +543,25 @@ export function AdminPartidasClient({
                 const partidasDaRodada = partidasAgrupadas[rodada.id] || [];
 
                 return (
-                  <div key={rodada.id} className="space-y-4">
+                  <div
+                    key={rodada.id}
+                    className={`space-y-4 ${rodadaAtiva?.id === rodada.id ? 'p-4 -mx-4 rounded-3xl border-2 border-emerald-400/40 bg-emerald-50/30 dark:border-emerald-500/30 dark:bg-emerald-950/10' : ''}`}
+                  >
                     <div className="flex items-center gap-2 border-b border-zinc-250 dark:border-zinc-800 pb-2 min-w-0">
-                      <span className="text-sm font-black px-2.5 py-0.5 rounded-lg bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300 shrink-0">
+                      <span
+                        className={`text-sm font-black px-2.5 py-0.5 rounded-lg shrink-0 ${rodadaAtiva?.id === rodada.id ? 'bg-emerald-600 text-white dark:bg-emerald-500 dark:text-zinc-950' : 'bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300'}`}
+                      >
                         Rodada {rodada.numero}
                       </span>
                       <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex-1 min-w-0 truncate">
                         {rodada.nome}
                       </h4>
+                      {rodadaAtiva?.id === rodada.id && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 shrink-0 flex items-center gap-1">
+                          <Play className="h-3 w-3" />
+                          Atual
+                        </span>
+                      )}
                       {/* Toggle Mata-Mata inline por rodada */}
                       <label
                         htmlFor={`rodada-tipo-${rodada.id}`}

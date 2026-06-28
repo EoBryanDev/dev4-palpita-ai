@@ -28,6 +28,7 @@ export async function obterRodadaAtiva(): Promise<IRodada | null> {
   const rodada =
     (await db.query.rodadas.findFirst({
       where: eq(rodadas.ativa, true),
+      orderBy: desc(rodadas.numero),
     })) ||
     (await db.query.rodadas.findFirst({
       orderBy: desc(rodadas.numero),

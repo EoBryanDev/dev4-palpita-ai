@@ -38,6 +38,12 @@ export interface IAdminPartidasClientProps {
   rodadas: IRodadaAdmin[];
   partidas: IPartidaAdmin[];
   times: ITimeAdmin[];
+  rodadaAtiva: IRodadaAdmin | null;
+  totalPartidasRodada: number;
+  totalEsperado: number;
+  totalPalpitesRealizados: number;
+  percentualSubmetidos: number;
+  totalLiberados: number;
 }
 
 export interface IUsuarioAdmin {
