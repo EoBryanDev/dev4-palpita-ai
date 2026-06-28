@@ -64,6 +64,13 @@
       "when": 1782101100000,
       "tag": "0008_add_idioma_to_times",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1782101200000,
+      "tag": "0009_add_mata_mata_columns",
+      "breakpoints": true
     }
   ]
 }

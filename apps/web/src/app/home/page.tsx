@@ -435,6 +435,26 @@ export default async function HomePage({
                   </p>
                 </div>
               </div>
+
+              {/* Bônus do Mata-Mata */}
+              <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5 dark:border-emerald-500/10 dark:bg-emerald-950/15 flex items-start gap-3 shadow-xs">
+                <Sparkles className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="text-sm font-bold text-emerald-800 dark:text-emerald-400">
+                    Bônus Extra de Mata-Mata (+1 Ponto)
+                  </h3>
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1 leading-relaxed">
+                    Nas rodadas de <strong>Mata-Mata</strong> (fase
+                    eliminatória), você deve prever como o confronto será
+                    decidido: no <strong>Tempo Normal</strong>, na{' '}
+                    <strong>Prorrogação</strong> ou nos{' '}
+                    <strong>Pênaltis</strong>. Se você acertar a seleção
+                    vencedora (ou acertar o empate caso o jogo seja decidido nos
+                    pênaltis) e também acertar o momento exato da vitória, você
+                    ganha <strong>+1 ponto de bônus</strong>.
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Coluna da direita (ocupa 1 coluna no desktop): Distribuição de Prêmio */}

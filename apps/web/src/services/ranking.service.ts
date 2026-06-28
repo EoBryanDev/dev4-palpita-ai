@@ -1,4 +1,5 @@
-import { db, palpites, partidas, usuarios } from '@palpita/db';
+import { Palpite } from '@palpita/core';
+import { db, palpites, partidas, rodadas, usuarios } from '@palpita/db';
 import { and, eq, ne, or } from 'drizzle-orm';
 
 export interface IRankedUser {
@@ -40,20 +41,30 @@ export async function calcularRankingGeral(): Promise<IRankedUser[]> {
       id: partidas.id,
       golsTimeA: partidas.golsTimeA,
       golsTimeB: partidas.golsTimeB,
+      decididoEm: partidas.decididoEm,
+      rodadaTipo: rodadas.tipo,
     })
     .from(partidas)
+    .innerJoin(rodadas, eq(partidas.rodadaId, rodadas.id))
     .where(eq(partidas.status, 'FINALIZADO'));
 
   // Criar um mapa de partidas finalizadas para busca O(1)
   const matchesMap = new Map<
     string,
-    { golsTimeA: number; golsTimeB: number }
+    {
+      golsTimeA: number;
+      golsTimeB: number;
+      decididoEm: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+      rodadaTipo: 'GRUPO' | 'MATAMATA';
+    }
   >();
   for (const match of finishedMatches) {
     if (match.golsTimeA !== null && match.golsTimeB !== null) {
       matchesMap.set(match.id, {
         golsTimeA: match.golsTimeA,
         golsTimeB: match.golsTimeB,
+        decididoEm: match.decididoEm,
+        rodadaTipo: match.rodadaTipo,
       });
     }
   }
@@ -79,20 +90,35 @@ export async function calcularRankingGeral(): Promise<IRankedUser[]> {
     for (const guess of userGuesses) {
       const match = matchesMap.get(guess.partidaId);
       if (match) {
-        const vencedorPalpite = obterVencedor(guess.golsTimeA, guess.golsTimeB);
-        const vencedorPartida = obterVencedor(match.golsTimeA, match.golsTimeB);
+        const palpiteEntity = new Palpite({
+          id: guess.id,
+          usuarioId: guess.usuarioId,
+          partidaId: guess.partidaId,
+          golsTimeA: guess.golsTimeA,
+          golsTimeB: guess.golsTimeB,
+          momentoPrevisto: guess.momentoPrevisto,
+          dataCriacao: guess.dataCriacao,
+          dataAtualizacao: guess.dataAtualizacao,
+        });
 
-        const acertouPlacarExato =
-          guess.golsTimeA === match.golsTimeA &&
-          guess.golsTimeB === match.golsTimeB;
+        const pontosPartida = palpiteEntity.calcularPontos(
+          match.golsTimeA,
+          match.golsTimeB,
+          match.rodadaTipo,
+          match.decididoEm,
+        );
 
-        if (acertouPlacarExato) {
-          pontos += 2;
-          palpitesCerteiros++;
+        if (pontosPartida > 0) {
+          pontos += pontosPartida;
           jogosPontuados++;
-        } else if (vencedorPalpite === vencedorPartida) {
-          pontos += 1;
-          jogosPontuados++;
+
+          const acertouPlacarExato =
+            guess.golsTimeA === match.golsTimeA &&
+            guess.golsTimeB === match.golsTimeB;
+
+          if (acertouPlacarExato) {
+            palpitesCerteiros++;
+          }
         }
       }
     }

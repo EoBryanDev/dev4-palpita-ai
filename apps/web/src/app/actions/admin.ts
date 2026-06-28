@@ -3,6 +3,7 @@
 import { validarOrigem } from '@/lib/csrf-server';
 import {
   Partida,
+  type TDecididoEm,
   type TPartidaStatus,
   type TUsuarioCargo,
   type TUsuarioStatus,
@@ -484,6 +485,7 @@ export async function lancarResultadoOficial(
   partidaId: string,
   golsTimeA: number,
   golsTimeB: number,
+  decididoEm?: TDecididoEm,
 ): Promise<IAdminActionResponse> {
   try {
     await validarOrigem();
@@ -530,11 +532,12 @@ export async function lancarResultadoOficial(
         golsTimeB: match.golsTimeB,
         dataInicio: new Date(match.dataInicio),
         status: match.status as TPartidaStatus,
+        decididoEm: match.decididoEm as TDecididoEm,
         dataCriacao: match.dataCriacao,
       });
 
       try {
-        partidaEntity.finalizar(golsTimeA, golsTimeB);
+        partidaEntity.finalizar(golsTimeA, golsTimeB, decididoEm);
       } catch (domainError) {
         return {
           success: false,
@@ -542,13 +545,14 @@ export async function lancarResultadoOficial(
         };
       }
 
-      // 2. Atualizar o status e o placar
+      // 2. Atualizar o status, o placar e decididoEm
       await tx
         .update(partidas)
         .set({
           golsTimeA: partidaEntity.golsTimeA,
           golsTimeB: partidaEntity.golsTimeB,
           status: 'FINALIZADO',
+          decididoEm: partidaEntity.decididoEm,
         })
         .where(eq(partidas.id, partidaId));
 

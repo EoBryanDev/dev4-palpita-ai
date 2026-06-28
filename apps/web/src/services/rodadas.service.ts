@@ -6,6 +6,7 @@ export interface IRodada {
   numero: number;
   nome: string;
   ativa: boolean;
+  tipo: 'GRUPO' | 'MATAMATA';
 }
 
 export async function obterRodadas(): Promise<IRodada[]> {
@@ -19,6 +20,7 @@ export async function obterRodadas(): Promise<IRodada[]> {
     numero: r.numero,
     nome: r.nome,
     ativa: r.ativa,
+    tipo: r.tipo,
   }));
 }
 
@@ -40,5 +42,6 @@ export async function obterRodadaAtiva(): Promise<IRodada | null> {
     numero: rodada.numero,
     nome: rodada.nome,
     ativa: rodada.ativa,
+    tipo: rodada.tipo,
   };
 }

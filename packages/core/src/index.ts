@@ -10,6 +10,8 @@ export {
   Partida,
   type IPartidaProps,
   type TPartidaStatus,
+  type TRodadaTipo,
+  type TDecididoEm,
 } from './domain/partida.entity';
 
 export {

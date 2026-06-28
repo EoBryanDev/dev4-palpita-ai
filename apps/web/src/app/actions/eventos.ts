@@ -243,8 +243,11 @@ export async function obterPontuadoresRodada(rodadaId: string): Promise<{
         id: partidas.id,
         golsTimeA: partidas.golsTimeA,
         golsTimeB: partidas.golsTimeB,
+        decididoEm: partidas.decididoEm,
+        rodadaTipo: rodadas.tipo,
       })
       .from(partidas)
+      .innerJoin(rodadas, eq(partidas.rodadaId, rodadas.id))
       .where(
         and(
           eq(partidas.rodadaId, rodadaId),
@@ -261,7 +264,12 @@ export async function obterPontuadoresRodada(rodadaId: string): Promise<{
 
     const partidasMap = new Map<
       string,
-      { golsTimeA: number; golsTimeB: number }
+      {
+        golsTimeA: number;
+        golsTimeB: number;
+        decididoEm: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+        rodadaTipo: 'GRUPO' | 'MATAMATA';
+      }
     >();
     const partidaIds: string[] = [];
     for (const p of partidasFinalizadas) {
@@ -269,6 +277,8 @@ export async function obterPontuadoresRodada(rodadaId: string): Promise<{
         partidasMap.set(p.id, {
           golsTimeA: p.golsTimeA,
           golsTimeB: p.golsTimeB,
+          decididoEm: p.decididoEm,
+          rodadaTipo: p.rodadaTipo,
         });
         partidaIds.push(p.id);
       }
@@ -281,6 +291,7 @@ export async function obterPontuadoresRodada(rodadaId: string): Promise<{
         partidaId: palpites.partidaId,
         golsTimeA: palpites.golsTimeA,
         golsTimeB: palpites.golsTimeB,
+        momentoPrevisto: palpites.momentoPrevisto,
       })
       .from(palpites)
       .where(inArrayOrTrue(palpites.partidaId, partidaIds));
@@ -309,12 +320,15 @@ export async function obterPontuadoresRodada(rodadaId: string): Promise<{
             partidaId: guess.partidaId,
             golsTimeA: guess.golsTimeA,
             golsTimeB: guess.golsTimeB,
+            momentoPrevisto: guess.momentoPrevisto,
             dataCriacao: new Date(),
             dataAtualizacao: new Date(),
           });
           pontosRodada += palpiteEntity.calcularPontos(
             match.golsTimeA,
             match.golsTimeB,
+            match.rodadaTipo,
+            match.decididoEm,
           );
         }
       }
@@ -497,11 +511,14 @@ export async function obterPontuadoresPartida(partidaId: string): Promise<{
         id: partidas.id,
         golsTimeA: partidas.golsTimeA,
         golsTimeB: partidas.golsTimeB,
+        decididoEm: partidas.decididoEm,
         timeANome: timeA.nome,
         timeBNome: timeB.nome,
         status: partidas.status,
+        rodadaTipo: rodadas.tipo,
       })
       .from(partidas)
+      .innerJoin(rodadas, eq(partidas.rodadaId, rodadas.id))
       .innerJoin(timeA, eq(partidas.timeAId, timeA.id))
       .innerJoin(timeB, eq(partidas.timeBId, timeB.id))
       .where(eq(partidas.id, partidaId))
@@ -526,6 +543,7 @@ export async function obterPontuadoresPartida(partidaId: string): Promise<{
         usuarioNome: usuarios.nome,
         palpiteA: palpites.golsTimeA,
         palpiteB: palpites.golsTimeB,
+        momentoPrevisto: palpites.momentoPrevisto,
       })
       .from(palpites)
       .innerJoin(usuarios, eq(palpites.usuarioId, usuarios.id))
@@ -541,10 +559,16 @@ export async function obterPontuadoresPartida(partidaId: string): Promise<{
         partidaId,
         golsTimeA: p.palpiteA,
         golsTimeB: p.palpiteB,
+        momentoPrevisto: p.momentoPrevisto,
         dataCriacao: new Date(),
         dataAtualizacao: new Date(),
       });
-      const pontos = palpiteEntity.calcularPontos(golsRealA, golsRealB);
+      const pontos = palpiteEntity.calcularPontos(
+        golsRealA,
+        golsRealB,
+        match.rodadaTipo,
+        match.decididoEm,
+      );
 
       return {
         usuarioNome: p.usuarioNome,

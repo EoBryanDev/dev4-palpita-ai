@@ -62,6 +62,10 @@ export function AdminPartidasClient({
     Record<string, { golsA: string; golsB: string }>
   >({});
 
+  const [decididoEmValores, setDecididoEmValores] = useState<
+    Record<string, 'NORMAL' | 'PRORROGACAO' | 'PENALTIS'>
+  >({});
+
   const [editingPartidas, setEditingPartidas] = useState<
     Record<string, boolean>
   >({});
@@ -74,6 +78,12 @@ export function AdminPartidasClient({
         golsA: String(partida.golsTimeA ?? ''),
         golsB: String(partida.golsTimeB ?? ''),
       },
+    }));
+    setDecididoEmValores((prev) => ({
+      ...prev,
+      [partida.id]:
+        (partida.decididoEm as 'NORMAL' | 'PRORROGACAO' | 'PENALTIS') ??
+        'NORMAL',
     }));
   };
 
@@ -179,11 +189,14 @@ export function AdminPartidasClient({
       return;
     }
 
+    const decididoEm = decididoEmValores[partidaId] ?? 'NORMAL';
+
     try {
       const res = await mutationLancarResultadoOficial.mutateAsync({
         partidaId,
         golsTimeA: Number(placar.golsA),
         golsTimeB: Number(placar.golsB),
+        decididoEm,
       });
       toast({
         title: 'Resultado Lançado!',
@@ -511,56 +524,105 @@ export function AdminPartidasClient({
                                     <div className="flex items-center gap-2 shrink-0">
                                       {isFinalizado &&
                                       !editingPartidas[partida.id] ? (
-                                        <div className="flex items-center gap-1.5 px-3 py-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl font-black text-sm">
-                                          <span>{partida.golsTimeA}</span>
-                                          <span className="text-zinc-400 text-xs">
-                                            x
-                                          </span>
-                                          <span>{partida.golsTimeB}</span>
+                                        <div className="flex flex-col items-center gap-1">
+                                          <div className="flex items-center gap-1.5 px-3 py-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl font-black text-sm">
+                                            <span>{partida.golsTimeA}</span>
+                                            <span className="text-zinc-400 text-xs">
+                                              x
+                                            </span>
+                                            <span>{partida.golsTimeB}</span>
+                                          </div>
+                                          {partida.tipoRodada ===
+                                            'MATAMATA' && (
+                                            <span className="text-[9px] font-bold text-zinc-500 uppercase">
+                                              {partida.decididoEm ===
+                                              'PRORROGACAO'
+                                                ? 'Prorrogação'
+                                                : partida.decididoEm ===
+                                                    'PENALTIS'
+                                                  ? 'Pênaltis'
+                                                  : 'Tempo Normal'}
+                                            </span>
+                                          )}
                                         </div>
                                       ) : (
-                                        <div className="flex items-center gap-1.5">
-                                          <input
-                                            type="text"
-                                            maxLength={2}
-                                            placeholder="-"
-                                            value={placarA}
-                                            onChange={(e) =>
-                                              handlePlacarChange(
-                                                partida.id,
-                                                'A',
-                                                e.target.value,
-                                              )
-                                            }
-                                            disabled={
-                                              isPending ||
-                                              (isJogoNoFuturo &&
-                                                !editingPartidas[partida.id])
-                                            }
-                                            className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
-                                          />
-                                          <span className="text-zinc-400 text-xs">
-                                            x
-                                          </span>
-                                          <input
-                                            type="text"
-                                            maxLength={2}
-                                            placeholder="-"
-                                            value={placarB}
-                                            onChange={(e) =>
-                                              handlePlacarChange(
-                                                partida.id,
-                                                'B',
-                                                e.target.value,
-                                              )
-                                            }
-                                            disabled={
-                                              isPending ||
-                                              (isJogoNoFuturo &&
-                                                !editingPartidas[partida.id])
-                                            }
-                                            className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
-                                          />
+                                        <div className="flex flex-col items-center gap-2">
+                                          <div className="flex items-center gap-1.5">
+                                            <input
+                                              type="text"
+                                              maxLength={2}
+                                              placeholder="-"
+                                              value={placarA}
+                                              onChange={(e) =>
+                                                handlePlacarChange(
+                                                  partida.id,
+                                                  'A',
+                                                  e.target.value,
+                                                )
+                                              }
+                                              disabled={
+                                                isPending ||
+                                                (isJogoNoFuturo &&
+                                                  !editingPartidas[partida.id])
+                                              }
+                                              className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
+                                            />
+                                            <span className="text-zinc-400 text-xs">
+                                              x
+                                            </span>
+                                            <input
+                                              type="text"
+                                              maxLength={2}
+                                              placeholder="-"
+                                              value={placarB}
+                                              onChange={(e) =>
+                                                handlePlacarChange(
+                                                  partida.id,
+                                                  'B',
+                                                  e.target.value,
+                                                )
+                                              }
+                                              disabled={
+                                                isPending ||
+                                                (isJogoNoFuturo &&
+                                                  !editingPartidas[partida.id])
+                                              }
+                                              className="h-9 w-9 text-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
+                                            />
+                                          </div>
+                                          {partida.tipoRodada ===
+                                            'MATAMATA' && (
+                                            <select
+                                              value={
+                                                decididoEmValores[partida.id] ??
+                                                'NORMAL'
+                                              }
+                                              onChange={(e) =>
+                                                setDecididoEmValores(
+                                                  (prev) => ({
+                                                    ...prev,
+                                                    [partida.id]: e.target
+                                                      .value as
+                                                      | 'NORMAL'
+                                                      | 'PRORROGACAO'
+                                                      | 'PENALTIS',
+                                                  }),
+                                                )
+                                              }
+                                              disabled={isPending}
+                                              className="text-[10px] bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-1 font-bold outline-none text-zinc-800 dark:text-zinc-200"
+                                            >
+                                              <option value="NORMAL">
+                                                Tempo Normal
+                                              </option>
+                                              <option value="PRORROGACAO">
+                                                Prorrogação
+                                              </option>
+                                              <option value="PENALTIS">
+                                                Pênaltis
+                                              </option>
+                                            </select>
+                                          )}
                                         </div>
                                       )}
                                     </div>

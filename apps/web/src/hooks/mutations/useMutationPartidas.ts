@@ -45,12 +45,19 @@ export function useMutationLancarResultadoOficial() {
       partidaId,
       golsTimeA,
       golsTimeB,
+      decididoEm,
     }: {
       partidaId: string;
       golsTimeA: number;
       golsTimeB: number;
+      decididoEm?: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
     }) => {
-      const res = await lancarResultadoOficial(partidaId, golsTimeA, golsTimeB);
+      const res = await lancarResultadoOficial(
+        partidaId,
+        golsTimeA,
+        golsTimeB,
+        decididoEm,
+      );
       if (!res.success) {
         throw new Error(res.message);
       }

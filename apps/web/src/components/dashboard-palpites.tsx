@@ -49,6 +49,7 @@ export function DashboardPalpites({
     valoresPalpites,
     isPending,
     handleInputChange,
+    handleMomentoChange,
     handleSalvar,
     handleLogout,
   } = useDashboardPalpites();
@@ -112,7 +113,25 @@ export function DashboardPalpites({
   };
 
   const isUsuarioLiberado = userStatus === 'LIBERADO';
-  const isInputHabilitado = isUsuarioLiberado && !isTudoBloqueado;
+  const isPartidaHabilitada = (partida: IPartidaDashboard) => {
+    if (!isUsuarioLiberado) return false;
+    if (isLiberacaoTardia) {
+      return !isTudoBloqueado;
+    }
+    const rodada = rodadas.find((r) =>
+      r.partidas.some((p) => p.id === partida.id),
+    );
+    if (!rodada) return false;
+    const primeiraPartida = [...rodada.partidas].sort(
+      (a, b) =>
+        new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime(),
+    )[0];
+    if (!primeiraPartida) return false;
+    const deadline = new Date(
+      new Date(primeiraPartida.dataInicio).getTime() - 30 * 60 * 1000,
+    );
+    return new Date() < deadline;
+  };
   const { timeLeft, mounted, isUrgent } = useCountdown(prazoLimite);
 
   const formatarData = (dataStr: string) => {
@@ -477,51 +496,86 @@ export function DashboardPalpites({
 
                             <div className="flex items-center gap-4">
                               {/* Inputs Placar */}
-                              <div className="flex items-center gap-2">
-                                <input
-                                  type="text"
-                                  maxLength={2}
-                                  placeholder="0"
-                                  disabled={!isInputHabilitado || isPending}
-                                  value={
-                                    valoresPalpites[partida.id]?.golsA ?? ''
-                                  }
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      partida.id,
-                                      'A',
-                                      e.target.value,
-                                    )
-                                  }
-                                  className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
-                                />
-                                <span className="text-zinc-400 font-bold">
-                                  :
-                                </span>
-                                <input
-                                  type="text"
-                                  maxLength={2}
-                                  placeholder="0"
-                                  disabled={!isInputHabilitado || isPending}
-                                  value={
-                                    valoresPalpites[partida.id]?.golsB ?? ''
-                                  }
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      partida.id,
-                                      'B',
-                                      e.target.value,
-                                    )
-                                  }
-                                  className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
-                                />
+                              <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="text"
+                                    maxLength={2}
+                                    placeholder="0"
+                                    disabled={
+                                      !isPartidaHabilitada(partida) || isPending
+                                    }
+                                    value={
+                                      valoresPalpites[partida.id]?.golsA ?? ''
+                                    }
+                                    onChange={(e) =>
+                                      handleInputChange(
+                                        partida.id,
+                                        'A',
+                                        e.target.value,
+                                      )
+                                    }
+                                    className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
+                                  />
+                                  <span className="text-zinc-400 font-bold">
+                                    :
+                                  </span>
+                                  <input
+                                    type="text"
+                                    maxLength={2}
+                                    placeholder="0"
+                                    disabled={
+                                      !isPartidaHabilitada(partida) || isPending
+                                    }
+                                    value={
+                                      valoresPalpites[partida.id]?.golsB ?? ''
+                                    }
+                                    onChange={(e) =>
+                                      handleInputChange(
+                                        partida.id,
+                                        'B',
+                                        e.target.value,
+                                      )
+                                    }
+                                    className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
+                                  />
+                                </div>
+                                {rodada.tipo === 'MATAMATA' && (
+                                  <select
+                                    disabled={
+                                      !isPartidaHabilitada(partida) || isPending
+                                    }
+                                    value={
+                                      valoresPalpites[partida.id]
+                                        ?.momentoPrevisto ?? 'NORMAL'
+                                    }
+                                    onChange={(e) =>
+                                      handleMomentoChange(
+                                        partida.id,
+                                        e.target.value as
+                                          | 'NORMAL'
+                                          | 'PRORROGACAO'
+                                          | 'PENALTIS',
+                                      )
+                                    }
+                                    className="text-xs bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-1.5 font-bold outline-none text-zinc-800 dark:text-zinc-205 focus:ring-2 focus:ring-emerald-500"
+                                  >
+                                    <option value="NORMAL">Tempo Normal</option>
+                                    <option value="PRORROGACAO">
+                                      Prorrogação
+                                    </option>
+                                    <option value="PENALTIS">Pênaltis</option>
+                                  </select>
+                                )}
                               </div>
 
                               {/* Botão Salvar */}
                               <div className="flex flex-col gap-1">
                                 <Button
                                   size="sm"
-                                  disabled={!isInputHabilitado || isPending}
+                                  disabled={
+                                    !isPartidaHabilitada(partida) || isPending
+                                  }
                                   onClick={() =>
                                     handleSalvar(partida.id, partida)
                                   }
@@ -606,42 +660,77 @@ export function DashboardPalpites({
 
                         <div className="flex items-center gap-4">
                           {/* Inputs Placar */}
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              maxLength={2}
-                              disabled={!isInputHabilitado || isPending}
-                              value={golsA}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  partida.id,
-                                  'A',
-                                  e.target.value,
-                                )
-                              }
-                              className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
-                            />
-                            <span className="text-zinc-400 font-bold">:</span>
-                            <input
-                              type="text"
-                              maxLength={2}
-                              disabled={!isInputHabilitado || isPending}
-                              value={golsB}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  partida.id,
-                                  'B',
-                                  e.target.value,
-                                )
-                              }
-                              className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500"
-                            />
+                          <div className="flex flex-col gap-2">
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                maxLength={2}
+                                disabled={
+                                  !isPartidaHabilitada(partida) || isPending
+                                }
+                                value={golsA}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    partida.id,
+                                    'A',
+                                    e.target.value,
+                                  )
+                                }
+                                className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-550"
+                              />
+                              <span className="text-zinc-400 font-bold">:</span>
+                              <input
+                                type="text"
+                                maxLength={2}
+                                disabled={
+                                  !isPartidaHabilitada(partida) || isPending
+                                }
+                                value={golsB}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    partida.id,
+                                    'B',
+                                    e.target.value,
+                                  )
+                                }
+                                className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center font-black text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900/60 disabled:opacity-50 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-550"
+                              />
+                            </div>
+                            {partida.tipoRodada === 'MATAMATA' && (
+                              <select
+                                disabled={
+                                  !isPartidaHabilitada(partida) || isPending
+                                }
+                                value={
+                                  valoresPalpites[partida.id]
+                                    ?.momentoPrevisto ??
+                                  partida.momentoPrevisto ??
+                                  'NORMAL'
+                                }
+                                onChange={(e) =>
+                                  handleMomentoChange(
+                                    partida.id,
+                                    e.target.value as
+                                      | 'NORMAL'
+                                      | 'PRORROGACAO'
+                                      | 'PENALTIS',
+                                  )
+                                }
+                                className="text-xs bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-1.5 font-bold outline-none text-zinc-800 dark:text-zinc-205 focus:ring-2 focus:ring-emerald-500"
+                              >
+                                <option value="NORMAL">Tempo Normal</option>
+                                <option value="PRORROGACAO">Prorrogação</option>
+                                <option value="PENALTIS">Pênaltis</option>
+                              </select>
+                            )}
                           </div>
 
                           {/* Botão Alterar */}
                           <Button
                             size="sm"
-                            disabled={!isInputHabilitado || isPending}
+                            disabled={
+                              !isPartidaHabilitada(partida) || isPending
+                            }
                             onClick={() => handleSalvar(partida.id, partida)}
                             className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold text-xs px-4 h-10 rounded-xl flex items-center gap-1.5 transition-all dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 disabled:opacity-50"
                           >
@@ -727,12 +816,24 @@ export function DashboardPalpites({
                     </div>
 
                     <div className="flex items-center justify-between gap-2 border-b border-zinc-100 dark:border-zinc-800/50 pb-2">
-                      <span className="text-sm font-semibold text-zinc-500 dark:text-zinc-400">
-                        {item.status === 'EM_ANDAMENTO' ||
-                        item.status === 'INICIADO'
-                          ? 'Placar Ao Vivo'
-                          : 'Placar Oficial'}
-                      </span>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-sm font-semibold text-zinc-500 dark:text-zinc-400">
+                          {item.status === 'EM_ANDAMENTO' ||
+                          item.status === 'INICIADO'
+                            ? 'Placar Ao Vivo'
+                            : 'Placar Oficial'}
+                        </span>
+                        {item.tipoRodada === 'MATAMATA' && item.decididoEm && (
+                          <span className="text-[9px] font-bold text-zinc-400">
+                            Decidido em:{' '}
+                            {item.decididoEm === 'PRORROGACAO'
+                              ? 'Prorrogação'
+                              : item.decididoEm === 'PENALTIS'
+                                ? 'Pênaltis'
+                                : 'Tempo Normal'}
+                          </span>
+                        )}
+                      </div>
                       <div className="flex items-center gap-2 select-none">
                         {item.timeAEmoji && (
                           <FlagImage
@@ -761,9 +862,22 @@ export function DashboardPalpites({
                     </div>
 
                     <div className="flex items-center justify-between gap-2 text-xs">
-                      <span className="font-semibold text-zinc-500 dark:text-zinc-400">
-                        Seu Palpite
-                      </span>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-semibold text-zinc-500 dark:text-zinc-400">
+                          Seu Palpite
+                        </span>
+                        {item.tipoRodada === 'MATAMATA' &&
+                          item.momentoPrevisto && (
+                            <span className="text-[9px] font-bold text-zinc-450 dark:text-zinc-400">
+                              Previsto:{' '}
+                              {item.momentoPrevisto === 'PRORROGACAO'
+                                ? 'Prorrogação'
+                                : item.momentoPrevisto === 'PENALTIS'
+                                  ? 'Pênaltis'
+                                  : 'Tempo Normal'}
+                            </span>
+                          )}
+                      </div>
                       <div className="flex items-center gap-2">
                         <span className="bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md font-bold">
                           {item.palpiteA} x {item.palpiteB}

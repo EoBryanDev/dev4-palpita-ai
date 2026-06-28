@@ -26,6 +26,10 @@ vi.mock('@palpita/db', () => {
       usuarioId: 'palpites.usuarioId',
       partidaId: 'palpites.partidaId',
     },
+    rodadas: {
+      id: 'rodadas.id',
+      tipo: 'rodadas.tipo',
+    },
   };
 });
 
@@ -66,6 +70,9 @@ describe('GET /api/ranking', () => {
     }));
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
+        innerJoin: vi.fn(() => ({
+          where: vi.fn(() => Promise.resolve(mockMatches)),
+        })),
         where: vi.fn(() => Promise.resolve(mockMatches)),
       })),
     }));
@@ -143,6 +150,9 @@ describe('GET /api/ranking', () => {
     }));
     mockSelect.mockImplementationOnce(() => ({
       from: vi.fn(() => ({
+        innerJoin: vi.fn(() => ({
+          where: vi.fn(() => Promise.resolve(mockMatches)),
+        })),
         where: vi.fn(() => Promise.resolve(mockMatches)),
       })),
     }));

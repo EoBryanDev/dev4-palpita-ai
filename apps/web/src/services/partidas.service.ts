@@ -14,6 +14,8 @@ export interface IPartidaCompleta {
   dataInicio: Date;
   status: string;
   rodadaNome: string;
+  decididoEm: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+  rodadaTipo: 'GRUPO' | 'MATAMATA';
 }
 
 export async function obterPartidas(
@@ -36,6 +38,8 @@ export async function obterPartidas(
       dataInicio: partidas.dataInicio,
       status: partidas.status,
       rodadaNome: rodadas.nome,
+      decididoEm: partidas.decididoEm,
+      rodadaTipo: rodadas.tipo,
     })
     .from(partidas)
     .innerJoin(rodadas, eq(partidas.rodadaId, rodadas.id))
