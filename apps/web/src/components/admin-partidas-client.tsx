@@ -7,9 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import {
+  useMutationAtualizarTipoRodada,
   useMutationCriarPartida,
   useMutationCriarRodada,
-  useMutationAtualizarTipoRodada,
   useMutationLancarResultadoOficial,
 } from '@/hooks/mutations/useMutationPartidas';
 import {
@@ -482,7 +482,11 @@ export function AdminPartidasClient({
                       <label
                         htmlFor={`rodada-tipo-${rodada.id}`}
                         className="flex items-center gap-2 cursor-pointer select-none group shrink-0"
-                        title={rodada.tipo === 'MATAMATA' ? 'Clique para mudar para Fase de Grupos' : 'Clique para marcar como Mata-Mata'}
+                        title={
+                          rodada.tipo === 'MATAMATA'
+                            ? 'Clique para mudar para Fase de Grupos'
+                            : 'Clique para marcar como Mata-Mata'
+                        }
                       >
                         <div className="relative">
                           <input
@@ -491,17 +495,26 @@ export function AdminPartidasClient({
                             checked={rodada.tipo === 'MATAMATA'}
                             disabled={isPending}
                             onChange={async () => {
-                              const novoTipo = rodada.tipo === 'MATAMATA' ? 'GRUPO' : 'MATAMATA';
+                              const novoTipo =
+                                rodada.tipo === 'MATAMATA'
+                                  ? 'GRUPO'
+                                  : 'MATAMATA';
                               try {
                                 await mutationAtualizarTipoRodada.mutateAsync({
                                   rodadaId: rodada.id,
                                   tipo: novoTipo,
                                 });
-                                toast({ title: `Rodada ${rodada.numero} atualizada para ${novoTipo === 'MATAMATA' ? 'Mata-Mata' : 'Fase de Grupos'}` });
+                                toast({
+                                  title: `Rodada ${rodada.numero} atualizada para ${novoTipo === 'MATAMATA' ? 'Mata-Mata' : 'Fase de Grupos'}`,
+                                });
                                 router.refresh();
                               } catch (err) {
                                 const e = err as { message?: string };
-                                toast({ title: 'Erro', description: e.message, variant: 'destructive' });
+                                toast({
+                                  title: 'Erro',
+                                  description: e.message,
+                                  variant: 'destructive',
+                                });
                               }
                             }}
                             className="sr-only peer"
@@ -509,8 +522,12 @@ export function AdminPartidasClient({
                           <div className="w-8 h-4 rounded-full bg-zinc-300 dark:bg-zinc-700 peer-checked:bg-amber-500 dark:peer-checked:bg-amber-400 transition-colors duration-200" />
                           <div className="absolute top-0.5 left-0.5 w-3 h-3 rounded-full bg-white shadow-sm transition-transform duration-200 peer-checked:translate-x-4" />
                         </div>
-                        <span className={`text-xs font-bold transition-colors ${rodada.tipo === 'MATAMATA' ? 'text-amber-500 dark:text-amber-400' : 'text-zinc-500 dark:text-zinc-400'}`}>
-                          {rodada.tipo === 'MATAMATA' ? '⚡ Mata-Mata' : 'Grupos'}
+                        <span
+                          className={`text-xs font-bold transition-colors ${rodada.tipo === 'MATAMATA' ? 'text-amber-500 dark:text-amber-400' : 'text-zinc-500 dark:text-zinc-400'}`}
+                        >
+                          {rodada.tipo === 'MATAMATA'
+                            ? '⚡ Mata-Mata'
+                            : 'Grupos'}
                         </span>
                       </label>
                     </div>
