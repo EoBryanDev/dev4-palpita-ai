@@ -591,7 +591,12 @@ export async function lancarResultadoOficial(
       });
 
       try {
-        partidaEntity.finalizar(golsTimeA, golsTimeB, decididoEm, timeVencedorPenaltis);
+        partidaEntity.finalizar(
+          golsTimeA,
+          golsTimeB,
+          decididoEm,
+          timeVencedorPenaltis,
+        );
       } catch (domainError) {
         return {
           success: false,

@@ -8,7 +8,7 @@ import {
   obterTotalPalpitesSalvosFuturos,
 } from '@/services/palpites.service';
 import type { TDecididoEm } from '@palpita/core';
-import { db, palpites, partidas, usuarios } from '@palpita/db';
+import { db, palpites, partidas, rodadas, usuarios } from '@palpita/db';
 import { and, eq } from 'drizzle-orm';
 import { obterSessao } from './auth';
 
@@ -136,7 +136,10 @@ export async function salvarPalpite(
     }
 
     // Forcar momentoPrevisto para PENALTIS em MATAMATA com empate
-    const momentoFinal = isMataMata && golsTimeA === golsTimeB ? 'PENALTIS' as TDecididoEm : momentoPrevisto;
+    const momentoFinal =
+      isMataMata && golsTimeA === golsTimeB
+        ? ('PENALTIS' as TDecididoEm)
+        : momentoPrevisto;
 
     // 7. Salvar ou Atualizar o Palpite
     const palpiteExistente = await db

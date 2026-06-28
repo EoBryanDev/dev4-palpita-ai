@@ -89,7 +89,7 @@ export async function obterPalpitesUsuariosAtivos(): Promise<
       ),
     );
 
-  return dbPalpites;
+  return dbPalpites as IPalpiteComUsuario[];
 }
 
 export async function obterTotalPalpitesSalvosFuturos(
