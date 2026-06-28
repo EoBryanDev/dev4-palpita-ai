@@ -11,7 +11,9 @@ export interface IPartidaDashboard {
   palpiteGolsA?: number | null;
   palpiteGolsB?: number | null;
   momentoPrevisto?: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+  timeVencedorPrevisto?: 'A' | 'B' | null;
   decididoEm?: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+  timeVencedorPenaltis?: 'A' | 'B' | null;
   tipoRodada?: 'GRUPO' | 'MATAMATA';
   jaPalpitou: boolean;
   rodadaNome?: string;
@@ -39,6 +41,8 @@ export interface IHistoricoDashboard {
   dataInicio: string;
   status?: string;
   momentoPrevisto?: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+  timeVencedorPrevisto?: 'A' | 'B' | null;
+  timeVencedorPenaltis?: 'A' | 'B' | null;
   decididoEm?: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
   tipoRodada?: 'GRUPO' | 'MATAMATA';
 }

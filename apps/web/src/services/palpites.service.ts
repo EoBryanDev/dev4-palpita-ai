@@ -10,6 +10,7 @@ export interface IPalpiteServiceData {
   golsTimeA: number;
   golsTimeB: number;
   momentoPrevisto: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+  timeVencedorPrevisto: 'A' | 'B' | null;
   dataCriacao: Date;
   dataAtualizacao: Date;
 }
@@ -29,6 +30,7 @@ export async function obterPalpitesUsuario(
     golsTimeA: p.golsTimeA,
     golsTimeB: p.golsTimeB,
     momentoPrevisto: p.momentoPrevisto,
+    timeVencedorPrevisto: p.timeVencedorPrevisto,
     dataCriacao: p.dataCriacao,
     dataAtualizacao: p.dataAtualizacao,
   }));
@@ -129,6 +131,7 @@ export async function obterPalpitesSalvosFuturosPaginados(
       palpiteGolsA: palpites.golsTimeA,
       palpiteGolsB: palpites.golsTimeB,
       momentoPrevisto: palpites.momentoPrevisto,
+      timeVencedorPrevisto: palpites.timeVencedorPrevisto,
       tipoRodada: rodadas.tipo,
       decididoEm: partidas.decididoEm,
       rodadaNome: rodadas.nome,
@@ -165,6 +168,7 @@ export async function obterPalpitesSalvosFuturosPaginados(
     palpiteGolsA: item.palpiteGolsA,
     palpiteGolsB: item.palpiteGolsB,
     momentoPrevisto: item.momentoPrevisto,
+    timeVencedorPrevisto: item.timeVencedorPrevisto,
     tipoRodada: item.tipoRodada,
     decididoEm: item.decididoEm,
     jaPalpitou: true,
@@ -192,6 +196,7 @@ export async function obterTodosPalpitesUsuario(
       palpiteGolsA: palpites.golsTimeA,
       palpiteGolsB: palpites.golsTimeB,
       momentoPrevisto: palpites.momentoPrevisto,
+      timeVencedorPrevisto: palpites.timeVencedorPrevisto,
       tipoRodada: rodadas.tipo,
       decididoEm: partidas.decididoEm,
       rodadaNome: rodadas.nome,
@@ -217,6 +222,7 @@ export async function obterTodosPalpitesUsuario(
     palpiteGolsA: item.palpiteGolsA,
     palpiteGolsB: item.palpiteGolsB,
     momentoPrevisto: item.momentoPrevisto,
+    timeVencedorPrevisto: item.timeVencedorPrevisto,
     tipoRodada: item.tipoRodada,
     decididoEm: item.decididoEm,
     jaPalpitou: true,

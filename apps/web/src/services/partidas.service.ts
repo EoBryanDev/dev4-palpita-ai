@@ -15,6 +15,7 @@ export interface IPartidaCompleta {
   status: string;
   rodadaNome: string;
   decididoEm: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+  timeVencedorPenaltis: 'A' | 'B' | null;
   rodadaTipo: 'GRUPO' | 'MATAMATA';
 }
 
@@ -39,6 +40,7 @@ export async function obterPartidas(
       status: partidas.status,
       rodadaNome: rodadas.nome,
       decididoEm: partidas.decididoEm,
+      timeVencedorPenaltis: partidas.timeVencedorPenaltis,
       rodadaTipo: rodadas.tipo,
     })
     .from(partidas)
