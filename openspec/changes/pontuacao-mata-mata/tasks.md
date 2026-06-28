@@ -16,6 +16,7 @@
 - [x] 3.1 Modify guess form in `meu-espaco` to allow selecting the moment of victory (tempo normal, prorrogação, pênaltis) if the round is `MATAMATA`
 - [x] 3.2 Add explanation of the knockout bonus rule to the public rules section in `/home`
 - [x] 3.3 Ensure the countdown banner in the private area displays the correct remaining time until the round starts
+- [x] 3.4 Add MATAMATA toggle to admin round creation form and inline toggle in round listing
 
 ## 4. Verification
 
