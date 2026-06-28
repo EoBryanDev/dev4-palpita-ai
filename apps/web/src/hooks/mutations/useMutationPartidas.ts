@@ -1,4 +1,5 @@
 import {
+  atualizarTipoRodada,
   criarPartida,
   criarRodada,
   lancarResultadoOficial,
@@ -7,8 +8,16 @@ import { useMutation } from '@tanstack/react-query';
 
 export function useMutationCriarRodada() {
   return useMutation({
-    mutationFn: async ({ numero, nome }: { numero: number; nome: string }) => {
-      const res = await criarRodada(numero, nome);
+    mutationFn: async ({
+      numero,
+      nome,
+      tipo,
+    }: {
+      numero: number;
+      nome: string;
+      tipo: 'GRUPO' | 'MATAMATA';
+    }) => {
+      const res = await criarRodada(numero, nome, tipo);
       if (!res.success) {
         throw new Error(res.message);
       }
@@ -58,6 +67,24 @@ export function useMutationLancarResultadoOficial() {
         golsTimeB,
         decididoEm,
       );
+      if (!res.success) {
+        throw new Error(res.message);
+      }
+      return res;
+    },
+  });
+}
+
+export function useMutationAtualizarTipoRodada() {
+  return useMutation({
+    mutationFn: async ({
+      rodadaId,
+      tipo,
+    }: {
+      rodadaId: string;
+      tipo: 'GRUPO' | 'MATAMATA';
+    }) => {
+      const res = await atualizarTipoRodada(rodadaId, tipo);
       if (!res.success) {
         throw new Error(res.message);
       }

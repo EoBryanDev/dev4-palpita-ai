@@ -353,6 +353,7 @@ export async function alterarStatusUsuario(
 export async function criarRodada(
   numero: number,
   nome: string,
+  tipo: 'GRUPO' | 'MATAMATA' = 'GRUPO',
 ): Promise<IAdminActionResponse> {
   try {
     await validarOrigem();
@@ -384,12 +385,49 @@ export async function criarRodada(
       numero,
       nome: nome.trim(),
       ativa: true,
+      tipo,
     });
 
     return { success: true, message: 'Rodada criada com sucesso!' };
   } catch (error) {
     console.error('Erro ao criar rodada:', error);
     return { success: false, message: 'Erro interno ao criar rodada.' };
+  }
+}
+
+/**
+ * Atualiza o tipo (GRUPO | MATAMATA) de uma rodada existente.
+ */
+export async function atualizarTipoRodada(
+  rodadaId: string,
+  tipo: 'GRUPO' | 'MATAMATA',
+): Promise<IAdminActionResponse> {
+  try {
+    await validarOrigem();
+  } catch {
+    return {
+      success: false,
+      message: 'Requisição inválida. Origem não permitida.',
+    };
+  }
+
+  const isAdmin = await verificarPermissaoAdmin();
+  if (!isAdmin) {
+    return { success: false, message: 'Acesso negado.' };
+  }
+
+  try {
+    await db.update(rodadas).set({ tipo }).where(eq(rodadas.id, rodadaId));
+    return {
+      success: true,
+      message: `Rodada atualizada para ${tipo === 'MATAMATA' ? 'Mata-Mata' : 'Fase de Grupos'}.`,
+    };
+  } catch (error) {
+    console.error('Erro ao atualizar tipo da rodada:', error);
+    return {
+      success: false,
+      message: 'Erro interno ao atualizar tipo da rodada.',
+    };
   }
 }
 
