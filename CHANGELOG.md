@@ -1,3 +1,10 @@
+## [1.21.2](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.21.1...v1.21.2) (2026-07-01)
+
+
+### Bug Fixes
+
+* **web:** correct bracket matchup path mapping for oitavas and quartas EOB-191 ([95a8824](https://github.com/EoBryanDev/dev4-palpita-ai/commit/95a8824574be5155183d8fe2857d8ec218744bd7))
+
 ## [1.21.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.21.0...v1.21.1) (2026-07-01)
 
 
