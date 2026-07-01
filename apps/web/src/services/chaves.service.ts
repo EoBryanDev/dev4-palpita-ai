@@ -289,53 +289,57 @@ export async function obterGruposClassificados(): Promise<{
     return null; // Não assumir 'A' como padrão caso ainda não esteja decidido
   };
 
-  // Atribuição gulosa determinista dos 8 melhores terceiros
-  const slotsTerceiros = [
-    { id: 'J79', allowed: ['C', 'E', 'F', 'H', 'I'] },
-    { id: 'J85', allowed: ['E', 'F', 'G', 'I', 'J'] },
-    { id: 'J82', allowed: ['B', 'E', 'F', 'I', 'J'] },
-    { id: 'J75', allowed: ['A', 'B', 'C', 'D', 'F'] },
-    { id: 'J81', allowed: ['A', 'E', 'H', 'I', 'J'] },
-    { id: 'J78', allowed: ['C', 'D', 'F', 'G', 'H'] },
-    { id: 'J88', allowed: ['D', 'E', 'I', 'J', 'L'] },
-    { id: 'J80', allowed: ['E', 'H', 'I', 'J', 'K'] },
-  ];
+  // Atribuição dos 8 melhores terceiros às chaves corretas baseada nas classificações reais da Copa 2026
+  const obterTerceiroDoGrupo = (grupoLetter: string) => {
+    const t = melhoresTerceiros.find((t) => t.grupoLetter === grupoLetter);
+    return t ? { id: t.id, nome: t.nome, emoji: t.emoji } : null;
+  };
 
-  const atribuidos = new Set<string>();
   const terceirosAtribuidos: Record<
     string,
     { nome: string; emoji: string; id: string }
-  > = {};
-
-  for (const slot of slotsTerceiros) {
-    const match = melhoresTerceiros.find(
-      (t) => slot.allowed.includes(t.grupoLetter) && !atribuidos.has(t.id),
-    );
-    if (match) {
-      terceirosAtribuidos[slot.id] = {
-        id: match.id,
-        nome: match.nome,
-        emoji: match.emoji,
-      };
-      atribuidos.add(match.id);
-    } else {
-      const fallback = melhoresTerceiros.find((t) => !atribuidos.has(t.id));
-      if (fallback) {
-        terceirosAtribuidos[slot.id] = {
-          id: fallback.id,
-          nome: fallback.nome,
-          emoji: fallback.emoji,
-        };
-        atribuidos.add(fallback.id);
-      } else {
-        terceirosAtribuidos[slot.id] = {
-          id: '',
-          nome: `3º ${slot.allowed.join('/')}`,
-          emoji: '⚽',
-        };
-      }
-    }
-  }
+  > = {
+    J75: obterTerceiroDoGrupo('D') || {
+      id: '',
+      nome: '3º Grupo D',
+      emoji: '⚽',
+    },
+    J78: obterTerceiroDoGrupo('F') || {
+      id: '',
+      nome: '3º Grupo F',
+      emoji: '⚽',
+    },
+    J79: obterTerceiroDoGrupo('E') || {
+      id: '',
+      nome: '3º Grupo E',
+      emoji: '⚽',
+    },
+    J80: obterTerceiroDoGrupo('K') || {
+      id: '',
+      nome: '3º Grupo K',
+      emoji: '⚽',
+    },
+    J81: obterTerceiroDoGrupo('I') || {
+      id: '',
+      nome: '3º Grupo I',
+      emoji: '⚽',
+    },
+    J82: obterTerceiroDoGrupo('B') || {
+      id: '',
+      nome: '3º Grupo B',
+      emoji: '⚽',
+    },
+    J85: obterTerceiroDoGrupo('J') || {
+      id: '',
+      nome: '3º Grupo J',
+      emoji: '⚽',
+    },
+    J88: obterTerceiroDoGrupo('L') || {
+      id: '',
+      nome: '3º Grupo L',
+      emoji: '⚽',
+    },
+  };
 
   // Formatador de data simplificado
   // Formatador de data simplificado com fuso horário America/Sao_Paulo
