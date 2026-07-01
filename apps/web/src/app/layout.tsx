@@ -52,7 +52,7 @@ export default async function RootLayout({
     if (todasPartidas.length > 0) {
       const primeiraPartida = todasPartidas[0];
       const dataLimite = new Date(
-        primeiraPartida.dataInicio.getTime() - 30 * 60 * 1000,
+        primeiraPartida.dataInicio.getTime() - 1 * 60 * 1000,
       );
       targetDate = dataLimite.toISOString();
     }

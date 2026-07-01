@@ -129,14 +129,22 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
     const diffMs = agora.getTime() - dataInicio.getTime();
     const diffMinutes = diffMs / (1000 * 60);
 
-    if (diffMinutes < 0) {
+    if (status === 'AGENDADO' || status === 'AGENDADA' || diffMinutes < 0) {
       return {
         label: 'Agendado',
         styles: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
       };
     }
 
-    if (diffMinutes >= 115) {
+    const label =
+      status !== 'EM_ANDAMENTO' && status !== 'INICIADO'
+        ? status
+        : 'Em Andamento';
+
+    if (
+      diffMinutes >= 115 &&
+      (status === 'EM_ANDAMENTO' || status === 'INICIADO')
+    ) {
       return {
         label: 'Calculando Encerramento',
         styles:
@@ -145,7 +153,7 @@ export function PalpitesStats({ nomeUsuario }: { nomeUsuario: string | null }) {
     }
 
     return {
-      label: 'Em Andamento',
+      label,
       styles: 'bg-blue-500/10 text-blue-500 dark:text-blue-400 animate-pulse',
     };
   };

@@ -268,7 +268,7 @@ export async function obterGruposClassificados(): Promise<{
     timeB: (typeof dbTimes)[0],
   ) => {
     if (
-      p.status !== 'FINALIZADO' ||
+      (p.status !== 'FINALIZADO' && p.status !== 'FINALIZADA') ||
       p.golsTimeA === null ||
       p.golsTimeB === null
     )
@@ -279,10 +279,14 @@ export async function obterGruposClassificados(): Promise<{
     if (p.golsTimeB > p.golsTimeA) {
       return p.timeBId === timeB.id ? 'B' : 'A';
     }
+    // Disputa por pênaltis
+    if (p.timeVencedorPenaltis === 'A') return 'A';
+    if (p.timeVencedorPenaltis === 'B') return 'B';
+
     const dataJogo = new Date(p.dataInicio);
     if (avancouPorPenaltis(timeA.id, dataJogo)) return 'A';
     if (avancouPorPenaltis(timeB.id, dataJogo)) return 'B';
-    return 'A'; // Fallback
+    return null; // Não assumir 'A' como padrão caso ainda não esteja decidido
   };
 
   // Atribuição gulosa determinista dos 8 melhores terceiros
@@ -334,26 +338,32 @@ export async function obterGruposClassificados(): Promise<{
   }
 
   // Formatador de data simplificado
+  // Formatador de data simplificado com fuso horário America/Sao_Paulo
   const formatarDataJogo = (dateInput: string | Date) => {
     const d = new Date(dateInput);
-    const meses = [
-      'Jan',
-      'Fev',
-      'Mar',
-      'Abr',
-      'Mai',
-      'Jun',
-      'Jul',
-      'Ago',
-      'Set',
-      'Out',
-      'Nov',
-      'Dez',
-    ];
-    const dia = String(d.getDate()).padStart(2, '0');
-    const mes = meses[d.getMonth()];
-    const hora = String(d.getHours()).padStart(2, '0');
-    const min = String(d.getMinutes()).padStart(2, '0');
+    const formatter = new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+
+    const parts = formatter.formatToParts(d);
+    const dia =
+      parts.find((p) => p.type === 'day')?.value ||
+      String(d.getDate()).padStart(2, '0');
+    const mesRaw = parts.find((p) => p.type === 'month')?.value || 'Jun';
+    const mes =
+      mesRaw.charAt(0).toUpperCase() + mesRaw.slice(1).replace('.', '');
+    const hora =
+      parts.find((p) => p.type === 'hour')?.value ||
+      String(d.getHours()).padStart(2, '0');
+    const min =
+      parts.find((p) => p.type === 'minute')?.value ||
+      String(d.getMinutes()).padStart(2, '0');
+
     return `${dia}/${mes} - ${hora}:${min}`;
   };
 

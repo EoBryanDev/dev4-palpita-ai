@@ -10,7 +10,9 @@ import type { IScraperEngine } from '../types.js';
 const resultadoSchema = z.object({
   golsTimeA: z.number().int().min(0),
   golsTimeB: z.number().int().min(0),
-  status: z.enum(['AGENDADO', 'EM_ANDAMENTO', 'FINALIZADO']),
+  status: z.string(),
+  decididoEm: z.enum(['NORMAL', 'PRORROGACAO', 'PENALTIS']).optional(),
+  timeVencedorPenaltis: z.enum(['A', 'B']).nullable().optional(),
 });
 
 function log(tipo: string, ...args: unknown[]) {
@@ -89,7 +91,9 @@ export async function syncOnce(engine: IScraperEngine): Promise<void> {
       const scoreOrStatusChanged =
         partida.golsTimeA !== parsed.golsTimeA ||
         partida.golsTimeB !== parsed.golsTimeB ||
-        partida.status !== parsed.status;
+        partida.status !== parsed.status ||
+        partida.decididoEm !== parsed.decididoEm ||
+        partida.timeVencedorPenaltis !== parsed.timeVencedorPenaltis;
 
       if (scoreOrStatusChanged) {
         await atualizarResultado(
@@ -97,6 +101,8 @@ export async function syncOnce(engine: IScraperEngine): Promise<void> {
           parsed.golsTimeA,
           parsed.golsTimeB,
           parsed.status,
+          parsed.decididoEm,
+          parsed.timeVencedorPenaltis,
         );
       }
 

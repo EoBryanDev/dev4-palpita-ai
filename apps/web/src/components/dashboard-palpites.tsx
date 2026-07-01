@@ -120,7 +120,7 @@ export function DashboardPalpites({
       return !isTudoBloqueado;
     }
     const deadline = new Date(
-      new Date(partida.dataInicio).getTime() - 30 * 60 * 1000,
+      new Date(partida.dataInicio).getTime() - 1 * 60 * 1000,
     );
     return new Date() < deadline;
   };
@@ -293,7 +293,7 @@ export function DashboardPalpites({
               <p className="text-xs mt-1">
                 {isLiberacaoTardia
                   ? 'Seu prazo de 30 minutos para palpitar expirou. Entre em contato com o administrador caso queira um novo prazo.'
-                  : 'O prazo limite para palpitar expirou (bloqueado 30 minutos antes do início do primeiro jogo da Copa do Mundo).'}
+                  : 'O prazo limite para palpitar expirou (bloqueado 1 minuto antes do início da partida).'}
               </p>
             </div>
           </div>
@@ -317,7 +317,10 @@ export function DashboardPalpites({
                 >
                   <div className="flex items-center justify-between text-xs text-red-650 dark:text-red-455">
                     <span className="font-bold uppercase tracking-wider bg-red-100 dark:bg-red-950/40 px-2 py-0.5 rounded-full">
-                      Ao Vivo
+                      {partida.status !== 'EM_ANDAMENTO' &&
+                      partida.status !== 'INICIADO'
+                        ? partida.status
+                        : 'Ao Vivo'}
                     </span>
                     <span className="text-[11px] font-bold text-zinc-550 dark:text-zinc-400">
                       {formatarData(partida.dataInicio)}

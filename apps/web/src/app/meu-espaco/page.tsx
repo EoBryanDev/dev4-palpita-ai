@@ -123,11 +123,7 @@ export default async function MeuEspacoPage() {
 
   // 8. Histórico de palpites do competidor (reusing todasPartidas from step 5)
   const todasPartidasHistorico = todasPartidas.filter(
-    (p) =>
-      p.status === 'FINALIZADO' ||
-      p.status === 'FINALIZADA' ||
-      p.status === 'EM_ANDAMENTO' ||
-      p.status === 'INICIADO',
+    (p) => p.status !== 'AGENDADO' && p.status !== 'AGENDADA',
   );
 
   const historico: IHistoricoDashboard[] = [];
@@ -195,7 +191,11 @@ export default async function MeuEspacoPage() {
 
   // 10. Buscar palpites de jogos em andamento (Ao Vivo)
   const partidasEmAndamento = todasPartidas.filter(
-    (p) => p.status === 'EM_ANDAMENTO',
+    (p) =>
+      p.status !== 'FINALIZADO' &&
+      p.status !== 'FINALIZADA' &&
+      p.status !== 'AGENDADO' &&
+      p.status !== 'AGENDADA',
   );
 
   const emAndamentoEnriquecidas: IPartidaDashboard[] = partidasEmAndamento.map(

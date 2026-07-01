@@ -187,7 +187,12 @@ export default async function AgendaPage({
             const hasFinished =
               partida.status === 'FINALIZADO' ||
               partida.status === 'FINALIZADA';
-            const isLive = partida.status === 'EM_ANDAMENTO';
+            const isLive =
+              partida.status !== 'FINALIZADO' &&
+              partida.status !== 'FINALIZADA' &&
+              partida.status !== 'AGENDADO' &&
+              partida.status !== 'AGENDADA' &&
+              partida.status !== 'NAO_INICIADA';
 
             return (
               <div
@@ -205,7 +210,10 @@ export default async function AgendaPage({
                   </span>
                   {isLive ? (
                     <span className="inline-flex items-center gap-1 bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase animate-pulse dark:bg-red-950/50 dark:text-red-400">
-                      Ao Vivo
+                      {partida.status !== 'EM_ANDAMENTO' &&
+                      partida.status !== 'INICIADO'
+                        ? partida.status
+                        : 'Ao Vivo'}
                     </span>
                   ) : hasFinished ? (
                     <span className="bg-zinc-100 text-zinc-600 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase dark:bg-zinc-800 dark:text-zinc-400">

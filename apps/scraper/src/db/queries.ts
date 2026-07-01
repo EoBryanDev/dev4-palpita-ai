@@ -1,5 +1,6 @@
+import type { TPartidaStatus } from '@palpita/core';
 import { db, eventosPartida, partidas, times } from '@palpita/db';
-import { and, asc, eq, gte, lte, or } from 'drizzle-orm';
+import { and, asc, eq, gte, lte, ne, or } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import type { IScrapeEvent } from '../types.js';
 
@@ -17,6 +18,8 @@ export interface IPartidaPendente {
   golsTimeB: number | null;
   dataInicio: Date;
   status: string;
+  decididoEm?: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+  timeVencedorPenaltis?: 'A' | 'B' | null;
 }
 
 export async function buscarPartidasPendentes(): Promise<IPartidaPendente[]> {
@@ -33,6 +36,8 @@ export async function buscarPartidasPendentes(): Promise<IPartidaPendente[]> {
       golsTimeB: partidas.golsTimeB,
       dataInicio: partidas.dataInicio,
       status: partidas.status,
+      decididoEm: partidas.decididoEm,
+      timeVencedorPenaltis: partidas.timeVencedorPenaltis,
     })
     .from(partidas)
     .innerJoin(timeA, eq(partidas.timeAId, timeA.id))
@@ -40,16 +45,13 @@ export async function buscarPartidasPendentes(): Promise<IPartidaPendente[]> {
     .where(
       and(
         lte(partidas.dataInicio, agora),
-        or(
-          eq(partidas.status, 'EM_ANDAMENTO'),
-          eq(partidas.status, 'AGENDADO'),
-          eq(partidas.status, 'AGENDADA'),
-        ),
+        ne(partidas.status, 'FINALIZADO'),
+        ne(partidas.status, 'FINALIZADA'),
       ),
     )
     .orderBy(asc(partidas.dataInicio));
 
-  return rows;
+  return rows as IPartidaPendente[];
 }
 
 export async function atualizarResultado(
@@ -57,13 +59,17 @@ export async function atualizarResultado(
   golsA: number,
   golsB: number,
   status: string,
+  decididoEm?: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS',
+  timeVencedorPenaltis?: 'A' | 'B' | null,
 ): Promise<void> {
   await db
     .update(partidas)
     .set({
       golsTimeA: golsA,
       golsTimeB: golsB,
-      status: status as 'AGENDADO' | 'EM_ANDAMENTO' | 'FINALIZADO',
+      status: status as unknown as TPartidaStatus,
+      decididoEm: decididoEm ?? 'NORMAL',
+      timeVencedorPenaltis: timeVencedorPenaltis ?? null,
     })
     .where(eq(partidas.id, partidaId));
 }

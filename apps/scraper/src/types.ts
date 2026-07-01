@@ -11,7 +11,9 @@ export interface IScrapeEvent {
 export interface IScrapeResult {
   golsTimeA: number;
   golsTimeB: number;
-  status: 'AGENDADO' | 'EM_ANDAMENTO' | 'FINALIZADO';
+  status: string;
+  decididoEm?: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS';
+  timeVencedorPenaltis?: 'A' | 'B' | null;
   eventos?: IScrapeEvent[];
 }
 

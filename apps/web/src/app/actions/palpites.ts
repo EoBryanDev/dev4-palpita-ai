@@ -93,15 +93,15 @@ export async function salvarPalpite(
     // 5. Validar prazos
     const agora = new Date();
 
-    // Deadline per-match: 30 min antes desta partida
+    // Deadline per-match: 1 min antes desta partida
     const prazoPartida = new Date(
-      new Date(match[0].dataInicio).getTime() - 30 * 60 * 1000,
+      new Date(match[0].dataInicio).getTime() - 1 * 60 * 1000,
     );
     if (agora >= prazoPartida) {
       return {
         success: false,
         message:
-          'O prazo para palpitar nesta partida expirou (palpites fechados 30 minutos antes do início).',
+          'O prazo para palpitar nesta partida expirou (palpites fechados 1 minuto antes do início).',
       };
     }
 

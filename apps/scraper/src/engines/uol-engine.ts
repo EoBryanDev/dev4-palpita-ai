@@ -529,7 +529,7 @@ export class UolEngine implements IScraperEngine {
             );
           });
 
-          let status: 'AGENDADO' | 'EM_ANDAMENTO' | 'FINALIZADO' = 'AGENDADO';
+          let status = 'AGENDADO';
           if (
             hasFimDeJogo ||
             statusText.includes('encerrado') ||
@@ -541,11 +541,124 @@ export class UolEngine implements IScraperEngine {
             liveEl ||
             statusText.includes('º') ||
             statusText.includes('prorrogacao') ||
-            statusText.includes('pro')
+            statusText.includes('pro') ||
+            statusText.includes('intervalo') ||
+            statusText.includes('penal')
           ) {
-            status = 'EM_ANDAMENTO';
+            status = timeEl?.textContent?.trim() || 'EM_ANDAMENTO';
           } else {
             status = 'AGENDADO';
+          }
+
+          let decididoEm: 'NORMAL' | 'PRORROGACAO' | 'PENALTIS' = 'NORMAL';
+          let timeVencedorPenaltis: 'A' | 'B' | null = null;
+
+          if (status === 'FINALIZADO') {
+            const hasPenalties =
+              cards.some((card) => {
+                const txt = card.textContent?.toLowerCase() || '';
+                return (
+                  txt.includes('pênaltis') ||
+                  txt.includes('penaltis') ||
+                  txt.includes('disputa de pênalti') ||
+                  txt.includes('cobrança de pênalti')
+                );
+              }) ||
+              statusText.includes('penal') ||
+              statusText.includes('pên');
+
+            if (hasPenalties) {
+              decididoEm = 'PENALTIS';
+
+              const normA = tA.toLowerCase();
+              const normB = tB.toLowerCase();
+
+              for (const card of cards) {
+                const txt = card.textContent?.toLowerCase() || '';
+                if (txt.includes('pênal') || txt.includes('penal')) {
+                  if (
+                    txt.includes('vence') ||
+                    txt.includes('classific') ||
+                    txt.includes('ganhou') ||
+                    txt.includes('venceu') ||
+                    txt.includes('vencedor')
+                  ) {
+                    if (txt.includes(normA) && !txt.includes(normB)) {
+                      timeVencedorPenaltis = 'A';
+                      break;
+                    }
+                    if (txt.includes(normB) && !txt.includes(normA)) {
+                      timeVencedorPenaltis = 'B';
+                      break;
+                    }
+                    if (
+                      txt.includes(`${normA} vence`) ||
+                      txt.includes(`${normA} classific`) ||
+                      txt.includes(`${normA} ganha`)
+                    ) {
+                      timeVencedorPenaltis = 'A';
+                      break;
+                    }
+                    if (
+                      txt.includes(`${normB} vence`) ||
+                      txt.includes(`${normB} classific`) ||
+                      txt.includes(`${normB} ganha`)
+                    ) {
+                      timeVencedorPenaltis = 'B';
+                      break;
+                    }
+                  }
+                }
+              }
+
+              if (!timeVencedorPenaltis) {
+                const bodyTxt = (
+                  document.body?.textContent || ''
+                ).toLowerCase();
+                const matchA = bodyTxt.match(
+                  new RegExp(
+                    `${normA}\\s+(?:vence|classifica|ganha|bate)[^.]+pênal`,
+                    'i',
+                  ),
+                );
+                const matchB = bodyTxt.match(
+                  new RegExp(
+                    `${normB}\\s+(?:vence|classifica|ganha|bate)[^.]+pênal`,
+                    'i',
+                  ),
+                );
+                if (matchA && !matchB) {
+                  timeVencedorPenaltis = 'A';
+                } else if (matchB && !matchA) {
+                  timeVencedorPenaltis = 'B';
+                } else {
+                  const idxA = bodyTxt.indexOf(normA);
+                  const idxB = bodyTxt.indexOf(normB);
+                  const idxPen = bodyTxt.indexOf('pênal');
+                  if (idxPen !== -1 && idxA !== -1 && idxB !== -1) {
+                    const distA = Math.abs(idxA - idxPen);
+                    const distB = Math.abs(idxB - idxPen);
+                    timeVencedorPenaltis = distA < distB ? 'A' : 'B';
+                  }
+                }
+              }
+            } else {
+              const hasExtraTime =
+                cards.some((card) => {
+                  const txt = card.textContent?.toLowerCase() || '';
+                  return (
+                    txt.includes('prorrogação') ||
+                    txt.includes('prorrogacao') ||
+                    txt.includes('tempo extra')
+                  );
+                }) ||
+                statusText.includes('prorrogacao') ||
+                statusText.includes('pro');
+
+              if (hasExtraTime) {
+                decididoEm = 'PRORROGACAO';
+              }
+            }
           }
 
           // 3. Extração dos eventos estruturados do minuto a minuto
@@ -737,6 +850,8 @@ export class UolEngine implements IScraperEngine {
             golsTimeA,
             golsTimeB,
             status,
+            decididoEm,
+            timeVencedorPenaltis,
             eventos: rawEvents,
           };
         },
@@ -790,6 +905,8 @@ export class UolEngine implements IScraperEngine {
         golsTimeA: finalGolsA,
         golsTimeB: finalGolsB,
         status: result.status,
+        decididoEm: result.decididoEm,
+        timeVencedorPenaltis: result.timeVencedorPenaltis,
         eventos: result.eventos?.map((evt) => {
           const jogador =
             evt.tipo === 'SUBSTITUICAO' ||

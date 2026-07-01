@@ -65,6 +65,8 @@ describe('SyncService', () => {
       2,
       1,
       'FINALIZADO',
+      undefined,
+      undefined,
     );
 
     console.log = originalLog;

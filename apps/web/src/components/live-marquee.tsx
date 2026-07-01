@@ -35,7 +35,11 @@ export function LiveMarquee({
         const result = await obterEventosTimeline();
         if (!result.success) return;
         const live = result.eventos.filter(
-          (m) => m.status === 'EM_ANDAMENTO' || m.status === 'INICIADO',
+          (m) =>
+            m.status !== 'FINALIZADO' &&
+            m.status !== 'FINALIZADA' &&
+            m.status !== 'AGENDADO' &&
+            m.status !== 'AGENDADA',
         );
         setMatches(live);
       } catch {
