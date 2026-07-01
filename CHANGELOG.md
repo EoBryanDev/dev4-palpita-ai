@@ -1,3 +1,10 @@
+## [1.21.3](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.21.2...v1.21.3) (2026-07-01)
+
+
+### Bug Fixes
+
+* **web:** correct third-placed team slot mapping for R32 matchups EOB-191 ([2fe1c50](https://github.com/EoBryanDev/dev4-palpita-ai/commit/2fe1c509712825af843d99555136e1783dc88d48))
+
 ## [1.21.2](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.21.1...v1.21.2) (2026-07-01)
 
 
