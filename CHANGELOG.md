@@ -1,3 +1,10 @@
+## [1.21.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.21.0...v1.21.1) (2026-07-01)
+
+
+### Bug Fixes
+
+* adjust prediction deadline, scraper live period, shootout details, bracket advancement and timezone EOB-191 ([3188e56](https://github.com/EoBryanDev/dev4-palpita-ai/commit/3188e56dfd553cc9d1b4b2319e7ee9023cd787ee))
+
 # [1.21.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.20.1...v1.21.0) (2026-06-28)
 
 
