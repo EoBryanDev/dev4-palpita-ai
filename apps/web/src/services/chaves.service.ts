@@ -569,50 +569,50 @@ export async function obterGruposClassificados(): Promise<{
   const oitavasList = [
     criarSubsequenteMatch(
       'Jogo 89 (O1)',
-      'Jogo 74',
-      'Jogo 77',
+      'Jogo 75',
+      'Jogo 78',
       '04/Jul - 13:00',
     ),
     criarSubsequenteMatch(
       'Jogo 90 (O2)',
       'Jogo 73',
-      'Jogo 75',
+      'Jogo 76',
       '04/Jul - 17:00',
     ),
     criarSubsequenteMatch(
       'Jogo 91 (O3)',
-      'Jogo 76',
-      'Jogo 78',
+      'Jogo 84',
+      'Jogo 83',
       '05/Jul - 13:00',
     ),
     criarSubsequenteMatch(
       'Jogo 92 (O4)',
-      'Jogo 79',
-      'Jogo 80',
+      'Jogo 82',
+      'Jogo 81',
       '05/Jul - 17:00',
     ),
     criarSubsequenteMatch(
       'Jogo 93 (O5)',
-      'Jogo 83',
-      'Jogo 84',
+      'Jogo 74',
+      'Jogo 77',
       '06/Jul - 13:00',
     ),
     criarSubsequenteMatch(
       'Jogo 94 (O6)',
-      'Jogo 81',
-      'Jogo 82',
+      'Jogo 79',
+      'Jogo 80',
       '06/Jul - 17:00',
     ),
     criarSubsequenteMatch(
       'Jogo 95 (O7)',
+      'Jogo 87',
       'Jogo 86',
-      'Jogo 88',
       '07/Jul - 13:00',
     ),
     criarSubsequenteMatch(
       'Jogo 96 (O8)',
       'Jogo 85',
-      'Jogo 87',
+      'Jogo 88',
       '07/Jul - 17:00',
     ),
   ];
@@ -677,8 +677,8 @@ export async function obterGruposClassificados(): Promise<{
 
   const quartasList = [
     criarQuartasMatch('Jogo 97 (Q1)', 'Jogo 89', 'Jogo 90', '09/Jul - 13:00'),
-    criarQuartasMatch('Jogo 98 (Q2)', 'Jogo 93', 'Jogo 94', '10/Jul - 17:00'),
-    criarQuartasMatch('Jogo 99 (Q3)', 'Jogo 91', 'Jogo 92', '11/Jul - 13:00'),
+    criarQuartasMatch('Jogo 98 (Q2)', 'Jogo 91', 'Jogo 92', '10/Jul - 17:00'),
+    criarQuartasMatch('Jogo 99 (Q3)', 'Jogo 93', 'Jogo 94', '11/Jul - 13:00'),
     criarQuartasMatch('Jogo 100 (Q4)', 'Jogo 95', 'Jogo 96', '12/Jul - 17:00'),
   ];
 
