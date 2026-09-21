@@ -44,7 +44,7 @@ COPY --from=pruner /pruned-db/node_modules ./node_modules
 # drizzle-kit/dotenv são devDeps (prune --prod remove): instala num prefixo
 # isolado (npm não entende a árvore symlinked do pnpm, então nada de
 # instalar dentro de /migrate/node_modules).
-RUN npm install --prefix /opt/migrator-tools --no-save --no-audit --no-fund --no-package-lock drizzle-kit@0.22.7 dotenv@16.4.5
+RUN npm install --prefix /opt/migrator-tools --no-save --no-audit --no-fund --no-package-lock drizzle-kit@0.22.8 dotenv@16.4.5
 ENV NODE_PATH=/opt/migrator-tools/node_modules
 COPY --from=pruner /app/packages/db/drizzle.config.ts ./drizzle.config.ts
 COPY --from=pruner /app/packages/db/migrations ./migrations
