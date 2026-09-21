@@ -1,3 +1,15 @@
+# [1.22.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.21.3...v1.22.0) (2026-09-21)
+
+
+### Bug Fixes
+
+* **web:** isolated npm prefix for migrator tools ([3bdb465](https://github.com/EoBryanDev/dev4-palpita-ai/commit/3bdb465aa79a313d5d3dc4eb6f11b41c0f764509))
+
+
+### Features
+
+* **web:** self-host dockerfile with standalone output and ghcr deploy pipeline ([aa365d7](https://github.com/EoBryanDev/dev4-palpita-ai/commit/aa365d7cc52b083a537c3a230a5c9e749479543f))
+
 ## [1.21.3](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.21.2...v1.21.3) (2026-07-01)
 
 
