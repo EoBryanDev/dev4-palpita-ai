@@ -15,6 +15,10 @@ const cspHeader = `
 `;
 
 const nextConfig: NextConfig = {
+  // Self-host (K8s): gera .next/standalone com server.js + deps mínimas.
+  // Vercel ignora este campo (usa o próprio runtime), então o deploy atual
+  // continua intacto.
+  output: 'standalone',
   async headers() {
     return [
       {
