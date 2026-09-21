@@ -35,17 +35,14 @@ EXPOSE 3000
 CMD ["node", "apps/web/server.js"]
 
 # ---- migrator: drizzle-kit migrate (usado pelo Job pre-deploy) ----
-# drizzle-kit/dotenv são devDeps (prune --prod remove): instala local.
+# ---- migrator: aplica migrations com o próprio drizzle-orm do app ----
+# (drizzle-kit 0.22.x exige orm mais novo que o 0.31.x do app; via orm não
+# há mismatch possível). Roda: DATABASE_URL=... node migrate.prod.mjs
 FROM node:20-bookworm-slim AS migrator
 WORKDIR /migrate
 ENV NODE_ENV=production
 COPY --from=pruner /pruned-db/package.json ./package.json
 COPY --from=pruner /pruned-db/node_modules ./node_modules
-# drizzle-kit/dotenv são devDeps (prune --prod remove): instala num prefixo
-# isolado (npm não entende a árvore symlinked do pnpm, então nada de
-# instalar dentro de /migrate/node_modules).
-RUN npm install --prefix /opt/migrator-tools --no-save --no-audit --no-fund --no-package-lock drizzle-kit@0.22.8 dotenv@16.4.5
-ENV NODE_PATH=/opt/migrator-tools/node_modules
-COPY --from=pruner /app/packages/db/drizzle.config.ts ./drizzle.config.ts
 COPY --from=pruner /app/packages/db/migrations ./migrations
-CMD ["/opt/migrator-tools/node_modules/.bin/drizzle-kit", "migrate"]
+COPY --from=pruner /app/packages/db/migrate.prod.mjs ./migrate.prod.mjs
+CMD ["node", "migrate.prod.mjs"]

@@ -1,83 +1,83 @@
 {
-  "version": "7",
-  "dialect": "postgresql",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "7",
-      "when": 1780456818401,
-      "tag": "0000_nervous_randall_flagg",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1780526331850,
-      "tag": "0001_icy_rockslide",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1781300162948,
-      "tag": "0002_add_comentarios",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1782100000000,
-      "tag": "0003_add_ultimo_login_at",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1781575540552,
-      "tag": "0004_add_data_liberacao",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1782100800000,
-      "tag": "0005_add_eventos_partida",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1782100900000,
-      "tag": "0006_add_feedbacks",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1782101000000,
-      "tag": "0007_add_admin_response_to_feedbacks",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1782101100000,
-      "tag": "0008_add_idioma_to_times",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1782101200000,
-      "tag": "0009_add_mata_mata_columns",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "7",
-      "when": 1739124000000,
-      "tag": "0010_add_penaltis_columns",
-      "breakpoints": true
-    }
-  ]
+	"version": "7",
+	"dialect": "postgresql",
+	"entries": [
+		{
+			"idx": 0,
+			"version": "7",
+			"when": 1781577005500,
+			"tag": "0000_nervous_randall_flagg",
+			"breakpoints": true
+		},
+		{
+			"idx": 1,
+			"version": "7",
+			"when": 1781577005501,
+			"tag": "0001_icy_rockslide",
+			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "7",
+			"when": 1781577005502,
+			"tag": "0002_add_comentarios",
+			"breakpoints": true
+		},
+		{
+			"idx": 3,
+			"version": "7",
+			"when": 1781577005503,
+			"tag": "0003_add_ultimo_login_at",
+			"breakpoints": true
+		},
+		{
+			"idx": 4,
+			"version": "7",
+			"when": 1781577005504,
+			"tag": "0004_add_data_liberacao",
+			"breakpoints": true
+		},
+		{
+			"idx": 5,
+			"version": "7",
+			"when": 1781577005505,
+			"tag": "0005_add_eventos_partida",
+			"breakpoints": true
+		},
+		{
+			"idx": 6,
+			"version": "7",
+			"when": 1781577005506,
+			"tag": "0006_add_feedbacks",
+			"breakpoints": true
+		},
+		{
+			"idx": 7,
+			"version": "7",
+			"when": 1781577005507,
+			"tag": "0007_add_admin_response_to_feedbacks",
+			"breakpoints": true
+		},
+		{
+			"idx": 8,
+			"version": "7",
+			"when": 1781577005508,
+			"tag": "0008_add_idioma_to_times",
+			"breakpoints": true
+		},
+		{
+			"idx": 9,
+			"version": "7",
+			"when": 1781577005509,
+			"tag": "0009_add_mata_mata_columns",
+			"breakpoints": true
+		},
+		{
+			"idx": 10,
+			"version": "7",
+			"when": 1781577005510,
+			"tag": "0010_add_penaltis_columns",
+			"breakpoints": true
+		}
+	]
 }
