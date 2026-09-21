@@ -41,7 +41,11 @@ WORKDIR /migrate
 ENV NODE_ENV=production
 COPY --from=pruner /pruned-db/package.json ./package.json
 COPY --from=pruner /pruned-db/node_modules ./node_modules
-RUN npm install --no-save --no-audit --no-fund drizzle-kit@0.22.7 dotenv@16.4.5
+# drizzle-kit/dotenv são devDeps (prune --prod remove): instala num prefixo
+# isolado (npm não entende a árvore symlinked do pnpm, então nada de
+# instalar dentro de /migrate/node_modules).
+RUN npm install --prefix /opt/migrator-tools --no-save --no-audit --no-fund --no-package-lock drizzle-kit@0.22.7 dotenv@16.4.5
+ENV NODE_PATH=/opt/migrator-tools/node_modules
 COPY --from=pruner /app/packages/db/drizzle.config.ts ./drizzle.config.ts
 COPY --from=pruner /app/packages/db/migrations ./migrations
-CMD ["./node_modules/.bin/drizzle-kit", "migrate"]
+CMD ["/opt/migrator-tools/node_modules/.bin/drizzle-kit", "migrate"]
