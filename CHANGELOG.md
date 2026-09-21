@@ -1,3 +1,10 @@
+## [1.22.2](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.22.1...v1.22.2) (2026-09-21)
+
+
+### Bug Fixes
+
+* **db:** baseline migration journal and orm-based prod migrator ([849a231](https://github.com/EoBryanDev/dev4-palpita-ai/commit/849a23137b25253dbdeaf01157fc18de9eddd713))
+
 ## [1.22.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.22.0...v1.22.1) (2026-09-21)
 
 
