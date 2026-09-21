@@ -1,3 +1,10 @@
+## [1.22.1](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.22.0...v1.22.1) (2026-09-21)
+
+
+### Bug Fixes
+
+* **web:** pin drizzle-kit to lockfile version ([b3c48cc](https://github.com/EoBryanDev/dev4-palpita-ai/commit/b3c48cc82093c13cf7734fb32a499e33bb2a3740))
+
 # [1.22.0](https://github.com/EoBryanDev/dev4-palpita-ai/compare/v1.21.3...v1.22.0) (2026-09-21)
 
 
